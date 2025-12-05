@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Главная – Фейк‑детектор{% endblock %}
+{% block content %}
+<h1>Добро пожаловать!</h1>
+<p>Проверьте, действительно ли это фейковая новость.</p>
+<a href="{{ url_for('train', step=0) }}">
+  <button>Начать тренировку</button>
+</a>
+{% endblock %}
+{% set show_footer = False %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Меню{% endblock %}
+{% block content %}
+<h2>Меню администратора</h2>
+
+<div class="admin-btns">
+    <a href="{{ url_for('add_message') }}" class="btn">Создать сообщение</a>
+    <a href="{{ url_for('admin_list') }}" class="btn">Список сообщений</a>
+    <!--<a href="{{ url_for('logout') }}" class="btn">Выйти из админки</a>-->
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}Фейк‑детектор{% endblock %}</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">{{ messages[0] }}</div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  {# Footer – видим только если явно не отключено #}
+  {% if show_footer|default(true) %}
+  <footer><a href="{{ url_for('index') }}">Главная</a></footer>
+  {% endif %}
+</div>
+</body>
+</html>

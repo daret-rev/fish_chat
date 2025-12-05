@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Список сообщений{% endblock %}
+{% block content %}
+<h2>Список всех сообщений</h2>
+
+<table border="1" cellpadding="5">
+  <tr>
+    <th>ID</th><th>Текст</th><th>Правильный ответ</th><th>Действия</th>
+  </tr>
+  {% for m in messages %}
+  <tr>
+    <td>{{ m.id }}</td>
+    <td>{{ m.text[:50] }}{% if m.text|length > 50 %}…{% endif %}</td>
+    <td>{% if m.correct %}Фейк{% else %}Нормальная{% endif %}</td>
+    <td>
+      <!-- компактные кнопки в одном ряду -->
+      <div class="actions">
+          <a href="{{ url_for('edit_message', msg_id=m.id) }}"
+             class="btn btn-action">Редактировать</a>
+
+          <span class="action-divider">/</span>
+
+          <form action="{{ url_for('delete_message', msg_id=m.id) }}"
+                method="post" style="display:inline;">
+              <button type="submit"
+                      onclick="return confirm('Удалить?')"
+                      class="btn btn-action">Удалить</button>
+          </form>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><a href="{{ url_for('add_message') }}" class="btn">Добавить новое сообщение</a></p>
+<p><a href="{{ url_for('admin') }}" class="btn">← Главное меню админа</a></p>
+{% endblock %}
+{% set show_footer = False %}

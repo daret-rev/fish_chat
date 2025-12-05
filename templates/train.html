@@ -1,0 +1,35 @@
+We need replace form section with new buttons and include message.text paragraph. Also keep other parts unchanged.```jinja
+{% extends 'base.html' %}
+{% block title %}Тренировка – Шаг {{ step + 1 }}{% endblock %}
+
+{% block content %}
+<h2>Шаг {{ step + 1 }} из {{ total }}</h2>
+
+<div class="chat-box">
+  <div class="message"><strong>Модератор:</strong> {{ message.text }}</div>
+</div> {# закрываем chat‑box #}
+<p><strong>Опыт:</strong> {{ experience }}
+  {% if exp_change %}
+      <span class="{{ 'exp-positive' if exp_change > 0 else 'exp-negative' }}">
+            {% if exp_change > 0 %}+{% endif %}{{ exp_change }}
+        </span>
+  {% endif %}
+</p>
+
+{% if explanation %}
+  <p><em>{{ explanation }}</em></p>
+  {% if next_step is not none and next_step < total %}
+    <a href="{{ url_for('train', step=next_step) }}"><button>Далее →</button></a>
+  {% elif next_step == total %}
+    <p>Тренировка завершена! <a href="{{ url_for('index') }}">Вернуться в главное меню</a></p>
+  {% endif %}
+{% else %}
+<form method="post">
+  <p>{{ message.text }}</p>
+  <button type="submit" name="answer" value="yes">Да</button>
+  <button type="submit" name="answer" value="no">Нет</button>
+  <button type="submit" name="answer" value="finish">Завершить тренировку</button>
+</form>
+{% endif %}
+{% endblock %}
+{% set show_footer = False %}

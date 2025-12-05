@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Результаты тренировки</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Тренировка завершена!</h1>
+    <p>Вы прошли {{ total }} сообщений.</p>
+        <p>Верных ответов: {{ correct_count }}</p>
+    <p>Общий опыт: {{ experience }}</p>
+
+    <!-- Новые элементы -->
+    <p>Ваш опыт: {{ experience }}</p>
+    <form action="{{ url_for('reset_experience') }}" method="get">
+        <button type="submit">Выйти из тренировки</button>
+    </form>
+</body>
+</html>
+{% set show_footer = False %}
