@@ -4,14 +4,16 @@ from flask import (
     redirect, url_for, session, flash
 )
 from flask_sqlalchemy import SQLAlchemy
-
+import model
+import inspect
+import json
 # ------------------------------------------------------------------
 # Инициализация приложения и БД
 # ------------------------------------------------------------------
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.secret_key = 'super-secret-key'           # поменяйте на свой
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "app.db")}'
+app.secret_key = 'super_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "test.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -20,13 +22,13 @@ db = SQLAlchemy(app)
 # Модель: сообщение + правильный ответ + комментарии
 # ------------------------------------------------------------------
 class Message(db.Model):
-    id          = db.Column(db.Integer, primary_key=True)
-    text        = db.Column(db.Text, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
 
     # --- новые поля ---
-    correct     = db.Column(db.Boolean, nullable=False)   # True → «Фейк», False → «Нормальная»
-    price_correct = db.Column(db.Float, default=0.0)      # опыт за правильный ответ
-    price_wrong   = db.Column(db.Float, default=0.0)      # опыт за неправильный ответ
+    correct     = db.Column(db.Boolean, nullable=False)
+    price_correct = db.Column(db.Float, default=0.0) 
+    price_wrong   = db.Column(db.Float, default=0.0)
 
     comment_yes = db.Column(db.Text, nullable=True)
     comment_no  = db.Column(db.Text, nullable=True)
@@ -34,7 +36,16 @@ class Message(db.Model):
     def __repr__(self):
         return f'<Message {self.id}>'
 
+def check_arg(func):
+    sign = inspect.signature(func)
 
+    def wrap(*args, **kwargs):
+        try:
+            bound = sign.bind_partial(*args, **kwargs)
+        except:
+            pass
+    
+    return wrap
 
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
@@ -50,10 +61,34 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+@app.route('/check')
+def check():
+    return render_template('check.html')
 
-# ------------------------------------------------------------------
-# Тренировка: шаг N (N = 0…len(messages)-1)
-# ------------------------------------------------------------------
+@app.route('/check_massege', methods=['POST'])
+def check_massege():
+    # Fix form field name: use 'msg' instead of 'message'
+    msg = request.form.get('msg')
+
+    resp_json = model.check_message(msg)
+
+    data = json.loads(resp_json)
+
+    text = data['text']
+    status = data['status']
+    certainty = data['certainty']
+    comment = data['comment']
+
+    return render_template('check_result.html',
+                       text=text,
+                       status=status,
+                       certainty=certainty,
+                       comment=comment
+                       )
+
+# ------------------------------------------------------------------------
+# Тренировка
+# ------------------------------------------------------------------------
 @app.route('/train/<int:step>', methods=['GET', 'POST'])
 def train(step):
     if step == 0:
@@ -70,7 +105,7 @@ def train(step):
     session.setdefault('experience', 0)
 
     if request.method == 'POST':
-        answer = request.form.get('answer')          # 'yes' или 'no'
+        answer = request.form.get('answer')
 
         if answer == 'finish':
             correct_count = sum(
@@ -115,20 +150,8 @@ def train(step):
                 total=len(messages),
                 correct_count=correct_count
             )
-        '''
-        if answer == 'finish':
-            correct_count = sum(1 for m in messages if session.get('answers', {}).get(str(m.id)) == ('yes' if m.correct else 'no'))
-            exp = session.get('experience', 0)
 
-            session['experience'] = 0
-            return render_template(
-                'results.html',
-                experience=exp,
-                total=len(messages),
-                correct_count=correct_count
-            )
-        '''
-        return redirect(url_for('train', step=next_step))   # ← **к следующему шагу**
+        return redirect(url_for('train', step=next_step)) 
 
     # При GET‑запросе читаем данные из сессии (если они есть)
     explanation   = session.pop('explanation', None)
@@ -151,9 +174,9 @@ def train(step):
 def reset_experience():
     session['experience'] = 0
     return redirect(url_for('index'))
-# ------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Админка – защита паролем (простейший вариант)
-# ------------------------------------------------------------------
+# ------------------------------------------------------------------------
 @app.route('/admin')
 def admin():
     # Если пользователь не авторизован – показываем форму входа
@@ -265,7 +288,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-# ------------------------------------------------------------------
+#?----------------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 

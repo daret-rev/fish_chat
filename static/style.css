@@ -51,3 +51,12 @@ a.btn {
 /* static/style.css */
 .exp-positive { color: green; }
 .exp-negative { color: red; }
+.vertical-form {
+  display: flex;
+  flex-direction: column;   /* вертикальная компоновка */
+  gap: 8px;                  /* расстояние между элементами */
+}
+
+.vertical-form textarea {
+  resize: vertical;          /* позволяет менять высоту, если нужно */
+}

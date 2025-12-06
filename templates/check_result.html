@@ -1,0 +1,29 @@
+<!-- templates/check_result.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Результат проверки сообщения
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<h2>Результаты проверки</h2>
+
+<div class="result-container">
+
+    <div class="message"> {{ text }}</div>
+
+    <p><strong>Статус:</strong> {{ status }}</p>
+
+    <p><strong>Уверенность программы:</strong> {{ certainty }}</p>
+
+    {% if comment %}
+        <div class="comment-box">
+            <strong>Комментарий:</strong>
+            <p>{{ comment }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

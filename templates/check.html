@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Проверка сообщений{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<h2>Проверьте сообщение, в котором сомневаетесь</h2>
+
+<form method="post" action="{{ url_for('check_massege') }}">
+  <div class="vertical-form">
+    <label>Ваше сообщение</label>
+    <textarea 
+      id="message" 
+      name="msg" 
+      rows="15" 
+      cols="25" 
+      placeholder="Текст"
+    ></textarea>
+    <button type="submit" disabled>Проверить</button>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('message');
+    const button = document.querySelector('button[type="submit"]');
+
+    textarea.addEventListener('input', function() {
+        const text = this.value.trim();
+        button.disabled = text === '';
+    });
+});
+</script>
+{% endblock %}
+{% set show_footer = False %}
+
