@@ -72,6 +72,7 @@ def check_massege():
 
     resp_json = model.check_message(msg)
 
+    print(resp_json)
     data = json.loads(resp_json)
 
     text = data['text']
@@ -288,7 +289,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-#?----------------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 

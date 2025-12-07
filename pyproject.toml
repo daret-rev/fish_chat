@@ -1,0 +1,11 @@
+[project]
+name = "fish-chat"
+version = "0.1.0"
+description = "Фейк-детектор"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask>=2.0.0",
+    "Flask-SQLAlchemy>=3.0.0",
+    "openai>=1.0.0"
+]
