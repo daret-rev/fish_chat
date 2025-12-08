@@ -3,10 +3,10 @@
 {% block content %}
 <h1>Добро пожаловать!</h1>
 <p>Проверьте, действительно ли это фейковая новость.</p>
-<a href="{{ url_for('train', step=0) }}">
+<a href="{{ url_for('train_preview') }}">
   <button>Начать тренировку</button>
 </a>
-<a href="{{ url_for('check')}}">
+<a href="{{ url_for('check_preview')}}">
   <button>Проверить сообщение</button>
 </a>
 {% endblock %}

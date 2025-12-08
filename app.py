@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 import model
 import inspect
 import json
+import random
 # ------------------------------------------------------------------
 # Инициализация приложения и БД
 # ------------------------------------------------------------------
@@ -61,6 +62,13 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+# ------------------------------------------------------------------
+# Проверка сообщений
+# ------------------------------------------------------------------
+@app.route('/check_preview')
+def check_preview():
+    return render_template('check_preview.html')
+
 @app.route('/check')
 def check():
     return render_template('check.html')
@@ -110,6 +118,10 @@ def check_massege():
 # ------------------------------------------------------------------------
 # Тренировка
 # ------------------------------------------------------------------------
+@app.route('/train_preview')
+def train_preview():
+    return render_template('train_preview.html')
+
 @app.route('/train/<int:step>', methods=['GET', 'POST'])
 def train(step):
     if step == 0:
@@ -117,7 +129,14 @@ def train(step):
         session['experience'] = 0
         session.pop('explanation', None)
         session.pop('exp_change', None)
-    messages = Message.query.order_by(Message.id).all()
+    
+    all_messages = Message.query.all()
+    if 'shuffled_ids' not in session:
+        shuffled_ids = [m.id for m in all_messages]
+        random.shuffle(shuffled_ids)
+        session['shuffled_ids'] = shuffled_ids
+    messages = [Message.query.get(mid) for mid in session['shuffled_ids']]
+
     if not messages:
         flash('Нет сообщений в базе. Добавьте их через /admin')
         return redirect(url_for('index'))

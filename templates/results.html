@@ -12,7 +12,7 @@
     
 
     <!-- Новые элементы -->
-    <p>Ваш опыт: {{ experience }}</p>
+    <p>Ваш опыт: {{ experience|round(3) }}</p>
     <form action="{{ url_for('reset_experience') }}" method="get">
         <button type="submit">Выйти из тренировки</button>
     </form>

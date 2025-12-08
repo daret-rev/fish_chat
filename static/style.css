@@ -60,3 +60,8 @@ a.btn {
 .vertical-form textarea {
   resize: vertical;          /* позволяет менять высоту, если нужно */
 }
+.button-container {
+  display: flex;
+  justify-content: center; /* Центрируем кнопки */
+  gap: 20px; /* Расстояние между кнопками */
+}

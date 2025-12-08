@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Проверка сообщений
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Проверка сообщений и получение советов</h1>
+
+        <section>
+            <h2>Что вас ждёт</h2>
+            <p>Наш умный бот-помощник проанализирует ваши сообщения:</p>
+            <ul>
+                <li>С обычной почты</li>
+                <li>С электронной почты</li>
+                <li>SMS-сообщения</li>
+                <li>сообщения с веб-сайтах</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Для чего это нужно</h2>
+            <p>Бот поможет определить, опасны сообщения или нет, и даст советы.</p>
+        </section>
+
+        <section>
+            <h2>Система оценки</h2>
+            <ul>
+                <li><span class="highlight">FAKE</span> — бот думает, что это сообщение опасно</li>
+                <li><span class="highlight">REAL</span> — бот считает, что сообщение безопасно</li>
+            </ul>
+        </section>
+
+        <div class="metric">
+            <h3>Важно</h3>
+            <p>Вместе с решением бот сообщает свою уверенность в нем</p>
+            <ul>
+                <li>50 - 75 недостаточно уверен</li>
+                <li>75 - 100 достаточно уверен</li>
+            </ul>
+        </div>
+
+        <section>
+            <h2>Совет</h2>
+            <p>Используйте бота, если сомневаетесь, но в первую очередь, нужно уметь анализировать ситуацию самостоятельно</p>
+        </section>
+
+        <div class="button-container">
+            <a href="{{ url_for('check') }}">
+                <button class="start-btn">Проверить сообщение</button>
+            </a>
+            <a href="{{ url_for('index') }}">
+                <button class="home-btn">Назад</button>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+{% set show_footer = False %}
+
