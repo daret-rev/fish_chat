@@ -1,7 +1,7 @@
 import os
 from flask import (
     Flask, render_template, request,
-    redirect, url_for, session, flash
+    redirect, url_for, session, flash, jsonify
 )
 from flask_sqlalchemy import SQLAlchemy
 import model
@@ -67,26 +67,46 @@ def check():
 
 @app.route('/check_massege', methods=['POST'])
 def check_massege():
-    # Fix form field name: use 'msg' instead of 'message'
+    # Получаем данные из формы
     msg = request.form.get('msg')
-
-    resp_json = model.check_message(msg)
-
-    print(resp_json)
-    data = json.loads(resp_json)
-
-    text = data['text']
-    status = data['status']
-    certainty = data['certainty']
-    comment = data['comment']
-
-    return render_template('check_result.html',
-                       text=text,
-                       status=status,
-                       certainty=certainty,
-                       comment=comment
-                       )
-
+    
+    if not msg:
+        return jsonify({'error': 'Message is required'}), 400
+    
+    try:
+        # Получаем ответ от модели
+        resp_json = model.check_message(msg)
+        
+        # Проверяем, что ответ не пустой
+        if not resp_json:
+            return jsonify({'error': 'Empty response from model'}), 500
+        
+        # Парсим JSON с обработкой ошибок
+        try:
+            data = json.loads(resp_json)
+        except json.JSONDecodeError:
+            return jsonify({'error': 'Invalid JSON response from model'}), 500
+        
+        # Проверяем наличие необходимых полей
+        required_fields = ['text', 'status', 'certainty', 'comment']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'Missing required fields in response'}), 500
+        
+        # Извлекаем данные
+        text = data['text']
+        status = data['status']
+        certainty = data['certainty']
+        comment = data['comment']
+        
+        # Возвращаем шаблон
+        return render_template('check_result.html',
+                              text=text,
+                              status=status,
+                              certainty=certainty,
+                              comment=comment)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 # ------------------------------------------------------------------------
 # Тренировка
 # ------------------------------------------------------------------------

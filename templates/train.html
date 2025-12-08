@@ -6,7 +6,7 @@ We need replace form section with new buttons and include message.text paragraph
 <h2>Шаг {{ step + 1 }} из {{ total }}</h2>
 
 <div class="chat-box">
-  <div class="message"><strong>Модератор:</strong> {{ message.text }}</div>
+  <div class="message"><strong>Сообщение:</strong> {{ message.text }}</div>
 </div> {# закрываем chat‑box #}
 <p><strong>Опыт:</strong> {{ experience }}
   {% if exp_change %}
@@ -25,7 +25,7 @@ We need replace form section with new buttons and include message.text paragraph
   {% endif %}
 {% else %}
 <form method="post">
-  <p>{{ message.text }}</p>
+  <p>Как вы считаете, это мошенники или нет?</p>
   <button type="submit" name="answer" value="yes">Да</button>
   <button type="submit" name="answer" value="no">Нет</button>
   <button type="submit" name="answer" value="finish">Завершить тренировку</button>

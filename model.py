@@ -100,6 +100,7 @@ def check_message(msg):
         output = analyze_text(msg)
         return(json.dumps(output, ensure_ascii=False, indent=2))
     except Exception:
+        
         print(f"❌ Ошибка: {Exception}")
 
 #check_message("Срочно! На вашем счете замечена подозрительная активность. Для предотвращения риска, просим перевести средства по номеру 9XXXXXXXXXX. С уважением, служба безопасности БАНКА")
