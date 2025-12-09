@@ -5,7 +5,6 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 import model
-import inspect
 import json
 import random
 # ------------------------------------------------------------------
@@ -14,7 +13,7 @@ import random
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "test.db")}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "app.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -36,17 +35,6 @@ class Message(db.Model):
 
     def __repr__(self):
         return f'<Message {self.id}>'
-
-def check_arg(func):
-    sign = inspect.signature(func)
-
-    def wrap(*args, **kwargs):
-        try:
-            bound = sign.bind_partial(*args, **kwargs)
-        except:
-            pass
-    
-    return wrap
 
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
@@ -156,6 +144,7 @@ def train(step):
             return render_template(
                 'results.html',
                 experience=exp_before_reset,
+                step=step,
                 total=len(messages),
                 correct_count=correct_count
             )
@@ -329,8 +318,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-
+    app.run(debug=False, host='0.0.0.0', port=5000)
 
