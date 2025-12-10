@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     build:
@@ -13,7 +15,6 @@ services:
       API_KEY: lmstudio
       MODEL_ID: openai/gpt-oss-20b
       BASE_URL: http://192.168.3.8:1234/v1 
-      SQLALCHEMY_DATABASE_URI: sqlite:////app/data/app.db
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:192.168.3.8"
@@ -24,7 +25,6 @@ services:
         max-file: "3"
     volumes:
       - .:/app
-      - db-data:/app/db-data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
@@ -37,6 +37,3 @@ networks:
   default:
     name: fish-chat-network
     driver: bridge
-
-volumes:  # Добавьте эту секцию
-  db-data:
