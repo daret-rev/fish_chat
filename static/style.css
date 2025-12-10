@@ -54,7 +54,6 @@ a.btn {
   flex-direction: column;   /* вертикальная компоновка */
   gap: 8px;                  /* расстояние между элементами */
 }
-
 .vertical-form textarea {
   resize: vertical;          /* позволяет менять высоту, если нужно */
 }

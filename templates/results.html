@@ -7,7 +7,7 @@
     <p>Вы прошли {{ step }} сообщений.</p>
         <p>Верных ответов: {{ correct_count }}</p>
 
-    <p>Ваш опыт: {{ experience|round(3) }}</p>
+    <p>Ваш опыт: {{ experience|int }}</p>
     <form action="{{ url_for('reset_experience') }}" method="get">
         <button type="submit">Выйти из тренировки</button>
     </form>
