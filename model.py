@@ -1,8 +1,9 @@
 import json
 import openai
+import os
 
 
-BASE_URL = "http://192.168.3.8:1234/v1"
+BASE_URL = os.environ.get('BASE_URL', None)
 API_KEY = "lmstudio"
 MODEL_ID = "openai/gpt-oss-20b"
 

@@ -26,7 +26,6 @@ EXPOSE 5000
 EXPOSE 1234
 
 # Устанавливаем переменные окружения
-ENV BASE_URL="http://192.168.3.8:1234/v1"
 ENV API_KEY="lmstudio"
 ENV MODEL_ID="openai/gpt-oss-20b"
 
