@@ -1,13 +1,36 @@
 {% extends 'base.html' %}
+
 {% block title %}Главная – Фейк‑детектор{% endblock %}
+
 {% block content %}
-<h1>Добро пожаловать!</h1>
-<p>Проверьте, действительно ли это фейковая новость.</p>
-<a href="{{ url_for('train', step=0) }}">
-  <button>Начать тренировку</button>
-</a>
-<a href="{{ url_for('check')}}">
-  <button>Проверить сообщение</button>
-</a>
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Добро пожаловать в Фейк‑детектор!</h1>
+            
+            <div class="hero-description">
+                <p>На нашем сайте вы можете:</p>
+                <ul class="feature-list">
+                    <li>Проверить свои навыки распознавания мошенничества</li>
+                    <li>Получить рекомендации по реагированию на сообщения</li>
+                </ul>
+            </div>
+            
+            <p class="hero-subtitle">Узнайте, действительно ли это фейковая новость</p>
+            
+            <div class="button-container">
+                <a href="{{ url_for('train_preview') }}">
+                    <button class="primary-button">Начать тренировку</button>
+                </a>
+                
+                <a href="{{ url_for('check_preview')}}">
+                    <button class="secondary-button">Проверить сообщение</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
+
 {% set show_footer = False %}

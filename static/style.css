@@ -8,7 +8,7 @@ button:hover{background:#0056b3}
 footer{margin-top:20px;text-align:center}
 .flash{color:red;font-weight:bold}
 /* -------------------------------------------------------------
-   Общие стили кнопок (используются и на главном меню, и в админке)
+   Общие стили кнопок (используются и в главном меню, и в админке)
 ------------------------------------------------------------- */
 button, .btn {
     padding: 10px 20px;
@@ -42,13 +42,11 @@ a.btn {
     margin-right:8px;           /* отступ справа, чтобы не прилипали к разделителю */
     white-space:nowrap;         /* не переносит текст */
 }
-
 /* Разделитель между действиями – просто символ “/” */
 .action-divider {
     color:#666;
     margin:0 4px;
 }
-/* static/style.css */
 .exp-positive { color: green; }
 .exp-negative { color: red; }
 .vertical-form {
@@ -56,7 +54,11 @@ a.btn {
   flex-direction: column;   /* вертикальная компоновка */
   gap: 8px;                  /* расстояние между элементами */
 }
-
 .vertical-form textarea {
   resize: vertical;          /* позволяет менять высоту, если нужно */
+}
+.button-container {
+  display: flex;
+  justify-content: center; /* Центрируем кнопки */
+  gap: 20px; /* Расстояние между кнопками */
 }

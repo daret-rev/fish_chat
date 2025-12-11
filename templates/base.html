@@ -15,7 +15,6 @@
   {% endwith %}
 
   {% block content %}{% endblock %}
-
   {# Footer – видим только если явно не отключено #}
   {% if show_footer|default(true) %}
   <footer><a href="{{ url_for('index') }}"><button type="button">Главная</button></a></footer>
