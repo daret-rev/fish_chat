@@ -120,6 +120,8 @@ def train_preview():
 @app.route('/train/<int:step>', methods=['GET', 'POST'])
 def train(step):
     # Получаем все сообщения один раз
+    print(f"DEBUG: Entering train(step={step})")
+    print(f"DEBUG: Session before: {dict(session)}")
     all_messages = Message.query.all()
     if not all_messages:
         flash('Нет сообщений в базе. Добавьте их через /admin')
@@ -128,7 +130,7 @@ def train(step):
     # Инициализируем или получаем перемешанные ID
     if 'shuffled_ids' not in session or step == 0:
         # При step == 0 сбрасываем сессию
-        if step == 0:
+        if step == 0 and request.method == "GET":
             session.clear()  # Очищаем всю сессию для новой тренировки
             session['experience'] = 0
             session['answers'] = {}
@@ -170,6 +172,7 @@ def train(step):
         
         # Если нажали кнопку "дальше" (из состояния с ответом)
         if action == 'next':
+            print(f"DEBUG: Next button pressed, current experience: {session.get('experience')}")
             # Сбрасываем флаг ответа для следующего вопроса
             session['answered_current'] = False
             session.pop('current_answer', None)
@@ -179,6 +182,7 @@ def train(step):
             
             # Переходим к следующему шагу
             next_step = step + 1
+            print(f"DEBUG: Redirecting to step {next_step}, experience: {session.get('experience')}")
             
             # Проверяем, не закончились ли сообщения
             if next_step >= total_messages:
