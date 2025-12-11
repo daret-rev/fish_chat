@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fish-chat-web
+    container_name: fish-chat-web
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      FLASK_APP: app.py
+      API_KEY: lmstudio
+      MODEL_ID: openai/gpt-oss-20b
+      BASE_URL: http://192.168.3.8:1234/v1 
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:192.168.3.8"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - default
+
+networks:
+  default:
+    name: fish-chat-network
+    driver: bridge
