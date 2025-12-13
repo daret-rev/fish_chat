@@ -1,6 +1,6 @@
 # Project Fish-Chat
 
-![Data Illustration](image/logo.jpg)
+![Data Illustration](image/logo.png)
 
 ## Description
 
