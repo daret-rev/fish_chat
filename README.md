@@ -18,7 +18,7 @@ git clone https://github.com/a20atamcom-beep/fish_chat.git
 https://lmstudio.ai/download
 Видимость модели определяется в docker-compose.yml
 ```
- BASE_URL: http://192.168.3.8:1234/v1 
+ 17   BASE_URL: http://192.168.3.8:1234/v1 
 ```
 ## Запуск
 ```sh
