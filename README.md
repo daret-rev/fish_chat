@@ -1,23 +1,11 @@
+# Project Fish-Chat
 
-<!DOCTYPE html>
-<html>
-  <head>
-  <meta charset="utf-8">
-  </head>
-  <style>
-    .conteiner{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-  </style>
-  <body>
-      <div class="conteiner">
-        <img src="image/logo.png" width="450" height="450">
-      </div>
-  </body>
-</html>
+![Data Illustration](image/logo.jpg)
 
-About
-=====
+## Description
+
+## Getting Started
+
+### Prerequisites
+
+### Installation
