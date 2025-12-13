@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,7 +13,7 @@
     }
   </style>
   <body>
-      <div class="conteiner" text-align: center>
+      <div class="conteiner">
         <img src="image/logo.png" width="450" height="450">
       </div>
   </body>
