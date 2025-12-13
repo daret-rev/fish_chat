@@ -1,12 +1,14 @@
 # Project Fish-Chat
-| |
-| :---: |
-| ![Data Illustration](image/logo.png) |
 
-## Description
+![Data Illustration](image/logo.png)
 
-## Getting Started
+## Описание
 
+## Запуск
+
+```sh
+docker compose up -d --build
+```
 ### Prerequisites
 
 ### Installation
