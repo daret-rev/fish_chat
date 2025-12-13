@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   </head>
   <body>
-      <div class="conteiner">
+      <div class="conteiner" text-align: center>
         <img src="image/logo.png" width="450" height="450">
-        <title>Hello, World!</title>
-        <link rel="stylesheet" href="styles.css" />
       </div>
   </body>
 </html>
+
+About
+=====
