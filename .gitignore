@@ -11,3 +11,4 @@ templates/admin_menu.html
 templates/edit.html
 templates/add.html
 templates/list.html
+templates/*.db
