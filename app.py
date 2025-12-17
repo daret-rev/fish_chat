@@ -300,6 +300,11 @@ def reset_experience():
     session['experience'] = 0
     return redirect(url_for('index'))
 
+@app.route('/health')
+def health():
+    """Health check endpoint for Docker"""
+    return "OK", 200
+
 if __name__ == '__main__':
     print("Регистрация маршрутов:")
     for rule in app.url_map.iter_rules():

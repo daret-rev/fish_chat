@@ -14,7 +14,7 @@ services:
       FLASK_APP: app.py
       API_KEY: lmstudio
       MODEL_ID: openai/gpt-oss-20b
-      BASE_URL: http://100.64.0.3:1234/v1 
+      BASE_URL: http://host.docker.internal:1234/v1
     restart: unless-stopped
     volumes:
       - .:/app

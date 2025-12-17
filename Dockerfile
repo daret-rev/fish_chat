@@ -4,12 +4,19 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir -r requirements.txt -w /wheels
 
-# Этап 2: Финальный образ
+# Этап 2: Финальный образ с nginx
 FROM python:3.13-slim
 WORKDIR /app
 
+# Устанавливаем nginx и зависимости
+RUN apt-get update && apt-get install -y \
+    nginx \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Обновляем pip
 RUN python3 -m pip install --upgrade pip
+RUN pip install --no-cache-dir gunicorn
 
 # Копируем и устанавливаем колеса
 COPY --from=web-deps /wheels /wheels
@@ -21,20 +28,21 @@ COPY . .
 # Устанавливаем права доступа
 RUN chmod -R 755 static templates
 
-# Открываем порты
+# Копируем конфигурацию nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Копируем entrypoint скрипт
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Открываем порт для nginx
 EXPOSE 5000
-EXPOSE 1234
 
 # Устанавливаем переменные окружения
 ENV API_KEY="lmstudio"
 ENV MODEL_ID="openai/gpt-oss-20b"
-
 ENV FLASK_ENV=production
 ENV FLASK_APP=app.py
 
-# Добавляем зависимости
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
 # Команда запуска
-CMD ["python", "app.py"]
+CMD ["/app/entrypoint.sh"]
