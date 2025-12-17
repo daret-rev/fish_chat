@@ -25,7 +25,7 @@ echo "3. Starting bot application on port 3000..."
 if [ -f "/app/bot_app/app.py" ]; then
     cd /app/bot_app
     # Устанавливаем переменные окружения для бота
-    export BASE_URL=http://host.docker.internal:1234/v1
+    export BASE_URL=${BASE_URL:-http://100.64.0.3:1234/v1}
     export MODEL_ID=openai/gpt-oss-20b
     export API_KEY=lmstudio
     
