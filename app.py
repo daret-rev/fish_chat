@@ -1,32 +1,32 @@
-import os
 from pathlib import Path
 from flask import (
     Flask, render_template, request,
-    redirect, url_for, session, flash, jsonify, g
+    redirect, url_for, session, flash, jsonify
 )
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user, UserMixin, LoginManager
 from flask_sqlalchemy import SQLAlchemy
 import model
 import json
 import random
 import logging
-import sqlite3
 # ------------------------------------------------------------------
-# Инициализация приложения и БД
+# Инициализация приложения, БД и менаджера авторизации
 # ------------------------------------------------------------------
-#BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 BASE_DIR = Path(__file__).parent.resolve()
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
 DB_PATH = BASE_DIR.joinpath("app.db")
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH.absolute()}'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/Users/uzver/Desktop/VSOSH/kod/fish_chat/appd.db'
-#app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "app.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 db = SQLAlchemy(app)
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 # ------------------------------------------------------------------
 # Модель: сообщение + правильный ответ + комментарии
 # ------------------------------------------------------------------
@@ -44,6 +44,54 @@ class Message(db.Model):
     def __repr__(self):
         return f'<Message {self.id}>'
 
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'Users'
+
+    id =  db.Column(db.Integer, primary_key=True)
+
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    password_hash = db.Column(db.String(64), nullable=False)
+
+    privileges = db.Column(db.Boolean, default = False)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    @property
+    def is_admin(self):
+        return self.privileges
+    
+    @staticmethod
+    def create_default_users():
+        """Создание начальных пользователей при первом запуске"""
+        if not User.query.filter_by(username='admin').first():
+            admin = User(username='admin', privileges=True)
+            admin.set_password('admin_admin')
+            db.session.add(admin)
+            
+        db.session.commit()
+
+    @staticmethod
+    def create_user(username, password):
+
+        user = User(username=username, privileges=False)
+        user.set_password(password)
+
+        db.session.add(user)  
+        db.session.commit()
+
+        return user
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
 # ------------------------------------------------------------------
@@ -294,11 +342,77 @@ def results():
         correct_count=correct_count
     )
 
-# В app.py
+# Очищение опыта после тренировки
 @app.route('/reset_experience')
 def reset_experience():
     session['experience'] = 0
     return redirect(url_for('index'))
+# -----------------------------------------------------------
+# Авторизация: создание пользователей и вход
+# -----------------------------------------------------------
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    user = User.query.filter(
+        User.username.ilike(username)
+        ).first()
+    
+    if user and user.check_password(password):
+        login_user(user)
+        if user.is_admin:
+            return jsonify({
+            'success': True,
+            'redirect': url_for('dashboard'),
+            'message': 'Вход выполнен'
+            })
+        else:
+            return jsonify({
+            'success': True,
+            'redirect': url_for('index'),
+            'message': 'Вход выполнен'
+            })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Неверный логин или пароль'
+        }), 401
+    
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    existing = User.query.filter(
+        User.username.ilike(username)
+        ).first()
+    
+    if existing:
+        return jsonify({
+            'success': False,
+            'message': 'Пользователь уже существует'
+        })
+    
+    user = User.create_user(username, password)
+
+    if user:
+        return jsonify({
+            'success': True,
+            'redirect': url_for('index'),
+            'message': 'Пользователь создан'
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Пользователь уже существует'
+        })
 
 if __name__ == '__main__':
     print("Регистрация маршрутов:")
