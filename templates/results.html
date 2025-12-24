@@ -1,21 +1,15 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <title>Результаты тренировки</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Тренировка завершена!</h1>
-    <p>Вы прошли {{ total }} сообщений.</p>
-        <p>Верных ответов: {{ correct_count }}</p>
-    
+{% extends 'base.html' %}
+{% block title %}Результаты тренировки{% endblock %}
 
-    <!-- Новые элементы -->
-    <p>Ваш опыт: {{ experience|round(3) }}</p>
+{% block content %}
+    <h1>Тренировка завершена!</h1>
+
+    <p>Вы прошли {{ step }} сообщений.</p>
+        <p>Верных ответов: {{ correct_count }}</p>
+
+    <p>Ваш опыт: {{ experience|int }}</p>
     <form action="{{ url_for('reset_experience') }}" method="get">
         <button type="submit">Выйти из тренировки</button>
     </form>
-</body>
-</html>
+{% endblock %}
 {% set show_footer = False %}

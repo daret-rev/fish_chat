@@ -1,13 +1,66 @@
 {% extends 'base.html' %}
+
 {% block title %}Главная – Фейк‑детектор{% endblock %}
+
 {% block content %}
-<h1>Добро пожаловать!</h1>
-<p>Проверьте, действительно ли это фейковая новость.</p>
-<a href="{{ url_for('train_preview') }}">
-  <button>Начать тренировку</button>
-</a>
-<a href="{{ url_for('check_preview')}}">
-  <button>Проверить сообщение</button>
-</a>
+<section class="hero-section">
+    <div class="container">
+      <a href="{{ url_for('login') }}">
+        <button class="secondary-button">Вход</button>
+      </a>
+    </div>
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Добро пожаловать в Фейк‑детектор!</h1>
+            
+            <div class="hero-description">
+                <p>На нашем сайте вы можете:</p>
+                <ul class="feature-list">
+                    <li>Ознакомиться с памяткой по информационной грамотности</li>
+                    <li>Проверить свои навыки распознавания мошенничества</li>
+                    <li>Получить рекомендации по реагированию на сообщения</li>
+                </ul>
+            </div>
+            
+            <p class="hero-subtitle">Узнайте, действительно ли это фейковая новость</p>
+            
+            <div class="button-container">
+                <a href="{{ url_for('memo') }}">
+                    <button class="secondary-button">Памятка</button>
+                </a>
+                <a href="{{ url_for('train_preview') }}">
+                    <button class="primary-button">Начать тренировку</button>
+                </a>
+                
+                <a href="{{ url_for('check_preview')}}">
+                    <button class="secondary-button">Проверить сообщение</button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-brand">Fish Chat</div>
+      <div class="footer-copy">© 2025 Fish Chat Team. Все права защищены.</div>
+    </div>
+
+    <div class="footer-right">
+      <nav class="footer-nav">
+        <a href="https://github.com/a20atamcom-beep/fish_chat">О проекте</a>
+        <!--<a href="/contacts">Контакты</a>-->
+        <!--<a href="/privacy">Политика конфиденциальности</a>-->
+      </nav>
+      <!--<div class="footer-socials">-->
+        <!--<a href="https://instagram.com/fishchat" target="_blank" rel="noopener noreferrer">Instagram</a>-->
+        <!--<a href="https://t.me/fishchat" target="_blank" rel="noopener noreferrer">Telegram</a>-->
+        <!--<a href="https://youtube.com/fishchat" target="_blank" rel="noopener noreferrer">YouTube</a>-->
+      <!--</div>-->
+    </div>
+  </div>
+</footer>
+</section>
+
 {% endblock %}
+
 {% set show_footer = False %}

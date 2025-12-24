@@ -1,10 +1,15 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
 <meta charset="utf-8">
+{% block header %}
 <title>{% block title %}Фейк‑детектор{% endblock %}</title>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
+{% endblock  %}
 </head>
 <body>
 <div class="container">
