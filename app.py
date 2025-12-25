@@ -35,7 +35,7 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
 
     correct     = db.Column(db.Boolean, nullable=False)
-    price_correct = db.Column(db.Float, default=0.0) 
+    price_correct = db.Column(db.Float, default=0.0)
     price_wrong   = db.Column(db.Float, default=0.0)
 
     comment_yes = db.Column(db.Text, nullable=True)
@@ -60,22 +60,21 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     @property
     def is_admin(self):
         return self.privileges
-    
+
     @staticmethod
     def create_default_users():
-        """Создание начальных пользователей при первом запуске"""
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin', privileges=True)
             admin.set_password('admin_admin')
             db.session.add(admin)
-            
+
         db.session.commit()
 
     @staticmethod
@@ -84,7 +83,7 @@ class User(db.Model, UserMixin):
         user = User(username=username, privileges=False)
         user.set_password(password)
 
-        db.session.add(user)  
+        db.session.add(user)
         db.session.commit()
 
         return user
@@ -92,6 +91,43 @@ class User(db.Model, UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+mgn = '/templateM/'
+
+
+class Lesson():
+    def __init__(self, name):
+        self.name = name
+        self.time = None
+
+    def set_count_questions(self, count_questions):
+        self.count_questions = count_questions
+
+    def __repr__(self):
+        return f'<Lesson {self.name}>'
+
+    def set_time(self, time):
+        self.time = time
+
+    def add_questions(self, rand=True, questions_id=None):
+        if not questions_id is None:
+            pass
+        else:
+            all_messages = Message.query.all()
+            shuffled_ids = [m.id for m in all_messages]
+            random.shuffle(shuffled_ids)
+            questions_id = shuffled_ids[:self.count_questions]
+
+        if rand:
+            questions_id = random.shuffle(questions_id)
+
+        self.questions = [Message.query.get(mid) for mid in questions_id]
+
+    def set_expirience(self, expirience_yes = 1, expirience_no = -1):
+        self.expirience_yes = expirience_yes
+        self.expirience_no = expirience_no
+
+    def add_users(self, users):
+        self.users = users
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
 # ------------------------------------------------------------------
@@ -171,6 +207,7 @@ def check_massege():
 @app.route('/train_preview')
 def train_preview():
     return render_template('train_preview.html')
+
 @app.route('/train/<int:step>', methods=['GET', 'POST'])
 def train(step):
     # Получаем все сообщения один раз
@@ -350,6 +387,7 @@ def reset_experience():
 # -----------------------------------------------------------
 # Авторизация: создание пользователей и вход
 # -----------------------------------------------------------
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -364,18 +402,24 @@ def login():
     
     if user and user.check_password(password):
         login_user(user)
+        print('User is admin:',user.is_admin)
+
+        session['curent_user'] = user.username
         if user.is_admin:
-            return jsonify({
+            """return jsonify({
             'success': True,
             'redirect': url_for('dashboard'),
             'message': 'Вход выполнен'
-            })
+            })"""
+
+            return redirect(url_for('dashboard'))
         else:
-            return jsonify({
+            """return jsonify({
             'success': True,
             'redirect': url_for('index'),
             'message': 'Вход выполнен'
-            })
+            })"""
+            return  render_template('index.html', user=user)
     else:
         return jsonify({
             'success': False,
@@ -402,7 +446,7 @@ def register():
     
     user = User.create_user(username, password)
 
-    if user:
+    """if user:
         return jsonify({
             'success': True,
             'redirect': url_for('index'),
@@ -412,8 +456,79 @@ def register():
         return jsonify({
             'success': False,
             'message': 'Пользователь уже существует'
+        })"""
+    if user:
+        return render_template('index.html')
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Пользователь уже существует'
         })
 
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session['curent_user'] = None
+    return render_template('index.html')
+# ---------------------------------------------------------
+# Панель управления
+# ---------------------------------------------------------
+@app.route('/ErAuth', methods=['GET'])
+def ErAuth():
+    return render_template(mgn + 'ErAuth.html')
+
+def check_privileges():
+    curent_user = User.query.filter(
+        User.username.ilike(
+            session.get('curent_user')
+        )
+    ).first()
+    print("DEBUD: curent user is",curent_user)
+    print("DEBUG: curent user privileges -",curent_user.is_admin)
+
+    if not curent_user or not curent_user.is_admin:
+        return False
+    else:
+        return True
+
+@app.route('/dashboard')
+def dashboard():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    return render_template(mgn + 'dashboard.html')
+@app.route('/DB_management', methods=['GET', 'POST'])
+def DB_management():
+
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'DB_management.html')
+
+@app.route('/DB_msg_create', methods=['GET', 'POST'])
+def DB_msg_create():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'DB_msg_create.html')
+
+@app.route('/DB_msg_edit', methods=['GET', 'POST'])
+def DB_msg_edit():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'DB_msg_edit.html')
+
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    User.create_default_users()
+    user = User.query.filter(
+        User.username.ilike('DARET')
+        ).first()
+
+    return render_template('index.html', user=user)
 if __name__ == '__main__':
     print("Регистрация маршрутов:")
     for rule in app.url_map.iter_rules():

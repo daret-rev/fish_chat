@@ -4,12 +4,23 @@
 
 {% block content %}
 <section class="hero-section">
+
     <div class="container">
-      <a href="{{ url_for('login') }}">
-        <button class="secondary-button">Вход</button>
-      </a>
-    </div>
-    <div class="container">
+        <div class="container-flex">
+          {% if not user %}
+          <a href="{{ url_for('login') }}">
+            <button class="btn-left">Вход</button>
+          </a>
+            <a href="{{ url_for('test') }}">
+            <!--<button class="btn-left">Test</button>-->
+          </a>
+          {% else %}
+            <a href="{{ url_for('logout') }}">
+                <button class="btn-left">Выход</button>
+            </a>
+            <p class="text-right">{{ user.username }}</p>
+          {% endif %}
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">Добро пожаловать в Фейк‑детектор!</h1>
             
