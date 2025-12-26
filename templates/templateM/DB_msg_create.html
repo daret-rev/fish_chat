@@ -1,24 +1,37 @@
 {% extends 'base.html' %}
-{% block title %}Результаты тренировки{% endblock %}
-
+{% block title %}Создать сообщение{% endblock %}
 {% block content %}
-    <h1>Создать сообщение</h1>
+<h2>Добавить новое сообщение для тренировки</h2>
 
-    <form method="post" action="{{ url_for('DB_msg_create') }}">
-      <div class="vertical-form">
-        <label>Текст сообщения</label>
-        <textarea
-          id="message_text"
-          name="msg_txt"
-          rows="15"
-          cols="25"
-          placeholder="Текст"
-        ></textarea>
+<form method="post">
+  <p><label>Текст сообщения:<br>
+    <textarea name="text" rows="3" cols="60"></textarea></label></p>
 
-        <button type="submit" disabled>Создать</button>
-      </div>
-    </form>
+  <p><label>Правильный ответ:
+      <select name="correct">
+          <option value="yes">Да (мошенник)</option>
+          <option value="no">Нет (реальная новость)</option>
+      </select>
+  </label></p>
 
-<script src="etc/js/main.js"></script>
+  <p><label>Комментарий при правильном ответе:<br>
+    <textarea name="comment_yes" rows="2" cols="60"></textarea></label></p>
+
+  <p><label>Комментарий при неверном ответе:<br>
+    <textarea name="comment_no" rows="2" cols="60"></textarea></label></p>
+
+  <p>
+    <label for="price_correct">Цена за правильный ответ:</label>
+    <input type="number" step="1" name="price_correct" id="price_correct" required><br>
+  </p>
+
+  <p>
+    <label for="price_wrong">Цена за неправильный ответ:</label>
+    <input type="number" step="1" name="price_wrong" id="price_wrong" required><br>
+  </p>
+
+  <button type="submit">Сохранить</button>
+</form>
+<p><a href="{{ url_for('DB_management') }}" class="btn">← назад</a></p>
 {% endblock %}
 {% set show_footer = False %}

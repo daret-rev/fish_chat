@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Список сообщений{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('DB_management') }}" class="btn">← назад</a></p>
+<h2>Список всех сообщений</h2>
+
+<!-- Фильтр поиска -->
+<div style="margin: 20px 0;">
+  <input type="text" id="searchText" placeholder="Поиск по тексту..."
+         style="padding: 8px; width: 300px;">
+
+  <input type="text" id="searchID" placeholder="Поиск по ID..."
+         style="padding: 8px; width: 100px; margin-left: 10px;">
+
+  <select id="searchAnswer" style="padding: 8px; margin-left: 10px;">
+    <option value="">Все ответы</option>
+    <option value="Фейк">Фейк</option>
+    <option value="Реальная">Реальная</option>
+  </select>
+
+  <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
+    Найти
+  </button>
+
+  <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
+    Сбросить
+  </button>
+</div>
+
+<table border="1" cellpadding="5" id="messagesTable">
+  <tr>
+    <th>ID</th><th>Текст</th><th>Правильный ответ</th><th>Действия</th>
+  </tr>
+  {% for m in messages %}
+  <tr class="msg_row">
+    <td>{{ m.id }}</td>
+    <td>
+      <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
+        {{ m.text }}
+      </div>
+    </td>
+    <td>{% if m.correct %}Фейк{% else %}Реальная{% endif %}</td>
+    <td>
+      <!-- компактные кнопки в одном ряду -->
+      <div class="actions">
+          <a href="{{ url_for('DB_msg_edit', msg_id=m.id) }}"
+             class="btn btn-action">Редактировать</a>
+
+          <span class="action-divider">/</span>
+
+          <form action="{{ url_for('DB_msg_delete', msg_id=m.id) }}"
+                method="post" style="display:inline;">
+              <button type="submit"
+                      onclick="return confirm('Удалить?')"
+                      class="btn btn-action">Удалить</button>
+          </form>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<script>
+    function searchTable() {
+      const searchText = document.getElementById('searchText').value.toLowerCase();
+      const searchID = document.getElementById('searchID').value.toLowerCase();
+      const searchAnswer = document.getElementById('searchAnswer').value;
+
+      const rows = document.querySelectorAll('table tr.msg_row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 3) {
+          const id = cells[0].textContent.toLowerCase();
+          const text = cells[1].textContent.toLowerCase();
+          const answer = cells[2].textContent;
+
+          let show = true;
+
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchText && !text.includes(searchText)) show = false;
+          if (searchAnswer && answer !== searchAnswer) show = false;
+
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('searchText').value = '';
+      document.getElementById('searchID').value = '';
+      document.getElementById('searchAnswer').value = '';
+
+      const rows = document.querySelectorAll('tr.msg_row, tr.msg-row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+</script>
+{% endblock %}
+{% set show_footer = False %}

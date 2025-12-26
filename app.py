@@ -415,7 +415,7 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             """return jsonify({
-            'success': True,
+            'success': True,de
             'redirect': url_for('index'),
             'message': 'Вход выполнен'
             })"""
@@ -496,7 +496,7 @@ def dashboard():
         return redirect(url_for('ErAuth'))
 
     return render_template(mgn + 'dashboard.html')
-@app.route('/DB_management', methods=['GET', 'POST'])
+@app.route('/dashboard/DB_management', methods=['GET', 'POST'])
 def DB_management():
 
     if not check_privileges():
@@ -505,7 +505,15 @@ def DB_management():
     if request.method == 'GET':
         return render_template(mgn + 'DB_management.html')
 
-@app.route('/DB_msg_create', methods=['GET', 'POST'])
+@app.route('/dashboard/DB_management/DB_management_instruction')
+def DB_management_instruction():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'DB_management_instruction.html')
+
+@app.route('/dashboard/DB_management/DB_msg_create', methods=['GET', 'POST'])
 def DB_msg_create():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
@@ -513,13 +521,64 @@ def DB_msg_create():
     if request.method == 'GET':
         return render_template(mgn + 'DB_msg_create.html')
 
-@app.route('/DB_msg_edit', methods=['GET', 'POST'])
-def DB_msg_edit():
+    text = request.form['text']
+    correct = request.form['correct'] == 'yes'
+    comment_yes = request.form['comment_yes']
+    comment_no = request.form['comment_no']
+    price_correct = float(request.form.get('price_correct', 0))
+    price_wrong = float(request.form.get('price_wrong', 0))
+
+    msg = Message(
+        text=text,
+        correct=correct,
+        comment_yes=comment_yes,
+        comment_no=comment_no,
+        price_correct=price_correct,
+        price_wrong=price_wrong
+    )
+    db.session.add(msg)
+    db.session.commit()
+    flash('Сообщение добавлено')
+    return redirect(url_for('DB_msg_create'))
+
+@app.route('/dashboard/DB_management/DB_msg_list')
+def DB_msg_list():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
 
+    messages = Message.query.order_by(Message.id).all()
+    return render_template(mgn + 'DB_msg_list.html', messages=messages)
+
+@app.route('/dashboard/DB_msg_list/DB_msg_delete/<int:msg_id>', methods=['POST'])
+def DB_msg_delete(msg_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    msg = Message.query.get_or_404(msg_id)
+    db.session.delete(msg)
+    db.session.commit()
+    flash('Сообщение удалено')
+    return redirect(url_for('dashboard/DB_msg_list'))
+
+@app.route('/dashboard/DB_msg_edit/<int:msg_id>', methods=['GET', 'POST'])
+def DB_msg_edit(msg_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    msg = Message.query.get_or_404(msg_id)
+
     if request.method == 'GET':
-        return render_template(mgn + 'DB_msg_edit.html')
+        return render_template(mgn + 'DB_msg_edit.html', message=msg)
+
+    msg.text = request.form['text']
+    msg.correct = request.form['correct'] == 'yes'
+    msg.comment_yes = request.form['comment_yes']
+    msg.comment_no = request.form['comment_no']
+    msg.price_correct = float(request.form.get('price_correct', 0))
+    msg.price_wrong = float(request.form.get('price_wrong', 0))
+    db.session.commit()
+    flash('Сообщение обновлено')
+    return redirect(url_for('dashboard/DB_management/DB_msg_list'))
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
