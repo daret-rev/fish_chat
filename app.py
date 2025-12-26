@@ -44,7 +44,9 @@ class Message(db.Model):
     def __repr__(self):
         return f'<Message {self.id}>'
 
-
+# ------------------------------------------------------------------
+# Модель: пользователь + пароль + ID
+# ------------------------------------------------------------------
 class User(db.Model, UserMixin):
     __tablename__ = 'Users'
 
@@ -93,41 +95,104 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 mgn = '/templateM/'
 
+# ------------------------------------------------------------------
+# Группа/класс: пользователи + ID
+# ------------------------------------------------------------------
+class Group(db.Model):
+    __tablename__ = 'Groups'
 
-class Lesson():
+    id = db.Column(db.Integer, primary_key=True)
+
+    groupname = db.Column(db.String(64), unique=True, nullable=False)
+    users = db.Column(db.JSON, nullable=False)
+
+    def __init__(self, groupname):
+        self.groupname = groupname
+        self.users = ""
+
+    def __repr__(self):
+        return f'<Group {self.groupname}>'
+
+    def add_users(self, users: list):
+        self.users = users
+
+    def set_groupname(self, groupname):
+        self.groupname = groupname
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        print(f"Группа '{self.groupname}' создана с ID: {self.id}")
+# ------------------------------------------------------------------
+# Модель: урок + участники + задания
+# ------------------------------------------------------------------
+class Lesson(db.Model):
+    __tablename__ = 'Lessons'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    time = db.Column(db.Integer, nullable=False)
+    questions = db.Column(db.JSON, nullable=False)
+
     def __init__(self, name):
         self.name = name
         self.time = None
 
-    def set_count_questions(self, count_questions):
-        self.count_questions = count_questions
-
     def __repr__(self):
         return f'<Lesson {self.name}>'
+
+    def set_count_questions(self, count_questions: int):
+        self.count_questions = count_questions
 
     def set_time(self, time):
         self.time = time
 
-    def add_questions(self, rand=True, questions_id=None):
-        if not questions_id is None:
-            pass
-        else:
+    def add_questions(self,  questions_id: list = None, rand=True):
+        if questions_id is None:
             all_messages = Message.query.all()
             shuffled_ids = [m.id for m in all_messages]
             random.shuffle(shuffled_ids)
             questions_id = shuffled_ids[:self.count_questions]
 
         if rand:
-            questions_id = random.shuffle(questions_id)
+            random.shuffle(questions_id)
 
-        self.questions = [Message.query.get(mid) for mid in questions_id]
+        self.questions = questions_id
 
     def set_expirience(self, expirience_yes = 1, expirience_no = -1):
         self.expirience_yes = expirience_yes
         self.expirience_no = expirience_no
 
-    def add_users(self, users):
-        self.users = users
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        print(f"Урок '{self.name}' создан с ID: {self.id}")
+
+# ------------------------------------------------------------------
+# Группа/класс: пользователи + ID
+# ------------------------------------------------------------------
+class Testing(db.Model):
+    __tablename__ = 'Testings'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    status = db.Column(db.Boolean, nullable=False)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('Lessons.id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('Groups.id'), nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f'<Testing {self.name}>'
+
+    def add_lesson(self, lesson: Lesson):
+        self.lesson_id = lesson.id
+
+    def add_group(self, group: Group):
+        self.group_id = group.id
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
 # ------------------------------------------------------------------
@@ -470,7 +535,7 @@ def logout():
     session['curent_user'] = None
     return render_template('index.html')
 # ---------------------------------------------------------
-# Панель управления
+# Панель управления БД
 # ---------------------------------------------------------
 @app.route('/ErAuth', methods=['GET'])
 def ErAuth():
@@ -579,6 +644,69 @@ def DB_msg_edit(msg_id):
     db.session.commit()
     flash('Сообщение обновлено')
     return redirect(url_for('dashboard/DB_management/DB_msg_list'))
+
+# ---------------------------------------------------------
+# Панель управления Тестами
+# ---------------------------------------------------------
+@app.route('/dashboard/testing_management')
+def testing_management():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'testing_management.html')
+@app.route('/dashboard/testing_management/lesson_management', methods=['GET', 'POST'])
+def lesson_management():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'lesson_management.html')
+
+@app.route('/dashboard/testing_management/lesson_management/lesson_create', methods=['GET', 'POST'])
+def lesson_create():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    messages = Message.query.order_by(Message.id).all()
+    if request.method == 'GET':
+        return render_template(mgn + 'lesson_create.html', messages=messages)
+
+    lesson_name = request.form.get('lesson_name')
+    time = request.form.get('time')
+    price_correct = request.form.get('price_correct')
+    price_wrong = request.form.get('price_wrong')
+    msg_count = request.form.get('msg_count')
+    selected_ids = request.form.get('selected_ids')
+
+    lesson = Lesson(lesson_name)
+
+    if time != '':
+        lesson.set_time(time)
+    else:
+        lesson.set_time(0)
+    lesson.set_expirience(price_correct, price_wrong)
+    if selected_ids != '':
+        selected_ids = selected_ids.split(',')
+        lesson.set_selected_ids(selected_ids)
+    else:
+        lesson.set_count_questions(int(msg_count))
+        lesson.add_questions()
+
+    lesson.save()
+
+    return render_template(mgn + 'lesson_management.html')
+
+@app.route('/dashboard/testing_management/lesson_management/lesson_list')
+def lesson_list():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    lessons = Lesson.query.order_by(Lesson.id).all()
+    return render_template(mgn + 'lesson_list.html', lessons=lessons)
+
+
+
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():

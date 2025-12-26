@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+
+    <div class="container">
+
+        <div class="hero-content">
+            <h1 class="hero-title">Управление тестированиями</h1>
+
+            <div class="button-container">
+                <a href="{{ url_for('DB_management_instruction') }}">
+                    <button class="secondary-button">Инструкция</button>
+                </a>
+                <a href="{{ url_for('DB_msg_list') }}">
+                    <button class="primary-button">Изменить</button>
+                </a>
+                
+                <a href="{{ url_for('lesson_management')}}">
+                    <button class="secondary-button">Уроки</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+<footer><a href="{{ url_for('dashboard') }}"><button type="button">Главная панель</button></a></footer>
+{% endblock %}
+
+{% set show_footer = False %}

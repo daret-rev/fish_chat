@@ -6,7 +6,9 @@
 <section class="hero-section">
 
     <div class="container">
-
+        <a href="{{ url_for('logout') }}">
+            <button class="btn-left">Выход</button>
+        </a>
         <div class="hero-content">
             <h1 class="hero-title">Панель управления</h1>
 
@@ -14,7 +16,7 @@
                 <a href="{{ url_for('memo') }}">
                     <button class="secondary-button">Инструкция</button>
                 </a>
-                <a href="{{ url_for('train_preview') }}">
+                <a href="{{ url_for('testing_management') }}">
                     <button class="primary-button">Настроить тренировку</button>
                 </a>
 
@@ -28,4 +30,6 @@
 </section>
 
 {% endblock %}
+{% set show_footer = False %}
+
 
