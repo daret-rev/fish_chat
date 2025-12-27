@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Админ – Создание тестирования{% endblock %}
+{% block title %}Создание тестирования{% endblock %}
 {% block content %}
 <p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
 
@@ -16,8 +16,8 @@
     <div style="margin: 20px 0;">
         <label for="status">Статус тестирования:</label>
         <select name="status" id="status" style="padding: 8px; width: 200px;">
-            <option value="active" selected>Активно</option>
-            <option value="archived">Архив</option>
+            <option value="archived" selected>Архив</option>
+            <option value="active">Активно</option>
         </select>
     </div>
 

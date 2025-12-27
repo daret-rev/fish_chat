@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Управление группами
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Управление группами</h1>
+
+        <section>
+            <h2>Группа - совокупность пользователей, которые вместе участвуют в тестировании</h2>
+        </section>
+
+        <section>
+            <section>
+                <h1>"Создание"</h1>
+                <p>Выберете пользователей, которых хотите объединить в группу</p>
+            </section>
+
+            <section>
+                <h1>"Редактирование"</h1>
+                <p>Удалите пользователей из группы или добавьте новых</p>
+            </section>
+        </section>
+
+    </div>
+<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
+
+{% endblock %}
+{% set show_footer = False %}

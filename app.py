@@ -544,7 +544,7 @@ def register():
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session['curent_user'] = None
-    return render_template('index.html')
+    return redirect(url_for('index'))
 # ---------------------------------------------------------
 # Панель управления БД
 # ---------------------------------------------------------
@@ -710,7 +710,7 @@ def lesson_edit(less_id):
 
     lesson = Lesson.query.get_or_404(less_id)
     messages = Message.query.order_by(Message.id).all()
-    lesson_names = [l.name for l in Lesson.query.order_by(Lesson.name).all()]
+    lesson_names = [l.name for l in Lesson.query.order_by(Lesson.name).all() if l.id != less_id]
 
     if request.method == 'GET':
         return render_template(mgn + 'lesson_edit.html', lesson=lesson, messages=messages, lesson_names=lesson_names)
@@ -749,7 +749,12 @@ def lesson_delete(less_id):
 
     return redirect(url_for('lesson_list'))
 
+@app.route('/dashboard/testing_management/lesson_instruction')
+def lesson_instruction():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
 
+    return render_template(mgn + 'lesson_instruction.html')
 # ---------------------------------------------------------
 # Панель управления Группами
 # ---------------------------------------------------------
@@ -790,7 +795,7 @@ def group_edit(group_id):
 
     group = Group.query.get_or_404(group_id)
     users = User.query.order_by(User.id).offset(1).all()
-    group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all()]
+    group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all() if g.id != group_id]
 
     if request.method == 'GET':
         return render_template(mgn + 'group_edit.html', group=group, users=users, group_names=group_names)
@@ -819,6 +824,11 @@ def group_delete(group_id):
 
     return redirect(url_for('group_list'))
 
+@app.route('/dashboard/testing_management/group_instruction')
+def group_instruction():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+    return render_template(mgn + 'group_instruction.html')
 # ---------------------------------------------------------
 # Панель управления Тестами
 # ---------------------------------------------------------
@@ -886,7 +896,7 @@ def testing_edit(testing_id):
 
         group_ids = testing.group_id
         lessons_dict = {lesson.id: lesson for lesson in lessons}
-        testing_names = [t.name for t in Testing.query.order_by(Testing.name).all()]
+        testing_names = [t.name for t in Testing.query.order_by(Testing.name).all() if t.id != testing_id]
 
         return render_template(mgn + 'testing_edit.html',
                                testing=testing,
@@ -895,6 +905,21 @@ def testing_edit(testing_id):
                                group_ids=group_ids,
                                lessons_dict=lessons_dict,
                                testing_names=testing_names)
+
+    testing_name = request.form.get('testing_name')
+    status = request.form['status'] == 'active'
+    lesson_id = request.form.get('lesson_id')
+    groups_ids = request.form.get('group_ids')
+
+    testing.name = testing_name
+    testing.set_status(status)
+    testing.add_lesson(lesson_id)
+    groups_ids = [int(id) for id in groups_ids.split(',')]
+    testing.add_group(groups_ids)
+
+    db.session.commit()
+
+    return redirect(url_for('testing_list'))
 
 @app.route('/dashboard/testing_management/testing_list/testing_delete/<int:testing_id>', methods=['POST'])
 def testing_delete(testing_id):

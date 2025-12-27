@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Админ – Редактирование урока{% endblock %}
+{% block title %}Редактирование урока{% endblock %}
 {% block content %}
 <p><a href="{{ url_for('lesson_list') }}" class="btn">← назад</a></p>
 
@@ -196,15 +196,11 @@
 
       const selectedIds = updateSelectedIds();
 
-      if (selectedIds.length === 0 && !countMsg) {
-        alert('Выберите сообщения для урока или укажите количество');
+      if (selectedIds.length === 0) {
+        alert('Выберите сообщения для урока');
         return;
       }
 
-      if (!(selectedIds.length === 0) && countMsg) {
-        alert('Выберете только 1 способ отбора сообщений');
-        return;
-      }
 
       document.getElementById('lessonForm').submit();
     }
