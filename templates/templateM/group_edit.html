@@ -136,6 +136,15 @@
         return;
       }
 
+      const inputValue = groupName.trim();
+      const group_names = {{ group_names|tojson|safe }};
+
+
+      if (group_names.includes(inputValue)) {
+        alert("Название должно быть уникальным");
+        return;
+      }
+
       const selectedIds = updateSelectedIds();
 
       if (selectedIds.length === 0) {

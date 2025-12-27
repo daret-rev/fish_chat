@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Список тестирований{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
+<h2>Список всех тестирований</h2>
+
+<div style="margin: 20px 0;">
+  <input type="text" id="searchID" placeholder="Поиск по ID теста..."
+         style="padding: 8px; width: 150px;">
+
+  <input type="text" id="searchName" placeholder="Поиск по названию теста..."
+         style="padding: 8px; width: 250px; margin-left: 10px;">
+
+  <input type="text" id="searchLesson" placeholder="Поиск по названию урока..."
+         style="padding: 8px; width: 250px; margin-left: 10px;">
+
+  <select id="searchStatus" style="padding: 8px; width: 150px; margin-left: 10px;">
+    <option value="">Все статусы</option>
+    <option value="active">Активно</option>
+    <option value="archived">Архив</option>
+  </select>
+
+  <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
+    Найти
+  </button>
+
+  <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
+    Сбросить
+  </button>
+</div>
+
+<table border="1" cellpadding="5" id="testingTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Название тестирования</th>
+      <th>Урок</th>
+      <th>Статус</th>
+      <th>Кол-во групп</th>
+      <th>Действие</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in testings %}
+    <tr class="testing_row">
+      <td>{{ t.id }}</td>
+      <td>{{ t.name }}</td>
+      <td>
+        {% set lesson = lessons_dict.get(t.lesson_id) %}
+        {% if lesson %}
+          {{ lesson.name }}
+        {% else %}
+          <span style="color: #999;">ID: {{ t.lesson_id }}</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if t.status == True %}
+          <span style="color: green; font-weight: bold;">Активно</span>
+        {% else %}
+          <span style="color: orange; font-weight: bold;">Архив</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if t.group_id %}
+          {% if t.group_id is string %}
+            {% set groups = t.group_id|from_json %}
+            {{ groups|length }}
+          {% elif t.group_id is iterable %}
+            {{ t.group_id|length }}
+          {% else %}
+            0
+          {% endif %}
+        {% else %}
+          0
+        {% endif %}
+      </td>
+      <td>
+        <div class="actions">
+            <a href="{{ url_for('testing_edit', testing_id=t.id) }}"
+               class="btn btn-action">Редактировать</a>
+
+            <span class="action-divider">/</span>
+
+            <form action="{{ url_for('testing_delete', testing_id=t.id) }}"
+                  method="post" style="display:inline;">
+                <button type="submit"
+                        onclick="return confirm('Удалить тестирование?')"
+                        class="btn btn-action">Удалить</button>
+            </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+    function searchTable() {
+      const searchID = document.getElementById('searchID').value.toLowerCase();
+      const searchName = document.getElementById('searchName').value.toLowerCase();
+      const searchLesson = document.getElementById('searchLesson').value.toLowerCase();
+      const searchStatus = document.getElementById('searchStatus').value.toLowerCase();
+
+      const rows = document.querySelectorAll('table tbody tr.testing_row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 6) {
+          const id = cells[0].textContent.toLowerCase();
+          const name = cells[1].textContent.toLowerCase();
+          const lesson = cells[2].textContent.toLowerCase();
+          const statusCell = cells[3];
+
+          let statusValue = '';
+          const statusSpan = statusCell.querySelector('span');
+          if (statusSpan) {
+            if (statusSpan.style.color === 'green') statusValue = 'active';
+            else if (statusSpan.style.color === 'orange') statusValue = 'archived';
+          }
+
+          let show = true;
+
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchName && !name.includes(searchName)) show = false;
+          if (searchLesson && !lesson.includes(searchLesson)) show = false;
+          if (searchStatus && statusValue !== searchStatus) show = false;
+
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('searchID').value = '';
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchLesson').value = '';
+      document.getElementById('searchStatus').value = '';
+
+      const rows = document.querySelectorAll('tr.testing_row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = ['searchID', 'searchName', 'searchLesson', 'searchStatus'];
+      inputs.forEach(id => {
+        document.getElementById(id).addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            searchTable();
+          }
+        });
+      });
+    });
+</script>
+{% endblock %}
+{% set show_footer = False %}

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Админ – Список пользователей{% endblock %}
+{% block title %}Админ – Создание группы{% endblock %}
 {% block content %}
 <p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
 
@@ -131,6 +131,15 @@
 
       if (!groupName.trim()) {
         alert('Введите название группы');
+        return;
+      }
+
+      const inputValue = groupName.trim();
+      const group_names = {{ group_names|tojson|safe }};
+
+
+      if (group_names.includes(inputValue)) {
+        alert("Название должно быть уникальным");
         return;
       }
 

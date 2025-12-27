@@ -10,68 +10,81 @@
         <div class="hero-content">
             <h1 class="hero-title">Управление тестированиями</h1>
 
-            <table border="1" cellpadding="5" id="messagesTable">
-              <tr>
-                <th>Тестирования</th><th>Группы</th><th>Уроки</th>
-              </tr>
-              <tr class="msg_row">
-                <td>
-                    <div class="button-container">
-                        <a href="{{ url_for('DB_management_instruction') }}">
-                            <button class="secondary-button">Инструкция</button>
+            <table border="1" cellpadding="10" id="messagesTable" style="width: 100%; border-collapse: collapse; text-align: center;">
+                <tr>
+                    <th style="padding: 15px; background-color: #f8f9fa;">Тестирования</th>
+                    <th style="padding: 15px; background-color: #f8f9fa;">Группы</th>
+                    <th style="padding: 15px; background-color: #f8f9fa;">Уроки</th>
+                </tr>
+                <tr class="msg_row">
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('testing_create') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Создание тестирования
+                            </button>
                         </a>
-                    </div>
-                </td>
-                <td>
-                  <a href="{{ url_for('group_create')}}">
-                      <button class="secondary-button">Создать группу</button>
-                  </a>
-                </td>
-                <td>
-                    <a href="{{ url_for('lesson_create')}}">
-                        <button class="secondary-button">Создать урок</button>
-                    </a>
-                </td>
-              </tr>
-              <tr class="msg_row">
-                <td>
-                    <div class="button-container">
-                        <a href="{{ url_for('DB_management_instruction') }}">
-                            <button class="secondary-button">Инструкция</button>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('group_create')}}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Создать группу
+                            </button>
                         </a>
-                    </div>
-                </td>
-                <td>
-                  <a href="{{ url_for('group_list') }}">
-                      <button class="primary-button">Редактировать группы</button>
-                  </a>
-                </td>
-                <td>
-                    <a href="{{ url_for('lesson_list') }}">
-                        <button class="primary-button">Редактировать уроки</button>
-                    </a>
-                </td>
-              </tr>
-
-              <tr class="msg_row">
-                <td>
-                    <div class="button-container">
-                        <a href="{{ url_for('DB_management_instruction') }}">
-                            <button class="secondary-button">Инструкция</button>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('lesson_create')}}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Создать урок
+                            </button>
                         </a>
-                    </div>
-                </td>
-                <td>
-                  <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-
-                  </div>
-                </td>
-                <td>
-                    <a href="{{ url_for('lesson_list') }}">
-                        <button class="primary-button">Инструкция</button>
-                    </a>
-                </td>
-              </tr>
+                    </td>
+                </tr>
+                <tr class="msg_row">
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('testing_list') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Редактировать тестирования
+                            </button>
+                        </a>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('group_list') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Редактировать группы
+                            </button>
+                        </a>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('lesson_list') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Редактировать уроки
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                <tr class="msg_row">
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('testing_management_instruction') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Инструкция
+                            </button>
+                        </a>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('testing_management_instruction') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Инструкция
+                            </button>
+                        </a>
+                    </td>
+                    <td style="padding: 20px; vertical-align: middle;">
+                        <a href="{{ url_for('testing_management_instruction') }}" style="text-decoration: none; display: block;">
+                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
+                                Инструкция
+                            </button>
+                        </a>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>

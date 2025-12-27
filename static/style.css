@@ -167,3 +167,108 @@ a.btn {
   color: #333;
   margin-right: 30px;
 }
+
+.table-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 10;
+    }
+
+    th, td {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        border-bottom: 2px solid #007bff;
+        position: sticky;
+        top: 0;
+    }
+
+    .msg_row {
+        transition: background-color 0.2s;
+    }
+
+    .msg_row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .secondary-button, .primary-button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 200px;
+        width: 80%;
+    }
+
+    .secondary-button {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .secondary-button:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .primary-button {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .primary-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    button[type="button"] {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    button[type="button"]:hover {
+        background-color: #218838;
+    }
+
+.btn-small {
+    padding: 6px 16px !important;
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    min-width: auto !important;
+    width: auto !important;
+}
+
+.btn-small:hover {
+    background-color: #5a6268 !important;
+    transform: none !important;
+}

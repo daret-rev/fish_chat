@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Создание тестирования{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
+
+<h2>Создание тестирования</h2>
+
+<form id="testingForm" method="post">
+    <section>
+        <div style="margin: 20px 0;">
+          <input type="text" name="testing_name" id="nemeTesting" placeholder="Название тестирования"
+                 style="padding: 8px; width: 300px;">
+        </div>
+    </section>
+
+    <div style="margin: 20px 0;">
+        <label for="status">Статус тестирования:</label>
+        <select name="status" id="status" style="padding: 8px; width: 200px;">
+            <option value="active" selected>Активно</option>
+            <option value="archived">Архив</option>
+        </select>
+    </div>
+
+    <h3>Выберите урок</h3>
+
+    <div style="margin: 10px 0;">
+        <input type="text" id="searchLessonName" placeholder="Поиск по названию..."
+               style="padding: 8px; width: 300px;">
+        <input type="text" id="searchLessonID" placeholder="Поиск по ID..."
+               style="padding: 8px; width: 100px; margin-left: 10px;">
+        <button type="button" onclick="searchLessons()" style="padding: 6px 16px; margin-left: 10px;">
+            Найти
+        </button>
+        <button type="button" onclick="clearLessonSearch()" style="padding: 6px 16px; margin-left: 5px;">
+            Сбросить
+        </button>
+    </div>
+
+    <div style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; margin-bottom: 30px;">
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">Выбрать</th>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Время</th>
+                    <th>Заданий</th>
+                </tr>
+            </thead>
+            <tbody id="lessonsTableBody">
+                {% for l in lessons %}
+                <tr class="lesson-select-row">
+                    <td><input type="radio" name="lesson_id" class="lesson-radio" value="{{ l.id }}"></td>
+                    <td>{{ l.id }}</td>
+                    <td>{{ l.name }}</td>
+                    <td>{{ l.time }}</td>
+                    <td>{{ l.questions|length }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Выберите группы</h3>
+
+    <div style="margin: 10px 0;">
+        <input type="text" id="searchGroupName" placeholder="Поиск по названию..."
+               style="padding: 8px; width: 300px;">
+        <input type="text" id="searchGroupID" placeholder="Поиск по ID..."
+               style="padding: 8px; width: 100px; margin-left: 10px;">
+        <button type="button" onclick="searchGroups()" style="padding: 6px 16px; margin-left: 10px;">
+            Найти
+        </button>
+        <button type="button" onclick="clearGroupSearch()" style="padding: 6px 16px; margin-left: 5px;">
+            Сбросить
+        </button>
+    </div>
+
+    <div style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; margin-bottom: 30px;">
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">Выбрать</th>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Участников</th>
+                </tr>
+            </thead>
+            <tbody id="groupsTableBody">
+                {% for g in groups %}
+                <tr class="group-select-row">
+                    <td><input type="checkbox" class="group-checkbox" value="{{ g.id }}"></td>
+                    <td>{{ g.id }}</td>
+                    <td>{{ g.groupname }}</td>
+                    <td>{{ g.users|length }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <button type="button" onclick="prepareAndSubmit()">Создать тестирование</button>
+</form>
+
+<script>
+
+    function searchLessons() {
+        const searchName = document.getElementById('searchLessonName').value.toLowerCase();
+        const searchID = document.getElementById('searchLessonID').value.toLowerCase();
+        const rows = document.querySelectorAll('#lessonsTableBody .lesson-select-row');
+
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 4) {
+                const id = cells[1].textContent.toLowerCase();
+                const name = cells[2].textContent.toLowerCase();
+                let show = true;
+                if (searchID && !id.includes(searchID)) show = false;
+                if (searchName && !name.includes(searchName)) show = false;
+                row.style.display = show ? '' : 'none';
+            }
+        });
+    }
+
+    function clearLessonSearch() {
+        document.getElementById('searchLessonName').value = '';
+        document.getElementById('searchLessonID').value = '';
+        const rows = document.querySelectorAll('#lessonsTableBody .lesson-select-row');
+        rows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    function searchGroups() {
+        const searchName = document.getElementById('searchGroupName').value.toLowerCase();
+        const searchID = document.getElementById('searchGroupID').value.toLowerCase();
+        const rows = document.querySelectorAll('#groupsTableBody .group-select-row');
+
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 4) {
+                const id = cells[1].textContent.toLowerCase();
+                const name = cells[2].textContent.toLowerCase();
+                let show = true;
+                if (searchID && !id.includes(searchID)) show = false;
+                if (searchName && !name.includes(searchName)) show = false;
+                row.style.display = show ? '' : 'none';
+            }
+        });
+    }
+
+    function clearGroupSearch() {
+        document.getElementById('searchGroupName').value = '';
+        document.getElementById('searchGroupID').value = '';
+        const rows = document.querySelectorAll('#groupsTableBody .group-select-row');
+        rows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    function prepareAndSubmit() {
+        const testingName = document.querySelector('input[name="testing_name"]').value.trim();
+
+        if (!testingName) {
+            alert('Введите название тестирования');
+            return;
+        }
+
+        const testing_names = {{ testing_names|tojson|safe }};
+
+        if (testing_names.includes(testingName)) {
+            alert('Тестирование с таким названием уже существует. Выберите другое название.');
+            return;
+        }
+
+        const selectedLesson = document.querySelector('input[name="lesson_id"]:checked');
+        if (!selectedLesson) {
+            alert('Выберите урок');
+            return;
+        }
+
+        const selectedGroups = document.querySelectorAll('.group-checkbox:checked');
+        if (selectedGroups.length === 0) {
+            alert('Выберите хотя бы одну группу');
+            return;
+        }
+
+        const groupIds = Array.from(selectedGroups).map(cb => cb.value).join(',');
+
+        const existingHidden = document.querySelector('input[name="group_ids"]');
+        if (existingHidden) {
+            existingHidden.remove();
+        }
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'group_ids';
+        hiddenInput.value = groupIds;
+
+        const form = document.getElementById('testingForm');
+        form.appendChild(hiddenInput);
+        form.submit();
+    }
+</script>
+{% endblock %}
+{% set show_footer = False %}

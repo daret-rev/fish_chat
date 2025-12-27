@@ -123,6 +123,7 @@ class Group(db.Model):
         db.session.add(self)
         db.session.commit()
         print(f"Группа '{self.groupname}' создана с ID: {self.id}")
+
 # ------------------------------------------------------------------
 # Модель: урок + участники + задания
 # ------------------------------------------------------------------
@@ -150,7 +151,7 @@ class Lesson(db.Model):
     def set_time(self, time):
         self.time = time
 
-    def add_questions(self,  questions_id: list = None, rand=True):
+    def add_questions(self,  questions_id: list[int] = None, rand=True):
         if questions_id is None:
             all_messages = Message.query.all()
             shuffled_ids = [m.id for m in all_messages]
@@ -181,8 +182,8 @@ class Testing(db.Model):
 
     name = db.Column(db.String(64), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False)
-    lesson_id = db.Column(db.Integer, db.ForeignKey('Lessons.id'), nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey('Groups.id'), nullable=False)
+    lesson_id = db.Column(db.Integer, nullable=False)
+    group_id = db.Column(db.JSON, nullable=False)
 
     def __init__(self, name):
         self.name = name
@@ -190,11 +191,19 @@ class Testing(db.Model):
     def __repr__(self):
         return f'<Testing {self.name}>'
 
-    def add_lesson(self, lesson: Lesson):
-        self.lesson_id = lesson.id
+    def set_status(self, status: bool):
+        self.status = status
 
-    def add_group(self, group: Group):
-        self.group_id = group.id
+    def add_lesson(self, lesson: int):
+        self.lesson_id = lesson
+
+    def add_group(self, group: list[int]):
+        self.group_id = group
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        print(f"Тестирование '{self.name}' создан с ID: {self.id}")
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
 # ------------------------------------------------------------------
@@ -649,24 +658,6 @@ def DB_msg_edit(msg_id):
     return redirect(url_for('dashboard/DB_management/DB_msg_list'))
 
 # ---------------------------------------------------------
-# Панель управления Тестами
-# ---------------------------------------------------------
-@app.route('/dashboard/testing_management')
-def testing_management():
-    if not check_privileges():
-        return redirect(url_for('ErAuth'))
-
-    if request.method == 'GET':
-        return render_template(mgn + 'testing_management.html')
-"""@app.route('/dashboard/testing_management/lesson_management', methods=['GET', 'POST'])
-def lesson_management():
-    if not check_privileges():
-        return redirect(url_for('ErAuth'))
-
-    if request.method == 'GET':
-        return render_template(mgn + 'lesson_management.html')"""
-
-# ---------------------------------------------------------
 # Панель управления Уроками
 # ---------------------------------------------------------
 @app.route('/dashboard/testing_management/lesson_create', methods=['GET', 'POST'])
@@ -675,8 +666,9 @@ def lesson_create():
         return redirect(url_for('ErAuth'))
 
     messages = Message.query.order_by(Message.id).all()
+    lesson_names = [l.name for l in Lesson.query.order_by(Lesson.name).all()]
     if request.method == 'GET':
-        return render_template(mgn + 'lesson_create.html', messages=messages)
+        return render_template(mgn + 'lesson_create.html', messages=messages, lesson_names=lesson_names)
 
     lesson_name = request.form.get('lesson_name')
     time = request.form.get('time')
@@ -718,9 +710,10 @@ def lesson_edit(less_id):
 
     lesson = Lesson.query.get_or_404(less_id)
     messages = Message.query.order_by(Message.id).all()
+    lesson_names = [l.name for l in Lesson.query.order_by(Lesson.name).all()]
 
     if request.method == 'GET':
-        return render_template(mgn + 'lesson_edit.html', lesson=lesson, messages=messages)
+        return render_template(mgn + 'lesson_edit.html', lesson=lesson, messages=messages, lesson_names=lesson_names)
 
     lesson.name = request.form.get('lesson_name')
 
@@ -766,8 +759,9 @@ def group_create():
         return redirect(url_for('ErAuth'))
 
     users = User.query.order_by(User.id).offset(1).all()
+    group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all()]
     if request.method == 'GET':
-        return render_template(mgn + 'group_create.html', users=users)
+        return render_template(mgn + 'group_create.html', users=users, group_names=group_names)
 
     group_name = request.form.get('group_name')
     users_ids = request.form.get('selected_ids')
@@ -796,9 +790,10 @@ def group_edit(group_id):
 
     group = Group.query.get_or_404(group_id)
     users = User.query.order_by(User.id).offset(1).all()
+    group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all()]
 
     if request.method == 'GET':
-        return render_template(mgn + 'group_edit.html', group=group, users=users)
+        return render_template(mgn + 'group_edit.html', group=group, users=users, group_names=group_names)
 
     group_name = request.form.get('group_name')
     users_ids = request.form.get('selected_ids')
@@ -823,6 +818,96 @@ def group_delete(group_id):
     db.session.commit()
 
     return redirect(url_for('group_list'))
+
+# ---------------------------------------------------------
+# Панель управления Тестами
+# ---------------------------------------------------------
+@app.route('/dashboard/testing_management')
+def testing_management():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'testing_management.html')
+
+@app.route('/dashboard/testing_management/testing_management_instruction')
+def testing_management_instruction():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    if request.method == 'GET':
+        return render_template(mgn + 'testing_management_instruction.html')
+
+@app.route('/dashboard/testing_management/testing_create', methods=['GET', 'POST'])
+def testing_create():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+    testing_names = [t.name for t in Testing.query.order_by(Testing.name).all()]
+    groups = Group.query.order_by(Group.id).all()
+    lessons = Lesson.query.order_by(Lesson.id).all()
+    if request.method == 'GET':
+        return render_template(mgn + 'testing_create.html', groups=groups, lessons=lessons, testing_names=testing_names)
+
+    testing_name = request.form.get('testing_name')
+    status = request.form['status'] == 'active'
+    lesson_id = request.form.get('lesson_id')
+    groups_ids = request.form.get('group_ids')
+
+    testing = Testing(testing_name)
+    testing.set_status(status)
+    testing.add_lesson(lesson_id)
+    groups_ids = [int(id) for id in groups_ids.split(',')]
+    testing.add_group(groups_ids)
+
+    testing.save()
+
+    return redirect(url_for('testing_management'))
+
+@app.route('/dashboard/testing_management/testing_list')
+def testing_list():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    testings = Testing.query.order_by(Testing.id).all()
+    lessons = Lesson.query.order_by(Lesson.id).all()
+    lessons_dict = {lesson.id: lesson for lesson in lessons}
+    return render_template(mgn + 'testing_list.html', testings=testings, lessons_dict=lessons_dict)
+
+@app.route('/dashboard/testing_management/testing_list/testing_edit/<int:testing_id>', methods=['GET','POST'])
+def testing_edit(testing_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    testing = Testing.query.get_or_404(testing_id)
+
+    if request.method == 'GET':
+        lessons = Lesson.query.order_by(Lesson.id).all()
+        groups = Group.query.order_by(Group.id).all()
+
+        group_ids = testing.group_id
+        lessons_dict = {lesson.id: lesson for lesson in lessons}
+        testing_names = [t.name for t in Testing.query.order_by(Testing.name).all()]
+
+        return render_template(mgn + 'testing_edit.html',
+                               testing=testing,
+                               lessons=lessons,
+                               groups=groups,
+                               group_ids=group_ids,
+                               lessons_dict=lessons_dict,
+                               testing_names=testing_names)
+
+@app.route('/dashboard/testing_management/testing_list/testing_delete/<int:testing_id>', methods=['POST'])
+def testing_delete(testing_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    testing = Testing.query.get_or_404(testing_id)
+    db.session.delete(testing)
+    db.session.commit()
+    flash(f'Тестирование "{testing.name}" с ID - "{testing.id}" удалено')
+
+    return redirect(url_for('testing_list'))
+
 # ---------------------------------------------------------
 # Запуск дебагера
 # ---------------------------------------------------------

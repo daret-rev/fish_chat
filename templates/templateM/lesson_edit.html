@@ -170,6 +170,15 @@
         return;
       }
 
+      const inputValue = lessonName.trim();
+      const lesson_names = {{ lesson_names|tojson|safe }};
+
+
+      if (lesson_names.includes(inputValue)) {
+        alert("Название должно быть уникальным");
+        return;
+      }
+
       const timeInput = document.getElementById('time');
       if (!timeInput.value.trim()) {
         timeInput.value = '';
