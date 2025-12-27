@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Админ – {% if lesson %}Редактирование урока{% else %}Создание урока{% endif %}{% endblock %}
+{% block title %}Админ – Редактирование урока{% endblock %}
 {% block content %}
 <p><a href="{{ url_for('lesson_list') }}" class="btn">← назад</a></p>
 
-<h2>{% if lesson %}Редактирование урока: {{ lesson.name }}{% else %}Создание урока{% endif %}</h2>
+<h2>Редактирование урока: {{ lesson.name }}</h2>
 
 <form id="lessonForm" method="post">
-    {% if lesson %}
     <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
-    {% endif %}
 
     <section>
         <div style="margin: 20px 0;">
           <input type="text" name="lesson_name" id="nemeLesson" placeholder="Название"
-                 value="{{ lesson.name if lesson else '' }}"
+                 value="{{ lesson.name }}"
                  style="padding: 8px; width: 300px;">
 
           <p>
@@ -37,12 +35,11 @@
         </div>
     </section>
 
-    {% if lesson and lesson.questions %}
     <div style="margin: 10px 0; padding: 10px; background: #f0f0f0;">
         <strong>Выбрано сообщений:</strong> {{ lesson.questions|length }}
     </div>
-    {% endif %}
-    <button type="button" onclick="prepareAndSubmit()">{% if lesson %}Сохранить{% else %}Создать{% endif %}</button>
+
+    <button type="button" onclick="prepareAndSubmit()">Сохранить</button>
 
     <h3>Список всех сообщений</h3>
 

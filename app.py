@@ -658,14 +658,17 @@ def testing_management():
 
     if request.method == 'GET':
         return render_template(mgn + 'testing_management.html')
-@app.route('/dashboard/testing_management/lesson_management', methods=['GET', 'POST'])
+"""@app.route('/dashboard/testing_management/lesson_management', methods=['GET', 'POST'])
 def lesson_management():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
 
     if request.method == 'GET':
-        return render_template(mgn + 'lesson_management.html')
+        return render_template(mgn + 'lesson_management.html')"""
 
+# ---------------------------------------------------------
+# Панель управления Уроками
+# ---------------------------------------------------------
 @app.route('/dashboard/testing_management/lesson_create', methods=['GET', 'POST'])
 def lesson_create():
     if not check_privileges():
@@ -698,7 +701,7 @@ def lesson_create():
 
     lesson.save()
 
-    return redirect(url_for('lesson_management'))
+    return redirect(url_for('testing_management'))
 
 @app.route('/dashboard/testing_management/lesson_list')
 def lesson_list():
@@ -754,7 +757,72 @@ def lesson_delete(less_id):
     return redirect(url_for('lesson_list'))
 
 
+# ---------------------------------------------------------
+# Панель управления Группами
+# ---------------------------------------------------------
+@app.route('/dashboard/testing_management/group_create', methods=['GET', 'POST'])
+def group_create():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
 
+    users = User.query.order_by(User.id).offset(1).all()
+    if request.method == 'GET':
+        return render_template(mgn + 'group_create.html', users=users)
+
+    group_name = request.form.get('group_name')
+    users_ids = request.form.get('selected_ids')
+
+    group = Group(group_name)
+
+    users_ids = [int(id) for id in users_ids.split(',')]
+    group.add_users(users_ids)
+
+    group.save()
+
+    return redirect(url_for('testing_management'))
+
+@app.route('/dashboard/testing_management/group_list')
+def group_list():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    groups = Group.query.order_by(Group.id).all()
+    return render_template(mgn + 'group_list.html', groups=groups)
+
+@app.route('/dashboard/lesson_list/group_edit/<int:group_id>', methods=['GET', 'POST'])
+def group_edit(group_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    group = Group.query.get_or_404(group_id)
+    users = User.query.order_by(User.id).offset(1).all()
+
+    if request.method == 'GET':
+        return render_template(mgn + 'group_edit.html', group=group, users=users)
+
+    group_name = request.form.get('group_name')
+    users_ids = request.form.get('selected_ids')
+
+    group.set_groupname(group_name)
+
+    users_ids = [int(id) for id in users_ids.split(',')]
+    group.add_users(users_ids)
+
+    db.session.commit()
+
+    return redirect(url_for('group_list'))
+
+@app.route('/dashboard/testing_management/group_delete/<int:group_id>', methods=['POST'])
+def group_delete(group_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    group = Group.query.get_or_404(group_id)
+    db.session.delete(group)
+    flash(f"Группа '{group_id}' удалена")
+    db.session.commit()
+
+    return redirect(url_for('group_list'))
 # ---------------------------------------------------------
 # Запуск дебагера
 # ---------------------------------------------------------

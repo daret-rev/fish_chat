@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Список пользователей{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
+
+<h2>Создание группы</h2>
+
+<form id="usersForm" method="post">
+    <section>
+        <div style="margin: 20px 0;">
+          <input type="text" name="group_name" id="nemeGroup" placeholder="Название"
+                 style="padding: 8px; width: 300px;">
+        </div>
+    </section>
+
+    <h3>Укажите участников группы</h3>
+
+    <button type="button" onclick="prepareAndSubmit()">Создать</button>
+    <h3>Список всех пользователей</h3>
+
+    <!-- Фильтр поиска -->
+    <div style="margin: 20px 0;">
+      <input type="text" id="searchName" placeholder="Поиск по имени..."
+             style="padding: 8px; width: 300px;">
+
+      <input type="text" id="searchID" placeholder="Поиск по ID..."
+             style="padding: 8px; width: 100px; margin-left: 10px;">
+
+      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
+        Найти
+      </button>
+
+      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
+        Сбросить
+      </button>
+    </div>
+
+  <input type="hidden" id="selectedIds" name="selected_ids" value="">
+
+    <table border="1" cellpadding="5" id="usersTable">
+      <tr>
+        <th>ID</th><th>Имя</th><th>Добавить</th>
+      </tr>
+      {% for u in users %}
+      <tr class="usr_row">
+        <td>{{ u.id }}</td>
+        <td>
+          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
+            {{ u.username }}
+          </div>
+        </td>
+
+        <td>
+          <div class="actions">
+              <input type="checkbox" class="usr-checkbox" value="{{ u.id }}">
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+</form>
+
+
+
+<script>
+    function searchTable() {
+      const searchName = document.getElementById('searchName').value.toLowerCase();
+      const searchID = document.getElementById('searchID').value.toLowerCase();
+
+      const rows = document.querySelectorAll('table tr.usr_row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 3) {
+          const id = cells[0].textContent.toLowerCase();
+          const name = cells[1].textContent.toLowerCase();
+
+          let show = true;
+
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchName && !name.includes(searchName)) show = false;
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchID').value = '';
+
+      const rows = document.querySelectorAll('tr.usr_row, tr.usr-row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+
+    function updateSelectedIds() {
+      const checkboxes = document.querySelectorAll('.usr-checkbox:checked');
+      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+      document.getElementById('selectedIds').value = selectedIds.join(',');
+      return selectedIds;
+    }
+
+    function submitForm(action) {
+      const selectedIds = updateSelectedIds();
+
+      if (selectedIds.length === 0) {
+        alert('Выберите хотя бы одно сообщение');
+        return;
+      }
+
+      const form = document.getElementById('usersForm');
+      const actionInput = document.createElement('input');
+      actionInput.type = 'hidden';
+      actionInput.name = 'action';
+      actionInput.value = action;
+      form.appendChild(actionInput);
+
+      form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = document.querySelectorAll('.usr-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedIds);
+      });
+    });
+
+    function prepareAndSubmit() {
+      const groupName = document.querySelector('input[name="group_name"]').value;
+
+      if (!groupName.trim()) {
+        alert('Введите название группы');
+        return;
+      }
+
+      const selectedIds = updateSelectedIds();
+
+      if (selectedIds.length === 0) {
+        alert('Выберите хотя бы одного пользователя');
+        return;
+      }
+
+      document.getElementById('usersForm').submit();
+    }
+</script>
+{% endblock %}
+{% set show_footer = False %}

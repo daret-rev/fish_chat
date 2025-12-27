@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Админ – Список уроков{% endblock %}
+{% block title %}Админ – Список групп{% endblock %}
 {% block content %}
 
 <p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
-<h2>Список всех уроков</h2>
+<h2>Список всех групп</h2>
 
 <!-- Фильтр поиска -->
 <div style="margin: 20px 0;">
@@ -22,30 +22,31 @@
   </button>
 </div>
 
-<table border="1" cellpadding="5" id="lessonTable">
+<table border="1" cellpadding="5" id="groupTable">
   <tr>
-    <th>ID</th><th>Название</th><th>Время</th><th>+</th><th>-</th><th>Заданий</th><th>Действие</th>
+    <th>ID</th><th>Название</th><th>Участников</th><th>Действие</th>
   </tr>
-  {% for l in lessons %}
-  <tr class="less_row">
-    <td>{{ l.id }}</td>
+  {% for g in groups %}
+  <tr class="group_row">
+    <td>{{ g.id }}</td>
     <td>
       <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-        {{ l.name }}
+        {{ g.groupname }}
       </div>
     </td>
-    <td>{{ l.time }}</td>
-    <td>{{ l.price_correct }}</td>
-    <td>{{ l.price_wrong }}</td>
-    <td>{{ l.questions|length }}</td>
+    <td>
+        <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
+            {{ g.users|length }}
+        </div>
+    </td>
     <td>
       <div class="actions">
-          <a href="{{ url_for('lesson_edit', less_id=l.id) }}"
+          <a href="{{ url_for('group_edit', group_id=g.id) }}"
              class="btn btn-action">Редактировать</a>
 
           <span class="action-divider">/</span>
 
-          <form action="{{ url_for('lesson_delete', less_id=l.id) }}"
+          <form action="{{ url_for('group_delete', group_id=g.id) }}"
                 method="post" style="display:inline;">
               <button type="submit"
                       onclick="return confirm('Удалить?')"
@@ -62,7 +63,7 @@
       const searchName = document.getElementById('searchName').value.toLowerCase();
       const searchID = document.getElementById('searchID').value.toLowerCase();
 
-      const rows = document.querySelectorAll('table tr.less_row');
+      const rows = document.querySelectorAll('table tr.group_row');
 
       rows.forEach(row => {
         const cells = row.getElementsByTagName('td');
@@ -84,7 +85,7 @@
       document.getElementById('searchName').value = '';
       document.getElementById('searchID').value = '';
 
-      const rows = document.querySelectorAll('tr.less_row, tr.less-row');
+      const rows = document.querySelectorAll('tr.group_row, tr.group-row');
       rows.forEach(row => {
         row.style.display = '';
       });

@@ -23,9 +23,9 @@
                     </div>
                 </td>
                 <td>
-                  <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-
-                  </div>
+                  <a href="{{ url_for('group_create')}}">
+                      <button class="secondary-button">Создать группу</button>
+                  </a>
                 </td>
                 <td>
                     <a href="{{ url_for('lesson_create')}}">
@@ -42,13 +42,13 @@
                     </div>
                 </td>
                 <td>
-                  <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-
-                  </div>
+                  <a href="{{ url_for('group_list') }}">
+                      <button class="primary-button">Редактировать группы</button>
+                  </a>
                 </td>
                 <td>
                     <a href="{{ url_for('lesson_list') }}">
-                        <button class="primary-button">Изменить урок</button>
+                        <button class="primary-button">Редактировать уроки</button>
                     </a>
                 </td>
               </tr>

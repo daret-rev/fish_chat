@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Админ – Редактирование группы{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('group_list') }}" class="btn">← назад</a></p>
+
+<h2>Редактирование группы: {{ group.groupname }}</h2>
+
+<form id="usersForm" method="post">
+    <section>
+        <div style="margin: 20px 0;">
+          <input type="text" name="group_name" id="nemeGroup" placeholder="Название"
+                 value="{{ group.groupname }}"
+                 style="padding: 8px; width: 200px;">
+        </div>
+    </section>
+
+    <div style="margin: 10px 0; padding: 10px; background: #f0f0f0;">
+        <strong>Участников:</strong> {{ group.users|length }}
+    </div>
+
+
+    <h3>Укажите участников группы</h3>
+
+    <button type="button" onclick="prepareAndSubmit()">Сохранить</button>
+    <h3>Список всех пользователей</h3>
+
+    <!-- Фильтр поиска -->
+    <div style="margin: 20px 0;">
+      <input type="text" id="searchName" placeholder="Поиск по имени..."
+             style="padding: 8px; width: 250px;">
+
+      <input type="text" id="searchID" placeholder="Поиск по ID..."
+             style="padding: 8px; width: 100px; margin-left: 10px;">
+
+      <select id="searchSelected" style="padding: 8px; margin-left: 10px;">
+        <option value="">Все</option>
+        <option value="selected">Выбранные</option>
+        <option value="not_selected">Не выбранные</option>
+      </select>
+
+      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
+        Найти
+      </button>
+
+      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
+        Сбросить
+      </button>
+    </div>
+
+  <input type="hidden" id="selectedIds" name="selected_ids" value="">
+
+    <table border="1" cellpadding="5" id="usersTable">
+      <tr>
+        <th>ID</th><th>Имя</th><th>Добавить</th>
+      </tr>
+      {% for u in users %}
+      <tr class="usr_row">
+        <td>{{ u.id }}</td>
+        <td>
+          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
+            {{ u.username }}
+          </div>
+        </td>
+
+        <td>
+          <div class="actions">
+              <input type="checkbox" class="usr-checkbox" value="{{ u.id }}"
+                {% if group and u.id in group.users %}checked{% endif %}>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+</form>
+
+<script>
+    function searchTable() {
+      const searchName = document.getElementById('searchName').value.toLowerCase();
+      const searchID = document.getElementById('searchID').value.toLowerCase();
+      const searchSelected = document.getElementById('searchSelected').value;
+
+      const rows = document.querySelectorAll('table tr.usr_row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 3) {
+          const id = cells[0].textContent.toLowerCase();
+          const name = cells[1].textContent.toLowerCase();
+          const checkbox = row.querySelector('.usr-checkbox');
+          const isSelected = checkbox ? checkbox.checked : false;
+
+          let show = true;
+
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchName && !name.includes(searchName)) show = false;
+          if (searchSelected === 'selected' && !isSelected) show = false;
+          if (searchSelected === 'not_selected' && isSelected) show = false;
+
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchID').value = '';
+      document.getElementById('searchSelected').value = '';
+
+      const rows = document.querySelectorAll('tr.usr_row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+
+    function updateSelectedIds() {
+      const checkboxes = document.querySelectorAll('.usr-checkbox:checked');
+      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+      document.getElementById('selectedIds').value = selectedIds.join(',');
+      return selectedIds;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = document.querySelectorAll('.usr-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedIds);
+      });
+      // Инициализируем скрытое поле при загрузке
+      updateSelectedIds();
+    });
+
+    function prepareAndSubmit() {
+      const groupName = document.querySelector('input[name="group_name"]').value;
+
+      if (!groupName.trim()) {
+        alert('Введите название группы');
+        return;
+      }
+
+      const selectedIds = updateSelectedIds();
+
+      if (selectedIds.length === 0) {
+        alert('Выберите хотя бы одного пользователя');
+        return;
+      }
+
+      document.getElementById('usersForm').submit();
+    }
+</script>
+{% endblock %}
+{% set show_footer = False %}
