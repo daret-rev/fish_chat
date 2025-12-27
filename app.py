@@ -133,6 +133,8 @@ class Lesson(db.Model):
 
     name = db.Column(db.String(64), unique=True, nullable=False)
     time = db.Column(db.Integer, nullable=False)
+    price_correct = db.Column(db.Integer, default=1)
+    price_wrong = db.Column(db.Integer, default=-1)
     questions = db.Column(db.JSON, nullable=False)
 
     def __init__(self, name):
@@ -161,8 +163,8 @@ class Lesson(db.Model):
         self.questions = questions_id
 
     def set_expirience(self, expirience_yes = 1, expirience_no = -1):
-        self.expirience_yes = expirience_yes
-        self.expirience_no = expirience_no
+        self.price_correct = expirience_yes
+        self.price_wrong = expirience_no
 
     def save(self):
         db.session.add(self)
@@ -622,7 +624,8 @@ def DB_msg_delete(msg_id):
     msg = Message.query.get_or_404(msg_id)
     db.session.delete(msg)
     db.session.commit()
-    flash('Сообщение удалено')
+    flash(f'Сообщение "{msg_id}" удалено')
+
     return redirect(url_for('dashboard/DB_msg_list'))
 
 @app.route('/dashboard/DB_msg_edit/<int:msg_id>', methods=['GET', 'POST'])
@@ -663,7 +666,7 @@ def lesson_management():
     if request.method == 'GET':
         return render_template(mgn + 'lesson_management.html')
 
-@app.route('/dashboard/testing_management/lesson_management/lesson_create', methods=['GET', 'POST'])
+@app.route('/dashboard/testing_management/lesson_create', methods=['GET', 'POST'])
 def lesson_create():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
@@ -687,17 +690,17 @@ def lesson_create():
         lesson.set_time(0)
     lesson.set_expirience(price_correct, price_wrong)
     if selected_ids != '':
-        selected_ids = selected_ids.split(',')
-        lesson.set_selected_ids(selected_ids)
+        selected_ids = [int(id) for id in selected_ids.split(',')]
+        lesson.add_questions(selected_ids)
     else:
         lesson.set_count_questions(int(msg_count))
         lesson.add_questions()
 
     lesson.save()
 
-    return render_template(mgn + 'lesson_management.html')
+    return redirect(url_for('lesson_management'))
 
-@app.route('/dashboard/testing_management/lesson_management/lesson_list')
+@app.route('/dashboard/testing_management/lesson_list')
 def lesson_list():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
@@ -705,9 +708,56 @@ def lesson_list():
     lessons = Lesson.query.order_by(Lesson.id).all()
     return render_template(mgn + 'lesson_list.html', lessons=lessons)
 
+@app.route('/dashboard/lesson_list/lesson_edit/<int:less_id>', methods=['GET', 'POST'])
+def lesson_edit(less_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    lesson = Lesson.query.get_or_404(less_id)
+    messages = Message.query.order_by(Message.id).all()
+
+    if request.method == 'GET':
+        return render_template(mgn + 'lesson_edit.html', lesson=lesson, messages=messages)
+
+    lesson.name = request.form.get('lesson_name')
+
+    time = request.form.get('time')
+    if time:
+        lesson.time = time
+    else:
+        lesson.time = 0
+
+    lesson.price_correct = request.form.get('price_correct')
+    lesson.price_wrong = request.form.get('price_wrong')
+
+    selected_ids_str = request.form.get('selected_ids')
+    if selected_ids_str:
+        question_ids = [int(id) for id in selected_ids_str.split(',')]
+        lesson.questions = question_ids
+    else:
+        lesson.questions = []
+
+    db.session.commit()
+    #flash(f'Урок "{lesson.id}" успешно обновлен', 'success')
+    return redirect(url_for('lesson_list'))
+
+@app.route('/dashboard/testing_management/lesson_delete/<int:less_id>', methods=['POST'])
+def lesson_delete(less_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    less = Lesson.query.get_or_404(less_id)
+    db.session.delete(less)
+    flash(f"Урок '{less_id}' удален")
+    db.session.commit()
+
+    return redirect(url_for('lesson_list'))
 
 
 
+# ---------------------------------------------------------
+# Запуск дебагера
+# ---------------------------------------------------------
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     User.create_default_users()

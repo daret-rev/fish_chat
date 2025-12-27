@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Админ – {% if lesson %}Редактирование урока{% else %}Создание урока{% endif %}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('lesson_list') }}" class="btn">← назад</a></p>
+
+<h2>{% if lesson %}Редактирование урока: {{ lesson.name }}{% else %}Создание урока{% endif %}</h2>
+
+<form id="lessonForm" method="post">
+    {% if lesson %}
+    <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
+    {% endif %}
+
+    <section>
+        <div style="margin: 20px 0;">
+          <input type="text" name="lesson_name" id="nemeLesson" placeholder="Название"
+                 value="{{ lesson.name if lesson else '' }}"
+                 style="padding: 8px; width: 300px;">
+
+          <p>
+            <label for="time">Время на тест:</label>
+            <input type="number" step="1" name="time" id="time" placeholder="мин"
+                   value="{{ lesson.time if lesson else '' }}"><br>
+          </p>
+
+        <p>
+            <label for="price_correct">Цена за правильный ответ:</label>
+            <input type="number" step="1" name="price_correct" id="price_correct" required
+                   value="{{ lesson.price_correct if lesson else 1 }}"><br>
+        </p>
+
+        <p>
+            <label for="price_wrong">Цена за неправильный ответ:</label>
+            <input type="number" step="1" name="price_wrong" id="price_wrong" required
+                   value="{{ lesson.price_wrong if lesson else -1 }}"><br>
+        </p>
+
+        </div>
+    </section>
+
+    {% if lesson and lesson.questions %}
+    <div style="margin: 10px 0; padding: 10px; background: #f0f0f0;">
+        <strong>Выбрано сообщений:</strong> {{ lesson.questions|length }}
+    </div>
+    {% endif %}
+    <button type="button" onclick="prepareAndSubmit()">{% if lesson %}Сохранить{% else %}Создать{% endif %}</button>
+
+    <h3>Список всех сообщений</h3>
+
+    <!-- Фильтр поиска -->
+    <div style="margin: 20px 0;">
+      <input type="text" id="searchText" placeholder="Поиск по тексту..."
+             style="padding: 8px; width: 300px;">
+
+      <input type="text" id="searchID" placeholder="Поиск по ID..."
+             style="padding: 8px; width: 100px; margin-left: 10px;">
+
+      <select id="searchAnswer" style="padding: 8px; margin-left: 10px;">
+        <option value="">Все ответы</option>
+        <option value="Фейк">Фейк</option>
+        <option value="Реальная">Реальная</option>
+      </select>
+
+      <select id="searchSelected" style="padding: 8px; margin-left: 10px;">
+        <option value="">Все</option>
+        <option value="selected">Выбранные</option>
+        <option value="not_selected">Не выбранные</option>
+      </select>
+
+      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
+        Найти
+      </button>
+
+      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
+        Сбросить
+      </button>
+    </div>
+
+  <input type="hidden" id="selectedIds" name="selected_ids" value="">
+
+    <table border="1" cellpadding="5" id="messagesTable">
+      <tr>
+        <th>ID</th><th>Текст</th><th>Правильный ответ</th><th>Добавить</th>
+      </tr>
+      {% for m in messages %}
+      <tr class="msg_row">
+        <td>{{ m.id }}</td>
+        <td>
+          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
+            {{ m.text }}
+          </div>
+        </td>
+        <td>{% if m.correct %}Фейк{% else %}Реальная{% endif %}</td>
+        <td>
+          <div class="actions">
+              <input type="checkbox" class="msg-checkbox" value="{{ m.id }}"
+                     {% if lesson and m.id in lesson.questions %}checked{% endif %}>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+</form>
+
+
+
+<script>
+    function searchTable() {
+      const searchText = document.getElementById('searchText').value.toLowerCase();
+      const searchID = document.getElementById('searchID').value.toLowerCase();
+      const searchAnswer = document.getElementById('searchAnswer').value;
+      const searchSelected = document.getElementById('searchSelected').value;
+
+      const rows = document.querySelectorAll('table tr.msg_row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 4) {
+          const id = cells[0].textContent.toLowerCase();
+          const text = cells[1].textContent.toLowerCase();
+          const answer = cells[2].textContent;
+          const checkbox = row.querySelector('.msg-checkbox');
+          const isSelected = checkbox ? checkbox.checked : false;
+
+          let show = true;
+
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchText && !text.includes(searchText)) show = false;
+          if (searchAnswer && answer !== searchAnswer) show = false;
+          if (searchSelected === 'selected' && !isSelected) show = false;
+          if (searchSelected === 'not_selected' && isSelected) show = false;
+
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('searchText').value = '';
+      document.getElementById('searchID').value = '';
+      document.getElementById('searchAnswer').value = '';
+      document.getElementById('searchSelected').value = '';
+
+      const rows = document.querySelectorAll('tr.msg_row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+
+    function updateSelectedIds() {
+      const checkboxes = document.querySelectorAll('.msg-checkbox:checked');
+      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+      document.getElementById('selectedIds').value = selectedIds.join(',');
+      return selectedIds;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = document.querySelectorAll('.msg-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedIds);
+      });
+      // Инициализируем скрытое поле при загрузке
+      updateSelectedIds();
+    });
+
+    function prepareAndSubmit() {
+      const lessonName = document.querySelector('input[name="lesson_name"]').value;
+      const priceCorrect = document.querySelector('input[name="price_correct"]').value;
+      const priceWrong = document.querySelector('input[name="price_wrong"]').value;
+
+      if (!lessonName.trim()) {
+        alert('Введите название урока');
+        return;
+      }
+
+      const timeInput = document.getElementById('time');
+      if (!timeInput.value.trim()) {
+        timeInput.value = '';
+      }
+
+      if (!priceCorrect) {
+        alert('Укажите цену за правильный ответ');
+        return;
+      }
+
+      if (!priceWrong) {
+        alert('Укажите цену за неправильный ответ');
+        return;
+      }
+
+      const selectedIds = updateSelectedIds();
+
+      if (selectedIds.length === 0 && !countMsg) {
+        alert('Выберите сообщения для урока или укажите количество');
+        return;
+      }
+
+      if (!(selectedIds.length === 0) && countMsg) {
+        alert('Выберете только 1 способ отбора сообщений');
+        return;
+      }
+
+      document.getElementById('lessonForm').submit();
+    }
+</script>
+{% endblock %}
+{% set show_footer = False %}
