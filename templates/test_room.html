@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Тестирование – Шаг {{ step + 1 }}{% endblock %}
+
+{% block content %}
+<h2>Шаг {{ step + 1 }} из {{ total }}</h2>
+
+<div class="chat-box">
+  <div class="message"><strong>Сообщение:</strong> {{ message.text }}</div>
+</div>
+
+<!--<p><strong>Опыт:</strong> {{ experience }}
+  {% if exp_change %}
+    <span class="{{ 'exp-positive' if exp_change > 0 else 'exp-negative' }}">
+      {% if exp_change > 0 %}+{% endif %}{{ exp_change }}
+    </span>
+  {% endif %}
+</p>-->
+
+{% if state == 'question' %}
+  <form method="post">
+    <p>Как вы считаете, это мошенники или нет?</p>
+    <button type="submit" name="answer" value="yes">Да</button>
+    <button type="submit" name="answer" value="no">Нет</button>
+    <button type="submit" name="answer" value="finish">Завершить тестирование</button>
+  </form>
+{% endif %}
+{% endblock %}
+
+{% set show_footer = False %}

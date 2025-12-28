@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Тестирования{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+
+    <div class="container">
+        <div class="container-flex">
+            <p class="text-right">{{ user.username }}</p>
+            {% if testings|length == 0 %}
+            <p class="text_alert">У вас нет активных тестирований</p>
+            {% endif %}
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Тестирования</h1>
+            
+            <div class="button-container">
+                <a href="{{ url_for('test_room_memo') }}">
+                    <button class="secondary-button">Памятка</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; margin: 20px 0;">
+
+      <!-- Фильтры -->
+      <div style="margin: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+        <input type="text" id="scrollSearchID" placeholder="Поиск по ID..."
+               style="padding: 8px; width: 120px;">
+        <input type="text" id="scrollSearchName" placeholder="По названию..."
+               style="padding: 8px; width: 200px; margin-left: 10px;">
+        <input type="text" id="scrollSearchLesson" placeholder="По уроку..."
+               style="padding: 8px; width: 150px; margin-left: 10px;">
+        <button type="button" onclick="searchScrollTable()"
+                style="padding: 6px 12px; margin-left: 10px; background: #6c757d; color: white; border: none; border-radius: 4px;">
+          Найти
+        </button>
+        <button type="button" onclick="clearScrollSearch()"
+                style="padding: 6px 12px; margin-left: 5px; background: #dc3545; color: white; border: none; border-radius: 4px;">
+          Сброс
+        </button>
+      </div>
+
+      <!-- Таблица -->
+      <table border="1" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+        <thead style="position: sticky; top: 0; background: #f8f9fa; z-index: 10;">
+          <tr>
+            <th style="padding: 10px; text-align: center;">ID</th>
+            <th style="padding: 10px; text-align: left;">Название тестирования</th>
+            <th style="padding: 10px; text-align: left;">Урок</th>
+            <th style="padding: 10px; text-align: center;">Статус</th>
+            <th style="padding: 10px; text-align: center;">Действие</th>
+          </tr>
+        </thead>
+        <tbody id="scrollTableBody">
+          {% for t in testings %}
+          <tr class="scroll-testing-row" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 8px; text-align: center; font-weight: bold;">{{ t.id }}</td>
+            <td style="padding: 8px;">{{ t.name }}</td>
+            <td style="padding: 8px;">
+              {% set lesson = lessons_dict.get(t.lesson_id) %}
+              {% if lesson %}
+                {{ lesson.name }}
+              {% else %}
+                <span style="color: #999;">ID: {{ t.lesson_id }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 8px; text-align: center;">
+              <span style="color: green; font-weight: bold;">✓ Активно</span>
+            </td>
+            <td style="padding: 8px; text-align: center;">
+                <form method="get" action="{{ url_for('test_room', test=t.id, step=0) }}" style="display: inline;">
+                    <input type="hidden" name="testing_id" value="{{ t.id }}">
+                    <button type="submit"
+                            style="padding: 6px 16px;
+                                   background-color: #28a745;
+                                   color: white;
+                                   border: none;
+                                   border-radius: 4px;
+                                   font-size: 14px;
+                                   cursor: pointer;">
+                        Приступить
+                    </button>
+                </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</section>
+<p><a href="{{ url_for('index') }}" class="btn">← назад</a></p>
+
+<script>
+    function searchScrollTable() {
+      const searchID = document.getElementById('scrollSearchID').value.toLowerCase();
+      const searchName = document.getElementById('scrollSearchName').value.toLowerCase();
+      const searchLesson = document.getElementById('scrollSearchLesson').value.toLowerCase();
+
+      const rows = document.querySelectorAll('.scroll-testing-row');
+
+      rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length >= 5) {
+          const id = cells[0].textContent.toLowerCase();
+          const name = cells[1].textContent.toLowerCase();
+          const lesson = cells[2].textContent.toLowerCase();
+
+          let show = true;
+          if (searchID && !id.includes(searchID)) show = false;
+          if (searchName && !name.includes(searchName)) show = false;
+          if (searchLesson && !lesson.includes(searchLesson)) show = false;
+
+          row.style.display = show ? '' : 'none';
+        }
+      });
+    }
+
+    function clearScrollSearch() {
+      document.getElementById('scrollSearchID').value = '';
+      document.getElementById('scrollSearchName').value = '';
+      document.getElementById('scrollSearchLesson').value = '';
+
+      const rows = document.querySelectorAll('.scroll-testing-row');
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+    }
+</script>
+{% endblock %}
+
+{% set show_footer = False %}

@@ -1,4 +1,6 @@
 from pathlib import Path
+from pyexpat.errors import messages
+
 from flask import (
     Flask, render_template, request,
     redirect, url_for, session, flash, jsonify
@@ -204,6 +206,32 @@ class Testing(db.Model):
         db.session.add(self)
         db.session.commit()
         print(f"Тестирование '{self.name}' создан с ID: {self.id}")
+
+# ------------------------------------------------------------------
+# Модель: результаты тестирования
+# ------------------------------------------------------------------
+class Result(db.Model):
+    __tablename__ = 'Results'
+    id = db.Column(db.Integer, primary_key=True)
+    testing_id = db.Column(db.Integer, nullable=False)
+    lesson_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    correct_answers_id = db.Column(db.JSON, nullable=False)
+    wrong_answers_id = db.Column(db.JSON, nullable=False)
+
+    def __repr__(self):
+        return f'<Result {self.id}>'
+
+    def __init__(self, testing_id, lesson_id, user_id, score, correct_answers_id, wrong_answers_id):
+        self.testing_id = testing_id
+        self.lesson_id = lesson_id
+        self.user_id = user_id
+        self.score = score
+        self.correct_answers_id = correct_answers_id
+        self.wrong_answers_id = wrong_answers_id
+
+
 # ------------------------------------------------------------------
 # Создаём таблицы (первый запуск)
 # ------------------------------------------------------------------
@@ -216,7 +244,12 @@ with app.app_context():
 # ------------------------------------------------------------------
 @app.route('/')
 def index():
-    return render_template('index.html')
+    username = session.get('curent_user')
+    if not username:
+        return render_template('index.html')
+    else:
+        user = User.query.filter(User.username == username).first()
+        return render_template('index.html', user=user)
 
 # ------------------------------------------------------------------
 # Памятка
@@ -224,6 +257,7 @@ def index():
 @app.route('/memo')
 def memo():
     return render_template('memo.html')
+
 # ------------------------------------------------------------------
 # Проверка сообщений
 # ------------------------------------------------------------------
@@ -298,7 +332,9 @@ def train(step):
     if 'shuffled_ids' not in session or step == 0:
         # При step == 0 сбрасываем сессию
         if step == 0 and request.method == "GET":
+            username = session.get('curent_user')  # Сохраняем
             session.clear()  # Очищаем всю сессию для новой тренировки
+            session['curent_user'] = username
             session['experience'] = 0
             session['answers'] = {}
             session['answered_current'] = False  # Флаг, что на текущий вопрос ответили
@@ -438,7 +474,6 @@ def train(step):
 @app.route('/results', methods=['GET'])
 def results():
     # Получаем все сообщения
-    all_messages = Message.query.all()
     messages = [Message.query.get(mid) for mid in session['shuffled_ids']]
     total = len(messages)
     
@@ -482,20 +517,9 @@ def login():
 
         session['curent_user'] = user.username
         if user.is_admin:
-            """return jsonify({
-            'success': True,
-            'redirect': url_for('dashboard'),
-            'message': 'Вход выполнен'
-            })"""
-
             return redirect(url_for('dashboard'))
         else:
-            """return jsonify({
-            'success': True,de
-            'redirect': url_for('index'),
-            'message': 'Вход выполнен'
-            })"""
-            return  render_template('index.html', user=user)
+            return redirect(url_for('index'))
     else:
         return jsonify({
             'success': False,
@@ -534,7 +558,7 @@ def register():
             'message': 'Пользователь уже существует'
         })"""
     if user:
-        return render_template('index.html')
+        return redirect(url_for('index'))
     else:
         return jsonify({
             'success': False,
@@ -830,7 +854,7 @@ def group_instruction():
         return redirect(url_for('ErAuth'))
     return render_template(mgn + 'group_instruction.html')
 # ---------------------------------------------------------
-# Панель управления Тестами
+# Панель управления Тестированиями
 # ---------------------------------------------------------
 @app.route('/dashboard/testing_management')
 def testing_management():
@@ -932,6 +956,220 @@ def testing_delete(testing_id):
     flash(f'Тестирование "{testing.name}" с ID - "{testing.id}" удалено')
 
     return redirect(url_for('testing_list'))
+
+# ---------------------------------------------------------
+# Тестирование: режим
+# ---------------------------------------------------------
+@app.route('/test_room_preview')
+def test_room_preview():
+    curent_user = User.query.filter(
+        User.username.ilike(
+            session.get('curent_user')
+        )
+    ).first()
+    testings_all = Testing.query.order_by(Testing.id).all()
+    testings = list()
+    user_results = Result.query.filter_by(user_id=curent_user.id).all()
+    for test in testings_all:
+        groups = test.group_id
+        for group_id in groups:
+            group = Group.query.get_or_404(group_id)
+            users = group.users
+            user_result = [r for r in user_results if r.testing_id == test.id]
+            if curent_user.id in users and len(user_result) == 0:
+                testings.append(test)
+    lessons = Lesson.query.order_by(Lesson.id).all()
+    lessons_dict = {lesson.id: lesson for lesson in lessons}
+
+    return render_template('test_room_preview.html',
+                           user=curent_user,
+                           testings=testings,
+                           lessons_dict=lessons_dict)
+
+@app.route('/test_room_preview/test_room_memo')
+def test_room_memo():
+    return render_template('test_room_memo.html')
+
+
+def save_test_result(session, messages, answers, experience):
+    testing_id = session.get('testing', {}).get('id')
+    lesson_id = session.get('lesson', {}).get('id')
+    username = session.get('curent_user')
+
+    print(f"DEBUG save_test_result: testing_id={testing_id}, lesson_id={lesson_id}, username={username}")
+
+    user = User.query.filter(User.username == username).first()
+
+    correct_ids = list()
+    wrong_ids = list()
+
+    for m in messages:
+        user_answer = answers.get(str(m.id))
+        if user_answer:
+            is_correct = user_answer == ('yes' if m.correct else 'no')
+            if is_correct:
+                correct_ids.append(m.id)
+            else:
+                wrong_ids.append(m.id)
+
+    print(f"DEBUG: Создаем Result: user_id={user.id}, score={experience}")
+    print(f"DEBUG: correct_ids={correct_ids}, wrong_ids={wrong_ids}")
+
+    try:
+        result = Result(
+            testing_id=testing_id,
+            lesson_id=lesson_id,
+            user_id=user.id,
+            score=experience,
+            correct_answers_id=correct_ids,
+            wrong_answers_id=wrong_ids
+        )
+        db.session.add(result)
+        db.session.commit()
+        print("DEBUG: Результат успешно сохранен в БД")
+    except Exception as e:
+        db.session.rollback()
+        print(f"DEBUG: Ошибка сохранения: {e}")
+
+
+def show_test_results(session, messages):
+    answers = session.get('answers', {})
+    correct_count = sum(
+        1 for m in messages
+        if answers.get(str(m.id)) == ('yes' if m.correct else 'no')
+    )
+    experience = session.get('experience', 0)
+
+
+    save_test_result(session, messages, answers, experience)
+
+    return render_template(
+        'test_room_result.html',
+        experience=experience,
+        step=len(messages),
+        correct_count=correct_count
+    )
+@app.route('/test_room/<int:test>/<int:step>', methods=['GET', 'POST'])
+def test_room(test, step):
+
+    if 'testing' not in session or step == 0:
+        testing = Testing.query.filter(
+            Testing.id == test
+        ).first()
+
+        if step == 0 or request.method == 'GET':
+            username = session.get('curent_user')
+            session.clear()
+            session['curent_user'] = username
+            session['answers'] = dict()
+            session['answered_current'] = False
+            session['experience'] = 0
+            session['testing'] = {
+                'id': testing.id,
+                'name': testing.name
+            }
+
+        lesson_id = testing.lesson_id
+        lesson = Lesson.query.get_or_404(lesson_id)
+        session['lesson'] = {
+            'id': lesson.id,
+            'name': lesson.name,
+            'price_correct': lesson.price_correct,
+            'price_wrong': lesson.price_wrong,
+            'questions': lesson.questions,
+        }
+
+        messages_id = lesson.questions
+        session['messages_id'] = messages_id
+
+    messages_id = session['messages_id']
+    messages = [Message.query.get(m) for m in messages_id]
+    total_messages = len(messages)
+
+    if step >= total_messages:
+        return show_test_results(session, messages)
+
+    session.setdefault('experience', 0)
+    session.setdefault('answers', {})
+    session.setdefault('answered_current', False)
+
+    current_msg = messages[step]
+
+    if request.method == 'POST':
+        answer = request.form.get('answer')
+        action = request.form.get('action', '')
+
+        if action == 'next':
+            session['answered_current'] = False
+            session.pop('current_answer', None)
+            session.pop('current_explanation', None)
+            session.pop('current_exp_change', None)
+            session.pop('current_is_correct', None)
+
+            next_step = step + 1
+            print(f"DEBUG: Redirecting to step {next_step}, experience: {session.get('experience')}")
+
+            if next_step >= total_messages:
+                return show_test_results(session, messages)
+
+            return redirect(url_for('test_room', test=test, step=next_step))
+
+        if answer == 'finish' or action == 'finish':
+            return show_test_results(session, messages)
+
+        if answer in ['yes', 'no'] and not session.get('answered_current', False):
+            is_correct = (answer == 'yes') == current_msg.correct
+
+            lesson = session.get('lesson')
+            delta_exp = lesson.get('price_correct') if is_correct else lesson.get('price_wrong')
+
+            session['experience'] = session.get('experience', 0) + delta_exp
+
+            answers = session.get('answers', {})
+            answers[str(current_msg.id)] = answer
+            session['answers'] = answers
+
+            next_step = step + 1
+            if next_step >= total_messages:
+                return show_test_results(session, messages)
+            return redirect(url_for('test_room', test=test, step=next_step))
+
+    current_answer = session.get('current_answer')
+    current_explanation = session.get('current_explanation')
+    current_exp_change = session.get('current_exp_change', 0)
+    current_is_correct = session.get('current_is_correct')
+
+    return render_template(
+        'test_room.html',
+        message=current_msg,
+        step=step,
+        total=total_messages,
+        explanation=current_explanation,
+        experience=session.get('experience', 0),
+        exp_change=current_exp_change,
+        current_answer=current_answer,
+        is_correct=current_is_correct,
+        state='question'
+    )
+
+
+@app.route('/test_room_result', methods=['GET'])
+def test_room_result():
+    messages = [Message.query.get(mid) for mid in session['messages_id']]
+    total = len(messages)
+
+    correct_count = sum(
+        1 for m in messages
+        if session.get('answers', {}).get(str(m.id)) == ('yes' if m.correct else 'no')
+    )
+
+    return render_template(
+        'test_room_result.html',
+        experience=session.get('experience', 0),
+        total=total,
+        correct_count=correct_count,
+    )
+
 
 # ---------------------------------------------------------
 # Запуск дебагера

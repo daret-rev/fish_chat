@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Результаты тестирования{% endblock %}
+
+{% block content %}
+    <h1>Тестирование пройдено!</h1>
+
+    <p>Вы прошли {{ step }} сообщений.</p>
+        <p>Верных ответов: {{ correct_count }}</p>
+
+    <p>Ваш результат: {{ experience|int }}</p>
+    <form action="{{ url_for('reset_experience') }}" method="get">
+        <button type="submit">Выйти из тренировки</button>
+    </form>
+{% endblock %}
+{% set show_footer = False %}

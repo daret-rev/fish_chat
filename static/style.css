@@ -272,3 +272,15 @@ a.btn {
     background-color: #5a6268 !important;
     transform: none !important;
 }
+
+.text_alert {
+    padding: 12px 20px;
+    margin: 20px 0;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 15px;
+    border-left: 4px solid #ffc107;
+}

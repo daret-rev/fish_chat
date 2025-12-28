@@ -42,9 +42,11 @@
                 <a href="{{ url_for('train_preview') }}">
                     <button class="primary-button">Начать тренировку</button>
                 </a>
-                <a href="{{ url_for('check_preview')}}">
+                {% if user %}
+                <a href="{{ url_for('test_room_preview')}}">
                     <button class="primary-button">Начать тестирование</button>
                 </a>
+                {% endif %}
                 <!--<a href="{{ url_for('check_preview')}}">
                     <button class="secondary-button">Проверить сообщение</button>
                 </a>-->
@@ -75,5 +77,4 @@
 </section>
 
 {% endblock %}
-
 {% set show_footer = False %}
