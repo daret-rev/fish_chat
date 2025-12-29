@@ -1,94 +1,455 @@
 {% extends 'base.html' %}
 {% block title %}Список уроков{% endblock %}
+
 {% block content %}
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Управление тестированиями
+                </button>
+            </a>
+        </div>
 
-<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
-<h2>Список всех уроков</h2>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Список всех уроков</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Просмотр, редактирование и управление всеми уроками тестирования
+            </p>
+        </div>
 
-<!-- Фильтр поиска -->
-<div style="margin: 20px 0;">
-  <input type="text" id="searchName" placeholder="Поиск по названию..."
-         style="padding: 8px; width: 300px;">
+        <!-- Панель управления -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #28a745;
+        ">
+            <!-- Статистика -->
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e9ecef;
+            ">
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Статистика уроков</h3>
+                    <div style="display: flex; gap: 25px; color: #6c757d; font-size: 0.95rem;">
+                        <div>
+                            <span style="color: #28a745; font-weight: 600;">●</span>
+                            Всего уроков: {{ lessons|length }}
+                        </div>
+                        <div>
+                            <span style="color: #007bff; font-weight: 600;">●</span>
+                            Общее количество заданий: {{ lessons|map(attribute='questions')|map('length')|sum }}
+                        </div>
+                        <div>
+                            <span style="color: #6f42c1; font-weight: 600;">●</span>
+                            Среднее заданий на урок: {{ ((lessons|map(attribute='questions')|map('length')|sum / lessons|length) if lessons|length > 0 else 0)|round|int }}
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('lesson_create') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 25px;
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <span style="font-size: 1.2rem;">➕</span>
+                        Создать новый урок
+                    </button>
+                </a>
+            </div>
 
-  <input type="text" id="searchID" placeholder="Поиск по ID..."
-         style="padding: 8px; width: 100px; margin-left: 10px;">
+            <!-- Фильтры поиска -->
+            <div>
+                <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.3rem;">🔍</span>
+                    Поиск и фильтрация
+                </h4>
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 15px;
+                    margin-bottom: 20px;
+                ">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                            По названию:
+                        </label>
+                        <input
+                            type="text"
+                            id="searchName"
+                            placeholder="Название урока..."
+                            style="
+                                width: 100%;
+                                padding: 10px 15px;
+                                border: 1px solid #ced4da;
+                                border-radius: 8px;
+                                font-size: 0.95rem;
+                                transition: border-color 0.3s ease;
+                            "
+                            onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            onkeyup="searchTable()"
+                        >
+                    </div>
 
-  <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
-    Найти
-  </button>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                            По ID:
+                        </label>
+                        <input
+                            type="text"
+                            id="searchID"
+                            placeholder="ID урока..."
+                            style="
+                                width: 100%;
+                                padding: 10px 15px;
+                                border: 1px solid #ced4da;
+                                border-radius: 8px;
+                                font-size: 0.95rem;
+                                transition: border-color 0.3s ease;
+                            "
+                            onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            onkeyup="searchTable()"
+                        >
+                    </div>
+                </div>
 
-  <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
-    Сбросить
-  </button>
-</div>
+                <div style="display: flex; gap: 10px;">
+                    <button
+                        type="button"
+                        onclick="clearSearch()"
+                        style="
+                            padding: 10px 20px;
+                            background-color: #6c757d;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            transition: all 0.3s ease;
+                        "
+                        onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                    >
+                        <span style="font-size: 1.1rem;">🔄</span>
+                        Сбросить фильтры
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<table border="1" cellpadding="5" id="lessonTable">
-  <tr>
-    <th>ID</th><th>Название</th><th>Время</th><th>+</th><th>-</th><th>Заданий</th><th>Действие</th>
-  </tr>
-  {% for l in lessons %}
-  <tr class="less_row">
-    <td>{{ l.id }}</td>
-    <td>
-      <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-        {{ l.name }}
-      </div>
-    </td>
-    <td>{{ l.time }}</td>
-    <td>{{ l.price_correct }}</td>
-    <td>{{ l.price_wrong }}</td>
-    <td>{{ l.questions|length }}</td>
-    <td>
-      <div class="actions">
-          <a href="{{ url_for('lesson_edit', less_id=l.id) }}"
-             class="btn btn-action">Редактировать</a>
+        <!-- Таблица уроков - ОБНОВЛЕННЫЙ КОНТЕЙНЕР -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: auto; /* Изменено с hidden на visible */
+            min-width: 100%; /* Гарантируем минимальную ширину */
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box; /* Учитывать padding в ширине */
+        ">
+            <!-- Убрал overflow-x: auto, таблица будет расширять контейнер -->
+            <table style="
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: auto; /* Автоматическая ширина столбцов */
+            ">
+                <thead>
+                    <tr style="
+                        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                        color: white;
+                    ">
+                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0; min-width: 80px;">ID</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; min-width: 200px;">Название урока</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; min-width: 150px;">Баллы</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; min-width: 120px;">Заданий</th>
+                        <th style="padding: 15px;
+                        text-align: left; font-weight: 600;
+                        border-radius: 0 8px 0 0;
+                        min-width: 220px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="lessonTableBody">
+                    {% for l in lessons %}
+                    <tr style="
+                        border-bottom: 1px solid #e9ecef;
+                        transition: all 0.3s ease;
+                    "
+                    class="less_row"
+                    onmouseover="this.style.backgroundColor='#f8f9fa';"
+                    onmouseout="this.style.backgroundColor='';">
+                        <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: top;">
+                            #{{ l.id }}
+                        </td>
+                        <td style="padding: 15px; vertical-align: top;">
+                            <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
+                                {{ l.name }}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #6c757d;">
+                                ID: {{ l.id }}
+                            </div>
+                        </td>
+                        <td style="padding: 15px; vertical-align: top;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <span style="color: #28a745; font-weight: 600;">+{{ l.price_correct }}</span>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">правильный</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <span style="color: #dc3545; font-weight: 600;">{{ l.price_wrong }}</span>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">неправильный</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 15px; vertical-align: top;">
+                            <div style="
+                                display: inline-flex;
+                                align-items: center;
+                                padding: 8px 15px;
+                                border-radius: 20px;
+                                font-weight: 600;
+                                font-size: 1.1rem;
+                                background-color: {% if l.questions|length >= 20 %}#d4edda{% elif l.questions|length >= 10 %}#fff3cd{% else %}#f8d7da{% endif %};
+                                color: {% if l.questions|length >= 20 %}#155724{% elif l.questions|length >= 10 %}#856404{% else %}#721c24{% endif %};
+                                gap: 8px;
+                            ">
+                                <span style="font-size: 1rem;">📋</span>
+                                {{ l.questions|length }}
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #6c757d;">
+                                {% if l.questions|length == 0 %}
+                                    <span style="color: #dc3545;">Нет заданий</span>
+                                {% elif l.questions|length == 1 %}
+                                    1 задание
+                                {% elif l.questions|length < 5 %}
+                                    {{ l.questions|length }} задания
+                                {% else %}
+                                    {{ l.questions|length }} заданий
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 15px; vertical-align: top;">
+                            <div style="display: flex; flex-direction: column; gap: 10px; min-width: 200px;">
+                                <a
+                                    href="{{ url_for('lesson_edit', less_id=l.id) }}"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        gap: 8px;
+                                        padding: 10px 15px;
+                                        background-color: #007bff;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 6px;
+                                        text-decoration: none;
+                                        font-weight: 600;
+                                        font-size: 0.9rem;
+                                        transition: all 0.3s ease;
+                                        text-align: center;
+                                    "
+                                    onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-2px)';"
+                                    onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)';"
+                                >
+                                    <span style="font-size: 1rem;">✏️</span>
+                                    Редактировать
+                                </a>
 
-          <span class="action-divider">/</span>
+                                <form
+                                    action="{{ url_for('lesson_delete', less_id=l.id) }}"
+                                    method="post"
+                                    style="margin: 0;"
+                                    onsubmit="return confirmDelete('{{ l.name }}', {{ l.questions|length }});"
+                                >
+                                    <button
+                                        type="submit"
+                                        style="
+                                            width: 100%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            gap: 8px;
+                                            padding: 10px 15px;
+                                            background-color: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 6px;
+                                            font-weight: 600;
+                                            font-size: 0.9rem;
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                        "
+                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.transform='translateY(-2px)';"
+                                        onmouseout="this.style.backgroundColor='#dc3545'; this.style.transform='translateY(0)';"
+                                    >
+                                        <span style="font-size: 1rem;">🗑️</span>
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 40px; text-align: center; color: #6c757d;">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">📭</div>
+                            <h3 style="margin-bottom: 10px; color: #495057;">Нет уроков</h3>
+                            <p style="margin-bottom: 20px;">В системе пока не создано ни одного урока</p>
+                            <a href="{{ url_for('lesson_create') }}" style="text-decoration: none;">
+                                <button style="
+                                    padding: 10px 25px;
+                                    background-color: #28a745;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">
+                                    ➕ Создать первый урок
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-          <form action="{{ url_for('lesson_delete', less_id=l.id) }}"
-                method="post" style="display:inline;">
-              <button type="submit"
-                      onclick="return confirm('Удалить?')"
-                      class="btn btn-action">Удалить</button>
-          </form>
-      </div>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+        <!-- Информационная панель -->
+        <div style="
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: center;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Управление уроками:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Используйте фильтры для быстрого поиска нужных уроков</li>
+                        <li>Редактируйте уроки для изменения состава заданий или параметров баллов</li>
+                        <li>Цвет индикатора количества заданий показывает размер урока (красный - маленький, желтый - средний, зеленый - большой)</li>
+                        <li>Удаляйте только ненужные или устаревшие уроки - это действие необратимо</li>
+                        <li>Каждый урок должен иметь уникальное название</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <script>
     function searchTable() {
-      const searchName = document.getElementById('searchName').value.toLowerCase();
-      const searchID = document.getElementById('searchID').value.toLowerCase();
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        const searchID = document.getElementById('searchID').value.toLowerCase();
 
-      const rows = document.querySelectorAll('table tr.less_row');
+        const rows = document.querySelectorAll('table tr.less_row');
 
-      rows.forEach(row => {
-        const cells = row.getElementsByTagName('td');
-        if (cells.length >= 3) {
-          const id = cells[0].textContent.toLowerCase();
-          const name = cells[1].textContent.toLowerCase();
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 3) {
+                const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
+                const name = cells[1].textContent.toLowerCase();
 
-          let show = true;
+                let show = true;
 
-          if (searchID && !id.includes(searchID)) show = false;
-          if (searchName && !name.includes(searchName)) show = false;
+                if (searchID && !id.includes(searchID)) show = false;
+                if (searchName && !name.includes(searchName)) show = false;
 
-          row.style.display = show ? '' : 'none';
-        }
-      });
+                row.style.display = show ? '' : 'none';
+                row.style.opacity = show ? '1' : '0.5';
+            }
+        });
     }
 
     function clearSearch() {
-      document.getElementById('searchName').value = '';
-      document.getElementById('searchID').value = '';
+        document.getElementById('searchName').value = '';
+        document.getElementById('searchID').value = '';
 
-      const rows = document.querySelectorAll('tr.less_row, tr.less-row');
-      rows.forEach(row => {
-        row.style.display = '';
-      });
+        const rows = document.querySelectorAll('tr.less_row');
+        rows.forEach(row => {
+            row.style.display = '';
+            row.style.opacity = '1';
+        });
     }
+
+    function confirmDelete(lessonName, questionsCount) {
+        let message = `Вы уверены, что хотите удалить урок "${lessonName}"?`;
+
+        if (questionsCount > 0) {
+            message += `\n\nВ уроке содержится ${questionsCount} ${getRussianPlural(questionsCount, 'задание', 'задания', 'заданий')}.`;
+        }
+
+        message += "\n\nЭто действие нельзя отменить.";
+
+        return confirm(message);
+    }
+
+    function getRussianPlural(number, one, few, many) {
+        number = Math.abs(number);
+        number %= 100;
+        if (number >= 5 && number <= 20) {
+            return many;
+        }
+        number %= 10;
+        if (number === 1) {
+            return one;
+        }
+        if (number >= 2 && number <= 4) {
+            return few;
+        }
+        return many;
+    }
+
+    // Автоматический поиск при вводе
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInputs = ['searchName', 'searchID'];
+        searchInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', searchTable);
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% set show_footer = False %}

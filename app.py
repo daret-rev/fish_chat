@@ -570,7 +570,7 @@ def logout():
     session['curent_user'] = None
     return redirect(url_for('index'))
 # ---------------------------------------------------------
-# Панель управления БД
+# Панель управления
 # ---------------------------------------------------------
 @app.route('/ErAuth', methods=['GET'])
 def ErAuth():
@@ -596,6 +596,16 @@ def dashboard():
         return redirect(url_for('ErAuth'))
 
     return render_template(mgn + 'dashboard.html')
+
+@app.route('/dashboard/dashboard_instruction')
+def dashboard_instruction():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    return render_template(mgn + 'dashboard_instruction.html')
+# ---------------------------------------------------------
+# Панель управления БД
+# ---------------------------------------------------------
 @app.route('/dashboard/DB_management', methods=['GET', 'POST'])
 def DB_management():
 
@@ -695,7 +705,7 @@ def lesson_create():
         return render_template(mgn + 'lesson_create.html', messages=messages, lesson_names=lesson_names)
 
     lesson_name = request.form.get('lesson_name')
-    time = request.form.get('time')
+    time = request.form.get('time', 0)
     price_correct = request.form.get('price_correct')
     price_wrong = request.form.get('price_wrong')
     msg_count = request.form.get('msg_count')
@@ -1170,6 +1180,199 @@ def test_room_result():
         correct_count=correct_count,
     )
 
+# ---------------------------------------------------------
+# Результаты тестирований
+# ---------------------------------------------------------
+@app.route('/dashboard/testing_management/result_list')
+def result_list():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    testings = Testing.query.order_by(Testing.id).all()
+    lessons = Lesson.query.order_by(Lesson.id).all()
+    groups = Group.query.order_by(Group.id).all()
+
+    lessons_dict = {lesson.id: lesson for lesson in lessons}
+    groups_dict = {group.id: group for group in groups}
+
+    all_results = Result.query.all()
+
+    test_completed_users = {}
+    for result in all_results:
+        test_id = result.testing_id
+        user_id = result.user_id
+
+        if test_id not in test_completed_users:
+            test_completed_users[test_id] = set()
+        test_completed_users[test_id].add(user_id)
+
+    for test in testings:
+        total_users = 0
+
+        if test.group_id:
+            all_users_id = set()
+
+            group_ids = test.group_id
+
+            for group_id in group_ids:
+                group = groups_dict.get(group_id)
+                if group and group.users:
+                    user_ids = group.users
+                    all_users_id.update(user_ids)
+
+            total_users = len(all_users_id)
+
+        completed_count = len(test_completed_users.get(test.id, set()))
+
+        test.total_users = total_users
+        test.completed_count = completed_count
+
+    return render_template(mgn + 'result_list.html',
+                           testings=testings,
+                           lessons_dict=lessons_dict,
+                           groups_dict=groups_dict)
+
+@app.route('/dashboard/result_testing')
+def result_testing():
+    results_all = Result.query.get(Lesson.id).all()
+    testings_all = list(set([r.testing_id for r in results_all]))
+    lessons_all = Lesson
+    testings = {}
+    for r in results_all:
+        if r.testing_id not in testings:
+            testings[r.testing_id] = []
+        testings[r.testing_id].append(r.id)
+
+
+@app.route('/dashboard/testing_management/results_detailed/<int:testing_id>')
+def results_detailed(testing_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    test = Testing.query.get_or_404(testing_id)
+    results = Result.query.filter_by(testing_id=testing_id).all()
+    groups = Group.query.filter(Group.id.in_(test.group_id)).all() if test.group_id else []
+
+    user_to_groups = {}
+    for group in groups:
+        for user_id in group.users:
+            if user_id not in user_to_groups:
+                user_to_groups[user_id] = []
+            user_to_groups[user_id].append(group.groupname)
+
+    # Режим групп (график)
+    groups_data = []
+    for group in groups:
+        group_results = [r for r in results if r.user_id in group.users]
+
+        if group_results:
+            scores = []
+
+            for result in group_results:
+                correct = len(result.correct_answers_id)
+                wrong = len(result.wrong_answers_id)
+                total_questions = (correct + wrong)
+                total_correct = correct
+                scores.append(result.score)
+
+            avg_score = sum(scores) / len(scores)
+            total_score = sum(scores)
+
+            groups_data.append({
+                'id': group.id,
+                'name': group.groupname,
+                'total_users': len(group.users),
+                'completed_users': len(group_results),
+                'avg_score': round(avg_score, 1),
+                'total_score': total_score,
+                'accuracy': round((total_correct / total_questions * 100) if total_questions > 0 else 0, 1),
+                'total_questions': total_questions,
+                'total_correct': total_correct
+            })
+
+    # Режим участников (график)
+    users_data = []
+    for result in results:
+        user = User.query.get(result.user_id)
+        if user:
+            correct = len(result.correct_answers_id)
+            wrong = len(result.wrong_answers_id)
+            total = correct + wrong
+
+            user_groups = user_to_groups.get(user.id, [])
+
+            users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'group_name': user_groups[0] if user_groups else 'Без группы',  # Первая группа для совместимости
+                'group_names': user_groups,  # Все группы
+                'groups': user_groups,  # Альтернативное название
+                'total_questions': total,
+                'correct': correct,
+                'wrong': wrong,
+                'accuracy': round((correct / total * 100) if total > 0 else 0, 1),
+                'score': result.score
+            })
+
+    all_scores = [result.score for result in results]
+
+    score_distribution = {}
+    for score in all_scores:
+        score_distribution[score] = score_distribution.get(score, 0) + 1
+
+    sorted_scores = sorted(score_distribution.keys())
+
+    chart_data = {
+        'labels': sorted_scores,
+        'values': [score_distribution[score] for score in sorted_scores]
+    }
+
+    return render_template(mgn + 'results_detail.html',
+                           test=test,
+                           groups_data=groups_data,
+                           users_data=users_data,
+                           chart_data=chart_data)
+
+
+@app.route('/dashboard/testing_management/user_results/<int:testing_id>/<int:user_id>')
+def user_detailed_results(testing_id, user_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    test = Testing.query.get_or_404(testing_id)
+    user = User.query.get_or_404(user_id)
+    result = Result.query.filter_by(testing_id=testing_id, user_id=user_id).first_or_404()
+
+    groups = Group.query.filter(Group.id.in_(test.group_id)).all() if test.group_id else []
+    user_groups = []
+
+    for group in groups:
+        if user_id in group.users:
+            user_groups.append(group.groupname)
+
+    user_group_display = ', '.join(user_groups) if user_groups else 'Без группы'
+
+    wrong_questions = []
+    if result.wrong_answers_id:
+        for question_id in result.wrong_answers_id:
+            question = Message.query.get(question_id)
+            if question:
+                wrong_questions.append(question)
+
+    correct_count = len(result.correct_answers_id)
+    wrong_count = len(result.wrong_answers_id)
+    total_count = correct_count + wrong_count
+
+    return render_template(mgn + 'user_results.html',
+                           test=test,
+                           user=user,
+                           result=result,
+                           user_group_display=user_group_display,
+                           user_groups=user_groups,
+                           wrong_questions=wrong_questions,
+                           correct_count=correct_count,
+                           wrong_count=wrong_count,
+                           total_count=total_count)
 
 # ---------------------------------------------------------
 # Запуск дебагера

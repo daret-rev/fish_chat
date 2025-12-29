@@ -1,209 +1,782 @@
 {% extends 'base.html' %}
 {% block title %}Редактирование урока{% endblock %}
+
 {% block content %}
-<p><a href="{{ url_for('lesson_list') }}" class="btn">← назад</a></p>
-
-<h2>Редактирование урока: {{ lesson.name }}</h2>
-
-<form id="lessonForm" method="post">
-    <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
-
-    <section>
-        <div style="margin: 20px 0;">
-          <input type="text" name="lesson_name" id="nemeLesson" placeholder="Название"
-                 value="{{ lesson.name }}"
-                 style="padding: 8px; width: 300px;">
-
-          <p>
-            <label for="time">Время на тест:</label>
-            <input type="number" step="1" name="time" id="time" placeholder="мин"
-                   value="{{ lesson.time if lesson else '' }}"><br>
-          </p>
-
-        <p>
-            <label for="price_correct">Цена за правильный ответ:</label>
-            <input type="number" step="1" name="price_correct" id="price_correct" required
-                   value="{{ lesson.price_correct if lesson else 1 }}"><br>
-        </p>
-
-        <p>
-            <label for="price_wrong">Цена за неправильный ответ:</label>
-            <input type="number" step="1" name="price_wrong" id="price_wrong" required
-                   value="{{ lesson.price_wrong if lesson else -1 }}"><br>
-        </p>
-
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('lesson_list') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Список уроков
+                </button>
+            </a>
         </div>
-    </section>
 
-    <div style="margin: 10px 0; padding: 10px; background: #f0f0f0;">
-        <strong>Выбрано сообщений:</strong> {{ lesson.questions|length }}
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Редактирование урока</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Редактирование набора вопросов и параметров урока: <strong>{{ lesson.name }}</strong>
+            </p>
+        </div>
+
+        <!-- Основная форма -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        ">
+            <form id="lessonForm" method="post">
+                <input type="hidden" name="lesson_id" value="{{ lesson.id }}">
+
+                <!-- Основные параметры -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">⚙️</span>
+                        Основные параметры урока
+                    </h3>
+
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 25px;
+                        margin-bottom: 30px;
+                    ">
+                        <!-- Название урока -->
+                        <div>
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="
+                                        background-color: #007bff;
+                                        color: white;
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        margin-right: 10px;
+                                        font-size: 1rem;
+                                    ">
+                                        1️⃣
+                                    </div>
+                                    Название урока:
+                                </div>
+                            </label>
+                            <input
+                                type="text"
+                                name="lesson_name"
+                                id="nemeLesson"
+                                value="{{ lesson.name }}"
+                                placeholder="Введите уникальное название урока"
+                                style="
+                                    width: 100%;
+                                    padding: 12px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 1rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            >
+                            <small style="color: #6c757d; display: block; margin-top: 5px;">
+                                Уникальное название для идентификации урока
+                            </small>
+                        </div>
+
+                        <!-- Цена за ответы -->
+                        <div>
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="
+                                        background-color: #28a745;
+                                        color: white;
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        margin-right: 10px;
+                                        font-size: 1rem;
+                                    ">
+                                        2️⃣
+                                    </div>
+                                    Баллы за ответы:
+                                </div>
+                            </label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <input
+                                        type="number"
+                                        step="1"
+                                        name="price_correct"
+                                        id="price_correct"
+                                        required
+                                        value="{{ lesson.price_correct if lesson else 1 }}"
+                                        placeholder="За правильный"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid #ced4da;
+                                            border-radius: 8px;
+                                            font-size: 0.95rem;
+                                            transition: border-color 0.3s ease;
+                                        "
+                                        onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    >
+                                    <small style="color: #6c757d; display: block; margin-top: 3px; font-size: 0.8rem;">
+                                        Правильный
+                                    </small>
+                                </div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        step="1"
+                                        name="price_wrong"
+                                        id="price_wrong"
+                                        required
+                                        value="{{ lesson.price_wrong if lesson else -1 }}"
+                                        placeholder="За неправильный"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid #ced4da;
+                                            border-radius: 8px;
+                                            font-size: 0.95rem;
+                                            transition: border-color 0.3s ease;
+                                        "
+                                        onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    >
+                                    <small style="color: #6c757d; display: block; margin-top: 3px; font-size: 0.8rem;">
+                                        Неправильный
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Статистика выбранных сообщений -->
+                    <div style="
+                        background-color: #f8f9fa;
+                        border-radius: 10px;
+                        padding: 20px;
+                        margin-bottom: 20px;
+                        border-left: 4px solid #6f42c1;
+                    ">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <div style="
+                                            background-color: #6f42c1;
+                                            color: white;
+                                            width: 30px;
+                                            height: 30px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            margin-right: 10px;
+                                            font-size: 1rem;
+                                        ">
+                                            📊
+                                        </div>
+                                        Выбрано сообщений:
+                                    </div>
+                                </label>
+                                <div style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    padding: 8px 20px;
+                                    border-radius: 20px;
+                                    font-weight: 600;
+                                    font-size: 1.1rem;
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                    gap: 8px;
+                                ">
+                                    <span style="font-size: 1rem;">📋</span>
+                                    {{ lesson.questions|length }} сообщений
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <small style="color: #6c757d;">
+                                    Изменяйте выбор сообщений в таблице ниже
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Кнопка сохранения -->
+                <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
+                    <button
+                        type="button"
+                        onclick="prepareAndSubmit()"
+                        style="
+                            padding: 14px 40px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,123,255,0.3)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                    >
+                        <span style="font-size: 1.2rem;">💾</span>
+                        Сохранить изменения
+                    </button>
+                </div>
+
+                <!-- Выбор сообщений -->
+                <div style="margin-bottom: 40px;">
+                    <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #6f42c1;">
+                        <h3 style="color: #2c3e50; display: flex; align-items: center; gap: 10px; margin: 0;">
+                            <span style="font-size: 1.3rem;">📋</span>
+                            Выбор сообщений для урока
+                        </h3>
+                        <p style="color: #6c757d; margin-top: 8px;">
+                            Выберите конкретные сообщения для урока. Выбрано: <span id="selectedCount" style="font-weight: 600; color: #007bff;">{{ lesson.questions|length }}</span> сообщений
+                        </p>
+                    </div>
+
+                    <!-- Фильтры поиска -->
+                    <div style="
+                        background-color: #f8f9fa;
+                        border-radius: 10px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                    ">
+                        <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.3rem;">🔍</span>
+                            Поиск и фильтрация сообщений
+                        </h4>
+                        <div style="
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 15px;
+                            margin-bottom: 20px;
+                        ">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По тексту:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchText"
+                                    placeholder="Текст сообщения..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchTable()"
+                                >
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По ID:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchID"
+                                    placeholder="ID сообщения..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchTable()"
+                                >
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По типу:
+                                </label>
+                                <select
+                                    id="searchAnswer"
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        background-color: white;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onchange="searchTable()"
+                                >
+                                    <option value="">Все типы</option>
+                                    <option value="Фейк">Фейк</option>
+                                    <option value="Реальная">Реальная</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    Статус выбора:
+                                </label>
+                                <select
+                                    id="searchSelected"
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        background-color: white;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onchange="searchTable()"
+                                >
+                                    <option value="">Все</option>
+                                    <option value="selected">Выбранные</option>
+                                    <option value="not_selected">Не выбранные</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                type="button"
+                                onclick="searchTable()"
+                                style="
+                                    padding: 10px 20px;
+                                    background-color: #007bff;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    transition: all 0.3s ease;
+                                "
+                                onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-2px)';"
+                                onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)';"
+                            >
+                                <span style="font-size: 1.1rem;">🔍</span>
+                                Применить фильтры
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="clearSearch()"
+                                style="
+                                    padding: 10px 20px;
+                                    background-color: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    transition: all 0.3s ease;
+                                "
+                                onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                                onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                            >
+                                <span style="font-size: 1.1rem;">🔄</span>
+                                Сбросить фильтры
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Скрытое поле для выбранных ID -->
+                    <input type="hidden" id="selectedIds" name="selected_ids" value="{{ lesson.questions|join(',') if lesson.questions else '' }}">
+
+                    <!-- Таблица сообщений -->
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        border: 1px solid #e9ecef;
+                        overflow: hidden;
+                    ">
+                        <div style="overflow-x: auto;">
+                            <table style="
+                                width: 100%;
+                                border-collapse: collapse;
+                                min-width: 800px;
+                            ">
+                                <thead>
+                                    <tr style="
+                                        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                                        color: white;
+                                    ">
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0;">ID</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">Текст сообщения</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">Тип</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0;">Выбрать</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="messagesTableBody">
+                                    {% for m in messages %}
+                                    <tr style="
+                                        border-bottom: 1px solid #e9ecef;
+                                        transition: all 0.3s ease;
+                                    "
+                                    class="msg_row"
+                                    onmouseover="this.style.backgroundColor='#f8f9fa';"
+                                    onmouseout="this.style.backgroundColor='';">
+                                        <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: top;">
+                                            #{{ m.id }}
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="
+                                                max-height: 100px;
+                                                overflow-y: auto;
+                                                padding: 10px;
+                                                background-color: #f8f9fa;
+                                                border-radius: 6px;
+                                                border: 1px solid #e9ecef;
+                                                font-size: 0.9rem;
+                                                line-height: 1.4;
+                                                color: #495057;
+                                            ">
+                                                {{ m.text }}
+                                            </div>
+                                            <div style="margin-top: 8px; display: flex; gap: 15px; font-size: 0.8rem; color: #6c757d;">
+                                                <div>
+                                                    <strong>Правильный:</strong>
+                                                    <span style="color: #28a745;">+{{ m.price_correct if m.price_correct is not none else 0 }}</span>
+                                                </div>
+                                                <div>
+                                                    <strong>Неправильный:</strong>
+                                                    <span style="color: #dc3545;">{{ m.price_wrong if m.price_wrong is not none else 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            {% if m.correct %}
+                                                <span style="
+                                                    display: inline-flex;
+                                                    align-items: center;
+                                                    padding: 6px 12px;
+                                                    border-radius: 20px;
+                                                    font-weight: 600;
+                                                    font-size: 0.85rem;
+                                                    background-color: #f8d7da;
+                                                    color: #721c24;
+                                                    gap: 6px;
+                                                ">
+                                                    <span style="font-size: 0.9rem;">⚠️</span> Фейк
+                                                </span>
+                                            {% else %}
+                                                <span style="
+                                                    display: inline-flex;
+                                                    align-items: center;
+                                                    padding: 6px 12px;
+                                                    border-radius: 20px;
+                                                    font-weight: 600;
+                                                    font-size: 0.85rem;
+                                                    background-color: #d1ecf1;
+                                                    color: #0c5460;
+                                                    gap: 6px;
+                                                ">
+                                                    <span style="font-size: 0.9rem;">✅</span> Реальная
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top; text-align: center;">
+                                            <label style="
+                                                display: inline-block;
+                                                cursor: pointer;
+                                                position: relative;
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    class="msg-checkbox"
+                                                    value="{{ m.id }}"
+                                                    {% if m.id in lesson.questions %}checked{% endif %}
+                                                    style="
+                                                        width: 20px;
+                                                        height: 20px;
+                                                        cursor: pointer;
+                                                    "
+                                                >
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" style="padding: 40px; text-align: center; color: #6c757d;">
+                                            <div style="font-size: 3rem; margin-bottom: 20px;">📭</div>
+                                            <h3 style="margin-bottom: 10px; color: #495057;">Нет сообщений</h3>
+                                            <p style="margin-bottom: 20px;">В банке заданий пока нет сообщений</p>
+                                            <a href="{{ url_for('DB_msg_create') }}" style="text-decoration: none;">
+                                                <button style="
+                                                    padding: 10px 25px;
+                                                    background-color: #28a745;
+                                                    color: white;
+                                                    border: none;
+                                                    border-radius: 6px;
+                                                    cursor: pointer;
+                                                    font-weight: 600;
+                                                ">
+                                                    ➕ Создать сообщение
+                                                </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Информационная панель -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Редактирование урока:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Измените название урока или баллы за ответы при необходимости</li>
+                        <li>Используйте фильтры для поиска нужных сообщений в таблице</li>
+                        <li>Отметьте или снимите отметку с сообщений, чтобы добавить или удалить их из урока</li>
+                        <li>Убедитесь, что выбрано хотя бы одно сообщение для урока</li>
+                        <li>Проверьте, что название урока остается уникальным среди всех уроков</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <button type="button" onclick="prepareAndSubmit()">Сохранить</button>
-
-    <h3>Список всех сообщений</h3>
-
-    <!-- Фильтр поиска -->
-    <div style="margin: 20px 0;">
-      <input type="text" id="searchText" placeholder="Поиск по тексту..."
-             style="padding: 8px; width: 300px;">
-
-      <input type="text" id="searchID" placeholder="Поиск по ID..."
-             style="padding: 8px; width: 100px; margin-left: 10px;">
-
-      <select id="searchAnswer" style="padding: 8px; margin-left: 10px;">
-        <option value="">Все ответы</option>
-        <option value="Фейк">Фейк</option>
-        <option value="Реальная">Реальная</option>
-      </select>
-
-      <select id="searchSelected" style="padding: 8px; margin-left: 10px;">
-        <option value="">Все</option>
-        <option value="selected">Выбранные</option>
-        <option value="not_selected">Не выбранные</option>
-      </select>
-
-      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
-        Найти
-      </button>
-
-      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
-        Сбросить
-      </button>
-    </div>
-
-  <input type="hidden" id="selectedIds" name="selected_ids" value="">
-
-    <table border="1" cellpadding="5" id="messagesTable">
-      <tr>
-        <th>ID</th><th>Текст</th><th>Правильный ответ</th><th>Добавить</th>
-      </tr>
-      {% for m in messages %}
-      <tr class="msg_row">
-        <td>{{ m.id }}</td>
-        <td>
-          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-            {{ m.text }}
-          </div>
-        </td>
-        <td>{% if m.correct %}Фейк{% else %}Реальная{% endif %}</td>
-        <td>
-          <div class="actions">
-              <input type="checkbox" class="msg-checkbox" value="{{ m.id }}"
-                     {% if lesson and m.id in lesson.questions %}checked{% endif %}>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-
-</form>
-
-
+</section>
 
 <script>
     function searchTable() {
-      const searchText = document.getElementById('searchText').value.toLowerCase();
-      const searchID = document.getElementById('searchID').value.toLowerCase();
-      const searchAnswer = document.getElementById('searchAnswer').value;
-      const searchSelected = document.getElementById('searchSelected').value;
+        const searchText = document.getElementById('searchText').value.toLowerCase();
+        const searchID = document.getElementById('searchID').value.toLowerCase();
+        const searchAnswer = document.getElementById('searchAnswer').value;
+        const searchSelected = document.getElementById('searchSelected').value;
 
-      const rows = document.querySelectorAll('table tr.msg_row');
+        const rows = document.querySelectorAll('table tr.msg_row');
 
-      rows.forEach(row => {
-        const cells = row.getElementsByTagName('td');
-        if (cells.length >= 4) {
-          const id = cells[0].textContent.toLowerCase();
-          const text = cells[1].textContent.toLowerCase();
-          const answer = cells[2].textContent;
-          const checkbox = row.querySelector('.msg-checkbox');
-          const isSelected = checkbox ? checkbox.checked : false;
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 3) {
+                const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
+                const text = cells[1].textContent.toLowerCase();
+                const answerTypeElement = cells[2].querySelector('span');
+                const answer = answerTypeElement ? answerTypeElement.textContent.toLowerCase().trim() : '';
+                const checkbox = row.querySelector('.msg-checkbox');
+                const isSelected = checkbox ? checkbox.checked : false;
 
-          let show = true;
+                let show = true;
 
-          if (searchID && !id.includes(searchID)) show = false;
-          if (searchText && !text.includes(searchText)) show = false;
-          if (searchAnswer && answer !== searchAnswer) show = false;
-          if (searchSelected === 'selected' && !isSelected) show = false;
-          if (searchSelected === 'not_selected' && isSelected) show = false;
+                if (searchID && !id.includes(searchID)) show = false;
+                if (searchText && !text.includes(searchText)) show = false;
+                if (searchAnswer) {
+                    if (searchAnswer === "Фейк" && !answer.includes("фейк")) show = false;
+                    else if (searchAnswer === "Реальная" && !answer.includes("реальная")) show = false;
+                }
+                if (searchSelected === 'selected' && !isSelected) show = false;
+                if (searchSelected === 'not_selected' && isSelected) show = false;
 
-          row.style.display = show ? '' : 'none';
-        }
-      });
+                row.style.display = show ? '' : 'none';
+                row.style.opacity = show ? '1' : '0.5';
+            }
+        });
     }
 
     function clearSearch() {
-      document.getElementById('searchText').value = '';
-      document.getElementById('searchID').value = '';
-      document.getElementById('searchAnswer').value = '';
-      document.getElementById('searchSelected').value = '';
+        document.getElementById('searchText').value = '';
+        document.getElementById('searchID').value = '';
+        document.getElementById('searchAnswer').value = '';
+        document.getElementById('searchSelected').value = '';
 
-      const rows = document.querySelectorAll('tr.msg_row');
-      rows.forEach(row => {
-        row.style.display = '';
-      });
+        const rows = document.querySelectorAll('tr.msg_row');
+        rows.forEach(row => {
+            row.style.display = '';
+            row.style.opacity = '1';
+        });
     }
 
     function updateSelectedIds() {
-      const checkboxes = document.querySelectorAll('.msg-checkbox:checked');
-      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-      document.getElementById('selectedIds').value = selectedIds.join(',');
-      return selectedIds;
+        const checkboxes = document.querySelectorAll('.msg-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+        document.getElementById('selectedIds').value = selectedIds.join(',');
+
+        // Обновляем счетчик выбранных сообщений
+        const selectedCount = document.getElementById('selectedCount');
+        selectedCount.textContent = selectedIds.length;
+        selectedCount.style.color = selectedIds.length > 0 ? '#28a745' : '#007bff';
+
+        return selectedIds;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const checkboxes = document.querySelectorAll('.msg-checkbox');
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectedIds);
-      });
-      // Инициализируем скрытое поле при загрузке
-      updateSelectedIds();
+        const checkboxes = document.querySelectorAll('.msg-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedIds);
+        });
+
+        // Инициализируем счетчик
+        updateSelectedIds();
     });
 
     function prepareAndSubmit() {
-      const lessonName = document.querySelector('input[name="lesson_name"]').value;
-      const priceCorrect = document.querySelector('input[name="price_correct"]').value;
-      const priceWrong = document.querySelector('input[name="price_wrong"]').value;
+        const lessonName = document.querySelector('input[name="lesson_name"]').value;
+        const priceCorrect = document.querySelector('input[name="price_correct"]').value;
+        const priceWrong = document.querySelector('input[name="price_wrong"]').value;
 
-      if (!lessonName.trim()) {
-        alert('Введите название урока');
-        return;
-      }
+        if (!lessonName.trim()) {
+            showError('Введите название урока');
+            return;
+        }
 
-      const inputValue = lessonName.trim();
-      const lesson_names = {{ lesson_names|tojson|safe }};
+        const inputValue = lessonName.trim();
+        const lesson_names = {{ lesson_names|tojson|safe }};
 
+        // Проверяем уникальность названия, исключая текущий урок
+        const currentLessonName = "{{ lesson.name }}";
+        const filteredNames = lesson_names.filter(name => name !== currentLessonName);
 
-      if (lesson_names.includes(inputValue)) {
-        alert("Название должно быть уникальным");
-        return;
-      }
+        if (filteredNames.includes(inputValue)) {
+            showError("Название должно быть уникальным");
+            return;
+        }
 
-      const timeInput = document.getElementById('time');
-      if (!timeInput.value.trim()) {
-        timeInput.value = '';
-      }
+        if (!priceCorrect) {
+            showError('Укажите цену за правильный ответ');
+            return;
+        }
 
-      if (!priceCorrect) {
-        alert('Укажите цену за правильный ответ');
-        return;
-      }
+        if (!priceWrong) {
+            showError('Укажите цену за неправильный ответ');
+            return;
+        }
 
-      if (!priceWrong) {
-        alert('Укажите цену за неправильный ответ');
-        return;
-      }
+        const selectedIds = updateSelectedIds();
 
-      const selectedIds = updateSelectedIds();
+        if (selectedIds.length === 0) {
+            showError('Выберите хотя бы одно сообщение для урока');
+            return;
+        }
 
-      if (selectedIds.length === 0) {
-        alert('Выберите сообщения для урока');
-        return;
-      }
-
-
-      document.getElementById('lessonForm').submit();
+        // Если все проверки пройдены, отправляем форму
+        document.getElementById('lessonForm').submit();
     }
+
+    function showError(message) {
+        // Убираем старые сообщения об ошибке
+        const existingAlert = document.querySelector('.alert-error');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Создаем всплывающее уведомление
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert-error';
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.backgroundColor = '#dc3545';
+        alertDiv.style.color = 'white';
+        alertDiv.style.padding = '15px 20px';
+        alertDiv.style.borderRadius = '8px';
+        alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.style.display = 'flex';
+        alertDiv.style.alignItems = 'center';
+        alertDiv.style.gap = '10px';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.innerHTML = `
+            <span style="font-size: 1.2rem;">⚠️</span>
+            <div>
+                <strong>Ошибка!</strong><br>
+                <span style="font-size: 0.9rem;">${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: auto;
+                padding: 0;
+            ">×</button>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Автоматический поиск при вводе
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInputs = ['searchText', 'searchID', 'searchAnswer', 'searchSelected'];
+        searchInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', searchTable);
+                element.addEventListener('change', searchTable);
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% set show_footer = False %}

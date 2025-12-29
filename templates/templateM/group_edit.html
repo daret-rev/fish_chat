@@ -1,77 +1,429 @@
 {% extends 'base.html' %}
 {% block title %}Редактирование группы{% endblock %}
+
 {% block content %}
-<p><a href="{{ url_for('group_list') }}" class="btn">← назад</a></p>
-
-<h2>Редактирование группы: {{ group.groupname }}</h2>
-
-<form id="usersForm" method="post">
-    <section>
-        <div style="margin: 20px 0;">
-          <input type="text" name="group_name" id="nemeGroup" placeholder="Название"
-                 value="{{ group.groupname }}"
-                 style="padding: 8px; width: 200px;">
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('group_list') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Список групп
+                </button>
+            </a>
         </div>
-    </section>
 
-    <div style="margin: 10px 0; padding: 10px; background: #f0f0f0;">
-        <strong>Участников:</strong> {{ group.users|length }}
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="
+                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                color: white;
+                padding: 15px 30px;
+                border-radius: 50px;
+                display: inline-flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 20px;
+            ">
+                <span style="font-size: 1.8rem;">✏️</span>
+                <h1 class="hero-title" style="margin: 0; color: white; font-size: 1.8rem;">
+                    Редактирование группы: {{ group.groupname }}
+                </h1>
+            </div>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Измените состав и название существующей группы пользователей
+            </p>
+        </div>
+
+        <!-- Основная форма -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        ">
+            <form id="usersForm" method="post">
+                <!-- Название группы -->
+                <div style="margin-bottom: 40px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                            <div style="
+                                background-color: #007bff;
+                                color: white;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin-right: 10px;
+                                font-size: 1rem;
+                            ">
+                                1️⃣
+                            </div>
+                            Название группы:
+                        </div>
+                    </label>
+                    <input
+                        type="text"
+                        name="group_name"
+                        id="nemeGroup"
+                        placeholder="Введите уникальное название группы"
+                        value="{{ group.groupname }}"
+                        style="
+                            width: 100%;
+                            max-width: 500px;
+                            padding: 12px 15px;
+                            border: 1px solid #ced4da;
+                            border-radius: 8px;
+                            font-size: 1rem;
+                            transition: border-color 0.3s ease;
+                        "
+                        onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                    >
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">
+                        Измените название группы при необходимости
+                    </small>
+                </div>
+
+                <!-- Информация о группе -->
+                <div style="
+                    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                    color: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 25px;
+                ">
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 20px;
+                    ">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">ID группы</div>
+                            <div style="font-weight: 600; font-size: 1.2rem;">#{{ group.id }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Текущее название</div>
+                            <div style="font-weight: 600; font-size: 1.2rem;">{{ group.groupname }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Участников в группе</div>
+                            <div style="font-weight: 600; font-size: 1.2rem;">
+                                {{ group.users|length }}
+                                <span style="font-size: 0.9rem; opacity: 0.8;">человек</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Заголовок выбора участников -->
+                <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #28a745;">
+                    <h3 style="color: #2c3e50; display: flex; align-items: center; gap: 10px; margin: 0;">
+                        <span style="font-size: 1.3rem;">👥</span>
+                        Управление участниками группы
+                    </h3>
+                    <p style="color: #6c757d; margin-top: 8px;">
+                        Отметьте пользователей, которых хотите включить в группу. Выбрано: <span id="selectedCount" style="font-weight: 600; color: #007bff;">{{ group.users|length }}</span> пользователей
+                    </p>
+                </div>
+
+                <!-- Фильтры поиска -->
+                <div style="
+                    background-color: #f8f9fa;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 25px;
+                ">
+                    <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">🔍</span>
+                        Фильтрация пользователей
+                    </h4>
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 15px;
+                        margin-bottom: 20px;
+                    ">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                По имени:
+                            </label>
+                            <input
+                                type="text"
+                                id="searchName"
+                                placeholder="Имя пользователя..."
+                                style="
+                                    width: 100%;
+                                    padding: 10px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 0.95rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                onkeyup="searchTable()"
+                            >
+                        </div>
+
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                По ID:
+                            </label>
+                            <input
+                                type="text"
+                                id="searchID"
+                                placeholder="ID пользователя..."
+                                style="
+                                    width: 100%;
+                                    padding: 10px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 0.95rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                onkeyup="searchTable()"
+                            >
+                        </div>
+
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                По статусу:
+                            </label>
+                            <select
+                                id="searchSelected"
+                                style="
+                                    width: 100%;
+                                    padding: 10px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 0.95rem;
+                                    background-color: white;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                onchange="searchTable()"
+                            >
+                                <option value="">Все пользователи</option>
+                                <option value="selected">Только в группе</option>
+                                <option value="not_selected">Не в группе</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button
+                            type="button"
+                            onclick="clearSearch()"
+                            style="
+                                padding: 10px 20px;
+                                background-color: #6c757d;
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: all 0.3s ease;
+                            "
+                            onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                            onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                        >
+                            <span style="font-size: 1.1rem;">🔄</span>
+                            Сбросить фильтры
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Скрытое поле для выбранных ID -->
+                <input type="hidden" id="selectedIds" name="selected_ids" value="">
+
+                <!-- Таблица пользователей -->
+                <div style="
+                    background: white;
+                    border-radius: 10px;
+                    border: 1px solid #e9ecef;
+                    overflow: hidden;
+                    margin-bottom: 30px;
+                ">
+                    <div style="overflow-x: auto;">
+                        <table style="
+                            width: 100%;
+                            border-collapse: collapse;
+                            min-width: 600px;
+                        ">
+                            <thead>
+                                <tr style="
+                                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                                    color: white;
+                                ">
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0;">ID</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600;">Имя пользователя</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0; width: 120px;">В группе</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                {% for u in users %}
+                                <tr style="
+                                    border-bottom: 1px solid #e9ecef;
+                                    transition: all 0.3s ease;
+                                "
+                                class="usr_row"
+                                onmouseover="this.style.backgroundColor='#f8f9fa';"
+                                onmouseout="this.style.backgroundColor='';">
+                                    <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: middle;">
+                                        #{{ u.id }}
+                                    </td>
+                                    <td style="padding: 15px; vertical-align: middle;">
+                                        <div style="color: #2c3e50; font-weight: 500;">{{ u.username }}</div>
+                                    </td>
+                                    <td style="padding: 15px; vertical-align: middle; text-align: center;">
+                                        <label style="
+                                            display: inline-block;
+                                            cursor: pointer;
+                                            position: relative;
+                                        ">
+                                            <input
+                                                type="checkbox"
+                                                class="usr-checkbox"
+                                                value="{{ u.id }}"
+                                                {% if group and u.id in group.users %}checked{% endif %}
+                                                style="
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    cursor: pointer;
+                                                "
+                                            >
+                                        </label>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" style="padding: 40px; text-align: center; color: #6c757d;">
+                                        <div style="font-size: 3rem; margin-bottom: 20px;">👤</div>
+                                        <h3 style="margin-bottom: 10px; color: #495057;">Нет пользователей</h3>
+                                        <p style="margin-bottom: 20px;">В системе пока нет зарегистрированных пользователей</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 20px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e9ecef;
+                ">
+                    <div>
+                        <a
+                            href="{{ url_for('group_list') }}"
+                            style="
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 8px;
+                                padding: 12px 25px;
+                                background-color: #6c757d;
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                text-decoration: none;
+                                font-weight: 600;
+                                font-size: 0.9rem;
+                                transition: all 0.3s ease;
+                                text-align: center;
+                            "
+                            onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                            onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                        >
+                            <span style="font-size: 1rem;">←</span>
+                            Отмена
+                        </a>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button
+                            type="button"
+                            onclick="prepareAndSubmit()"
+                            style="
+                                padding: 12px 30px;
+                                font-size: 16px;
+                                font-weight: 600;
+                                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 10px;
+                            "
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,123,255,0.3)';"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                        >
+                            <span style="font-size: 1.2rem;">💾</span>
+                            Сохранить изменения
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Информационная панель -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Редактирование группы:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Используйте фильтр "Только в группе" для просмотра текущих участников</li>
+                        <li>Для добавления новых участников отметьте соответствующие чекбоксы</li>
+                        <li>Для исключения участников снимите отметку с чекбокса</li>
+                        <li>Убедитесь, что новое название группы уникально среди всех групп</li>
+                        <li>Изменения вступят в силу сразу после сохранения</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-
-
-    <h3>Укажите участников группы</h3>
-
-    <button type="button" onclick="prepareAndSubmit()">Сохранить</button>
-    <h3>Список всех пользователей</h3>
-
-    <!-- Фильтр поиска -->
-    <div style="margin: 20px 0;">
-      <input type="text" id="searchName" placeholder="Поиск по имени..."
-             style="padding: 8px; width: 250px;">
-
-      <input type="text" id="searchID" placeholder="Поиск по ID..."
-             style="padding: 8px; width: 100px; margin-left: 10px;">
-
-      <select id="searchSelected" style="padding: 8px; margin-left: 10px;">
-        <option value="">Все</option>
-        <option value="selected">Выбранные</option>
-        <option value="not_selected">Не выбранные</option>
-      </select>
-
-      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
-        Найти
-      </button>
-
-      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
-        Сбросить
-      </button>
-    </div>
-
-  <input type="hidden" id="selectedIds" name="selected_ids" value="">
-
-    <table border="1" cellpadding="5" id="usersTable">
-      <tr>
-        <th>ID</th><th>Имя</th><th>Добавить</th>
-      </tr>
-      {% for u in users %}
-      <tr class="usr_row">
-        <td>{{ u.id }}</td>
-        <td>
-          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-            {{ u.username }}
-          </div>
-        </td>
-
-        <td>
-          <div class="actions">
-              <input type="checkbox" class="usr-checkbox" value="{{ u.id }}"
-                {% if group and u.id in group.users %}checked{% endif %}>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-</form>
+</section>
 
 <script>
     function searchTable() {

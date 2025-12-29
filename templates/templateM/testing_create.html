@@ -1,109 +1,646 @@
 {% extends 'base.html' %}
 {% block title %}Создание тестирования{% endblock %}
+
 {% block content %}
-<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
-
-<h2>Создание тестирования</h2>
-
-<form id="testingForm" method="post">
-    <section>
-        <div style="margin: 20px 0;">
-          <input type="text" name="testing_name" id="nemeTesting" placeholder="Название тестирования"
-                 style="padding: 8px; width: 300px;">
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Управление тестированиями
+                </button>
+            </a>
         </div>
-    </section>
 
-    <div style="margin: 20px 0;">
-        <label for="status">Статус тестирования:</label>
-        <select name="status" id="status" style="padding: 8px; width: 200px;">
-            <option value="archived" selected>Архив</option>
-            <option value="active">Активно</option>
-        </select>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Создание тестирования</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Создание нового тестирования с выбором урока и назначением групп
+            </p>
+        </div>
+
+        <!-- Основная форма -->
+        <div style="
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        ">
+            <form id="testingForm" method="post">
+                <!-- Основные параметры -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">⚙️</span>
+                        Основные параметры тестирования
+                    </h3>
+
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 25px;
+                        margin-bottom: 30px;
+                    ">
+                        <!-- Название тестирования -->
+                        <div>
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="
+                                        background-color: #007bff;
+                                        color: white;
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        margin-right: 10px;
+                                        font-size: 1rem;
+                                    ">
+                                        1️⃣
+                                    </div>
+                                    Название тестирования:
+                                </div>
+                            </label>
+                            <input
+                                type="text"
+                                name="testing_name"
+                                id="nemeTesting"
+                                placeholder="Введите уникальное название тестирования"
+                                style="
+                                    width: 100%;
+                                    padding: 12px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 1rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            >
+                            <small style="color: #6c757d; display: block; margin-top: 5px;">
+                                Уникальное название для идентификации тестирования
+                            </small>
+                        </div>
+
+                        <!-- Статус тестирования -->
+                        <div>
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="
+                                        background-color: #28a745;
+                                        color: white;
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        margin-right: 10px;
+                                        font-size: 1rem;
+                                    ">
+                                        2️⃣
+                                    </div>
+                                    Статус тестирования:
+                                </div>
+                            </label>
+                            <select
+                                name="status"
+                                id="status"
+                                style="
+                                    width: 100%;
+                                    padding: 12px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 1rem;
+                                    background-color: white;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            >
+                                <option value="archived" selected>Архив</option>
+                                <option value="active">Активно</option>
+                            </select>
+                            <small style="color: #6c757d; display: block; margin-top: 5px;">
+                                "Активно" - пользователи могут проходить тестирование
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Выбор урока -->
+                <div style="margin-bottom: 40px;">
+                    <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #6f42c1;">
+                        <h3 style="color: #2c3e50; display: flex; align-items: center; gap: 10px; margin: 0;">
+                            <span style="font-size: 1.3rem;">📚</span>
+                            Выбор урока для тестирования
+                        </h3>
+                        <p style="color: #6c757d; margin-top: 8px;">
+                            Выберите один урок, который будет использоваться в тестировании. Выбрано: <span id="selectedLessonCount" style="font-weight: 600; color: #007bff;">0</span> уроков
+                        </p>
+                    </div>
+
+                    <!-- Фильтры поиска уроков -->
+                    <div style="
+                        background-color: #f8f9fa;
+                        border-radius: 10px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                    ">
+                        <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.3rem;">🔍</span>
+                            Поиск уроков
+                        </h4>
+                        <div style="
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 15px;
+                            margin-bottom: 20px;
+                        ">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По названию:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchLessonName"
+                                    placeholder="Название урока..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchLessons()"
+                                >
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По ID:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchLessonID"
+                                    placeholder="ID урока..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchLessons()"
+                                >
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                type="button"
+                                onclick="clearLessonSearch()"
+                                style="
+                                    padding: 10px 20px;
+                                    background-color: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    transition: all 0.3s ease;
+                                "
+                                onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                                onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                            >
+                                <span style="font-size: 1.1rem;">🔄</span>
+                                Сбросить фильтры
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Таблица уроков -->
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        border: 1px solid #e9ecef;
+                        overflow: hidden;
+                        max-height: 300px;
+                        overflow-y: auto;
+                    ">
+                        <div style="overflow-x: auto;">
+                            <table style="
+                                width: 100%;
+                                border-collapse: collapse;
+                                min-width: 800px;
+                            ">
+                                <thead>
+                                    <tr style="
+                                        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                                        color: white;
+                                    ">
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0; width: 60px;">Выбрать</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">ID</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">Название</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">Баллы</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0;">Заданий</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lessonsTableBody">
+                                    {% for l in lessons %}
+                                    <tr style="
+                                        border-bottom: 1px solid #e9ecef;
+                                        transition: all 0.3s ease;
+                                    "
+                                    class="lesson-select-row"
+                                    onmouseover="this.style.backgroundColor='#f8f9fa';"
+                                    onmouseout="this.style.backgroundColor='';">
+                                        <td style="padding: 15px; vertical-align: top; text-align: center;">
+                                            <label style="
+                                                display: inline-block;
+                                                cursor: pointer;
+                                                position: relative;
+                                            ">
+                                                <input
+                                                    type="radio"
+                                                    name="lesson_id"
+                                                    class="lesson-radio"
+                                                    value="{{ l.id }}"
+                                                    style="
+                                                        width: 20px;
+                                                        height: 20px;
+                                                        cursor: pointer;
+                                                    "
+                                                >
+                                            </label>
+                                        </td>
+                                        <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: top;">
+                                            #{{ l.id }}
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
+                                                {{ l.name }}
+                                            </div>
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="display: flex; gap: 10px; font-size: 0.85rem;">
+                                                <div>
+                                                    <span style="color: #28a745; font-weight: 600;">+{{ l.price_correct }}</span>
+                                                </div>
+                                                <div>
+                                                    <span style="color: #dc3545; font-weight: 600;">{{ l.price_wrong }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="
+                                                display: inline-flex;
+                                                align-items: center;
+                                                padding: 6px 12px;
+                                                border-radius: 20px;
+                                                font-weight: 600;
+                                                font-size: 0.85rem;
+                                                background-color: {% if l.questions|length >= 20 %}#d4edda{% elif l.questions|length >= 10 %}#fff3cd{% else %}#f8d7da{% endif %};
+                                                color: {% if l.questions|length >= 20 %}#155724{% elif l.questions|length >= 10 %}#856404{% else %}#721c24{% endif %};
+                                                gap: 6px;
+                                            ">
+                                                <span style="font-size: 0.9rem;">📋</span>
+                                                {{ l.questions|length }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" style="padding: 40px; text-align: center; color: #6c757d;">
+                                            <div style="font-size: 2rem; margin-bottom: 20px;">📭</div>
+                                            <h3 style="margin-bottom: 10px; color: #495057;">Нет доступных уроков</h3>
+                                            <p style="margin-bottom: 20px;">Сначала создайте уроки в системе</p>
+                                            <a href="{{ url_for('lesson_create') }}" style="text-decoration: none;">
+                                                <button style="
+                                                    padding: 10px 20px;
+                                                    background-color: #28a745;
+                                                    color: white;
+                                                    border: none;
+                                                    border-radius: 6px;
+                                                    cursor: pointer;
+                                                    font-weight: 600;
+                                                ">
+                                                    ➕ Создать урок
+                                                </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Выбор групп -->
+                <div style="margin-bottom: 40px;">
+                    <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">
+                        <h3 style="color: #2c3e50; display: flex; align-items: center; gap: 10px; margin: 0;">
+                            <span style="font-size: 1.3rem;">👥</span>
+                            Выбор групп для тестирования
+                        </h3>
+                        <p style="color: #6c757d; margin-top: 8px;">
+                            Выберите одну или несколько групп, которые будут иметь доступ к тестированию. Выбрано: <span id="selectedGroupCount" style="font-weight: 600; color: #007bff;">0</span> групп
+                        </p>
+                    </div>
+
+                    <!-- Фильтры поиска групп -->
+                    <div style="
+                        background-color: #f8f9fa;
+                        border-radius: 10px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                    ">
+                        <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.3rem;">🔍</span>
+                            Поиск групп
+                        </h4>
+                        <div style="
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 15px;
+                            margin-bottom: 20px;
+                        ">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По названию:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchGroupName"
+                                    placeholder="Название группы..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchGroups()"
+                                >
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                                    По ID:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="searchGroupID"
+                                    placeholder="ID группы..."
+                                    style="
+                                        width: 100%;
+                                        padding: 10px 15px;
+                                        border: 1px solid #ced4da;
+                                        border-radius: 8px;
+                                        font-size: 0.95rem;
+                                        transition: border-color 0.3s ease;
+                                    "
+                                    onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                    onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                    onkeyup="searchGroups()"
+                                >
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                type="button"
+                                onclick="clearGroupSearch()"
+                                style="
+                                    padding: 10px 20px;
+                                    background-color: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    transition: all 0.3s ease;
+                                "
+                                onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                                onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                            >
+                                <span style="font-size: 1.1rem;">🔄</span>
+                                Сбросить фильтры
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Таблица групп -->
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        border: 1px solid #e9ecef;
+                        overflow: hidden;
+                        max-height: 300px;
+                        overflow-y: auto;
+                    ">
+                        <div style="overflow-x: auto;">
+                            <table style="
+                                width: 100%;
+                                border-collapse: collapse;
+                                min-width: 800px;
+                            ">
+                                <thead>
+                                    <tr style="
+                                        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                        color: white;
+                                    ">
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0; width: 60px;">Выбрать</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">ID</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600;">Название группы</th>
+                                        <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0;">Участников</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupsTableBody">
+                                    {% for g in groups %}
+                                    <tr style="
+                                        border-bottom: 1px solid #e9ecef;
+                                        transition: all 0.3s ease;
+                                    "
+                                    class="group-select-row"
+                                    onmouseover="this.style.backgroundColor='#f8f9fa';"
+                                    onmouseout="this.style.backgroundColor='';">
+                                        <td style="padding: 15px; vertical-align: top; text-align: center;">
+                                            <label style="
+                                                display: inline-block;
+                                                cursor: pointer;
+                                                position: relative;
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    class="group-checkbox"
+                                                    value="{{ g.id }}"
+                                                    style="
+                                                        width: 20px;
+                                                        height: 20px;
+                                                        cursor: pointer;
+                                                    "
+                                                >
+                                            </label>
+                                        </td>
+                                        <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: top;">
+                                            #{{ g.id }}
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
+                                                {{ g.groupname }}
+                                            </div>
+                                        </td>
+                                        <td style="padding: 15px; vertical-align: top;">
+                                            <div style="
+                                                display: inline-flex;
+                                                align-items: center;
+                                                padding: 6px 12px;
+                                                border-radius: 20px;
+                                                font-weight: 600;
+                                                font-size: 0.85rem;
+                                                background-color: {% if g.users|length >= 20 %}#d4edda{% elif g.users|length >= 10 %}#fff3cd{% else %}#f8d7da{% endif %};
+                                                color: {% if g.users|length >= 20 %}#155724{% elif g.users|length >= 10 %}#856404{% else %}#721c24{% endif %};
+                                                gap: 6px;
+                                            ">
+                                                <span style="font-size: 0.9rem;">👥</span>
+                                                {{ g.users|length }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" style="padding: 40px; text-align: center; color: #6c757d;">
+                                            <div style="font-size: 2rem; margin-bottom: 20px;">👥</div>
+                                            <h3 style="margin-bottom: 10px; color: #495057;">Нет доступных групп</h3>
+                                            <p style="margin-bottom: 20px;">Сначала создайте группы пользователей</p>
+                                            <a href="{{ url_for('group_create') }}" style="text-decoration: none;">
+                                                <button style="
+                                                    padding: 10px 20px;
+                                                    background-color: #28a745;
+                                                    color: white;
+                                                    border: none;
+                                                    border-radius: 6px;
+                                                    cursor: pointer;
+                                                    font-weight: 600;
+                                                ">
+                                                    ➕ Создать группу
+                                                </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопка создания -->
+                <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
+                    <button
+                        type="button"
+                        onclick="prepareAndSubmit()"
+                        style="
+                            padding: 14px 40px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(40,167,69,0.3)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                    >
+                        <span style="font-size: 1.2rem;">✅</span>
+                        Создать тестирование
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Информационная панель -->
+        <div style="
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Создание тестирования:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Название тестирования должно быть уникальным среди всех тестирований</li>
+                        <li>Выберите статус "Активно" для немедленного доступа пользователей к тестированию</li>
+                        <li>Для тестирования можно выбрать только один урок из списка доступных</li>
+                        <li>Можно выбрать несколько групп пользователей для участия в тестировании</li>
+                        <li>Используйте фильтры для быстрого поиска нужных уроков и групп</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <h3>Выберите урок</h3>
-
-    <div style="margin: 10px 0;">
-        <input type="text" id="searchLessonName" placeholder="Поиск по названию..."
-               style="padding: 8px; width: 300px;">
-        <input type="text" id="searchLessonID" placeholder="Поиск по ID..."
-               style="padding: 8px; width: 100px; margin-left: 10px;">
-        <button type="button" onclick="searchLessons()" style="padding: 6px 16px; margin-left: 10px;">
-            Найти
-        </button>
-        <button type="button" onclick="clearLessonSearch()" style="padding: 6px 16px; margin-left: 5px;">
-            Сбросить
-        </button>
-    </div>
-
-    <div style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; margin-bottom: 30px;">
-        <table style="width: 100%;">
-            <thead>
-                <tr>
-                    <th style="width: 50px;">Выбрать</th>
-                    <th>ID</th>
-                    <th>Название</th>
-                    <th>Время</th>
-                    <th>Заданий</th>
-                </tr>
-            </thead>
-            <tbody id="lessonsTableBody">
-                {% for l in lessons %}
-                <tr class="lesson-select-row">
-                    <td><input type="radio" name="lesson_id" class="lesson-radio" value="{{ l.id }}"></td>
-                    <td>{{ l.id }}</td>
-                    <td>{{ l.name }}</td>
-                    <td>{{ l.time }}</td>
-                    <td>{{ l.questions|length }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <h3>Выберите группы</h3>
-
-    <div style="margin: 10px 0;">
-        <input type="text" id="searchGroupName" placeholder="Поиск по названию..."
-               style="padding: 8px; width: 300px;">
-        <input type="text" id="searchGroupID" placeholder="Поиск по ID..."
-               style="padding: 8px; width: 100px; margin-left: 10px;">
-        <button type="button" onclick="searchGroups()" style="padding: 6px 16px; margin-left: 10px;">
-            Найти
-        </button>
-        <button type="button" onclick="clearGroupSearch()" style="padding: 6px 16px; margin-left: 5px;">
-            Сбросить
-        </button>
-    </div>
-
-    <div style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; margin-bottom: 30px;">
-        <table style="width: 100%;">
-            <thead>
-                <tr>
-                    <th style="width: 50px;">Выбрать</th>
-                    <th>ID</th>
-                    <th>Название</th>
-                    <th>Участников</th>
-                </tr>
-            </thead>
-            <tbody id="groupsTableBody">
-                {% for g in groups %}
-                <tr class="group-select-row">
-                    <td><input type="checkbox" class="group-checkbox" value="{{ g.id }}"></td>
-                    <td>{{ g.id }}</td>
-                    <td>{{ g.groupname }}</td>
-                    <td>{{ g.users|length }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <button type="button" onclick="prepareAndSubmit()">Создать тестирование</button>
-</form>
+</section>
 
 <script>
+    // Счетчики выбранных элементов
+    function updateSelectedCounts() {
+        // Счетчик выбранных уроков
+        const selectedLesson = document.querySelectorAll('.lesson-radio:checked').length;
+        document.getElementById('selectedLessonCount').textContent = selectedLesson;
+        document.getElementById('selectedLessonCount').style.color = selectedLesson > 0 ? '#28a745' : '#007bff';
 
+        // Счетчик выбранных групп
+        const selectedGroups = document.querySelectorAll('.group-checkbox:checked').length;
+        document.getElementById('selectedGroupCount').textContent = selectedGroups;
+        document.getElementById('selectedGroupCount').style.color = selectedGroups > 0 ? '#28a745' : '#007bff';
+    }
+
+    // Поиск уроков
     function searchLessons() {
         const searchName = document.getElementById('searchLessonName').value.toLowerCase();
         const searchID = document.getElementById('searchLessonID').value.toLowerCase();
@@ -112,12 +649,15 @@
         rows.forEach(row => {
             const cells = row.getElementsByTagName('td');
             if (cells.length >= 4) {
-                const id = cells[1].textContent.toLowerCase();
+                const id = cells[1].textContent.toLowerCase().replace('#', '').trim();
                 const name = cells[2].textContent.toLowerCase();
                 let show = true;
+
                 if (searchID && !id.includes(searchID)) show = false;
                 if (searchName && !name.includes(searchName)) show = false;
+
                 row.style.display = show ? '' : 'none';
+                row.style.opacity = show ? '1' : '0.5';
             }
         });
     }
@@ -128,9 +668,11 @@
         const rows = document.querySelectorAll('#lessonsTableBody .lesson-select-row');
         rows.forEach(row => {
             row.style.display = '';
+            row.style.opacity = '1';
         });
     }
 
+    // Поиск групп
     function searchGroups() {
         const searchName = document.getElementById('searchGroupName').value.toLowerCase();
         const searchID = document.getElementById('searchGroupID').value.toLowerCase();
@@ -139,12 +681,15 @@
         rows.forEach(row => {
             const cells = row.getElementsByTagName('td');
             if (cells.length >= 4) {
-                const id = cells[1].textContent.toLowerCase();
+                const id = cells[1].textContent.toLowerCase().replace('#', '').trim();
                 const name = cells[2].textContent.toLowerCase();
                 let show = true;
+
                 if (searchID && !id.includes(searchID)) show = false;
                 if (searchName && !name.includes(searchName)) show = false;
+
                 row.style.display = show ? '' : 'none';
+                row.style.opacity = show ? '1' : '0.5';
             }
         });
     }
@@ -155,33 +700,35 @@
         const rows = document.querySelectorAll('#groupsTableBody .group-select-row');
         rows.forEach(row => {
             row.style.display = '';
+            row.style.opacity = '1';
         });
     }
 
+    // Подготовка и отправка формы
     function prepareAndSubmit() {
         const testingName = document.querySelector('input[name="testing_name"]').value.trim();
 
         if (!testingName) {
-            alert('Введите название тестирования');
+            showError('Введите название тестирования');
             return;
         }
 
         const testing_names = {{ testing_names|tojson|safe }};
 
         if (testing_names.includes(testingName)) {
-            alert('Тестирование с таким названием уже существует. Выберите другое название.');
+            showError('Тестирование с таким названием уже существует. Выберите другое название.');
             return;
         }
 
         const selectedLesson = document.querySelector('input[name="lesson_id"]:checked');
         if (!selectedLesson) {
-            alert('Выберите урок');
+            showError('Выберите урок для тестирования');
             return;
         }
 
         const selectedGroups = document.querySelectorAll('.group-checkbox:checked');
         if (selectedGroups.length === 0) {
-            alert('Выберите хотя бы одну группу');
+            showError('Выберите хотя бы одну группу для тестирования');
             return;
         }
 
@@ -201,6 +748,86 @@
         form.appendChild(hiddenInput);
         form.submit();
     }
+
+    // Показ ошибок
+    function showError(message) {
+        // Убираем старые сообщения об ошибке
+        const existingAlert = document.querySelector('.alert-error');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Создаем всплывающее уведомление
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert-error';
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.backgroundColor = '#dc3545';
+        alertDiv.style.color = 'white';
+        alertDiv.style.padding = '15px 20px';
+        alertDiv.style.borderRadius = '8px';
+        alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.style.display = 'flex';
+        alertDiv.style.alignItems = 'center';
+        alertDiv.style.gap = '10px';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.innerHTML = `
+            <span style="font-size: 1.2rem;">⚠️</span>
+            <div>
+                <strong>Ошибка!</strong><br>
+                <span style="font-size: 0.9rem;">${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: auto;
+                padding: 0;
+            ">×</button>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обновляем счетчики при изменении выбора
+        const lessonRadios = document.querySelectorAll('.lesson-radio');
+        lessonRadios.forEach(radio => {
+            radio.addEventListener('change', updateSelectedCounts);
+        });
+
+        const groupCheckboxes = document.querySelectorAll('.group-checkbox');
+        groupCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCounts);
+        });
+
+        // Инициализируем счетчики
+        updateSelectedCounts();
+
+        // Автоматический поиск при вводе
+        const searchInputs = ['searchLessonName', 'searchLessonID', 'searchGroupName', 'searchGroupID'];
+        searchInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', function() {
+                    if (id.includes('Lesson')) searchLessons();
+                    if (id.includes('Group')) searchGroups();
+                });
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% set show_footer = False %}

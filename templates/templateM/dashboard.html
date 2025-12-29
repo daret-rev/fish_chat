@@ -4,32 +4,150 @@
 
 {% block content %}
 <section class="hero-section">
-
     <div class="container">
-        <a href="{{ url_for('logout') }}">
-            <button class="btn-left">Выход</button>
-        </a>
-        <div class="hero-content">
-            <h1 class="hero-title">Панель управления</h1>
+        <!-- Выход в правом верхнем углу -->
+        <div style="text-align: right; margin-bottom: 40px;">
+            <a href="{{ url_for('logout') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 10px 24px; font-size: 14px;">
+                    Выход
+                </button>
+            </a>
+        </div>
 
-            <div class="button-container">
-                <a href="{{ url_for('memo') }}">
-                    <button class="secondary-button">Инструкция</button>
-                </a>
-                <a href="{{ url_for('testing_management') }}">
-                    <button class="primary-button">Управление тестированиями</button>
-                </a>
+        <!-- Заголовок по центру -->
+        <div style="text-align: center; margin-bottom: 60px;">
+            <h1 class="hero-title" style="margin-bottom: 20px;">Панель управления</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                Управление тестированиями и банком заданий
+            </p>
+        </div>
 
-                <a href="{{ url_for('DB_management')}}">
-                    <button class="primary-button">Управление банком заданий</button>
+        <!-- Контейнер кнопок с сеткой -->
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        ">
+            <!-- Инструкция -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+                border: 1px solid #e9ecef;
+            " onmouseover="this.style.transform='translateY(-5px)'"
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="margin-bottom: 20px; color: #6f42c1; font-size: 2.5rem;">
+                    📋
+                </div>
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">Инструкция</h3>
+                <p style="color: #6c757d; margin-bottom: 25px; font-size: 0.95rem;">
+                    Руководство по использованию системы тестирования
+                </p>
+                <a href="{{ url_for('dashboard_instruction') }}" style="text-decoration: none;">
+                    <button class="secondary-button" style="width: 100%; padding: 12px;">
+                        Открыть инструкцию
+                    </button>
+                </a>
+            </div>
+
+            <!-- Управление тестированиями -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+                border: 1px solid #e9ecef;
+            " onmouseover="this.style.transform='translateY(-5px)'"
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="margin-bottom: 20px; color: #007bff; font-size: 2.5rem;">
+                    🎯
+                </div>
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">Управление тестированиями</h3>
+                <p style="color: #6c757d; margin-bottom: 25px; font-size: 0.95rem;">
+                    Создание, запуск и анализ тестирований
+                </p>
+                <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                    <button class="primary-button" style="width: 100%; padding: 12px;">
+                        Перейти к тестированиям
+                    </button>
+                </a>
+            </div>
+
+            <!-- Управление банком заданий -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+                border: 1px solid #e9ecef;
+            " onmouseover="this.style.transform='translateY(-5px)'"
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="margin-bottom: 20px; color: #28a745; font-size: 2.5rem;">
+                    📚
+                </div>
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">Банк заданий</h3>
+                <p style="color: #6c757d; margin-bottom: 25px; font-size: 0.95rem;">
+                    Добавление и редактирование вопросов теста
+                </p>
+                <a href="{{ url_for('DB_management') }}" style="text-decoration: none;">
+                    <button class="primary-button" style="width: 100%; padding: 12px;">
+                        Перейти к заданиям
+                    </button>
+                </a>
+            </div>
+
+            <!-- Результаты тестирований (новая кнопка) -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+                border: 1px solid #e9ecef;
+            " onmouseover="this.style.transform='translateY(-5px)'"
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="margin-bottom: 20px; color: #6f42c1; font-size: 2.5rem;">
+                    📊
+                </div>
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">Результаты</h3>
+                <p style="color: #6c757d; margin-bottom: 25px; font-size: 0.95rem;">
+                    Анализ результатов и статистика тестирований
+                </p>
+                <a href="{{ url_for('result_list') }}" style="text-decoration: none;">
+                    <button class="primary-button" style="
+                        width: 100%;
+                        padding: 12px;
+                        background-color: #6f42c1;
+                        border-color: #6f42c1;
+                    ">
+                        Просмотреть результаты
+                    </button>
                 </a>
             </div>
         </div>
+
+        <!-- Информационная строка внизу -->
+        <div style="
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 0.9rem;
+        ">
+            <p>Система тестирования • Версия 1.0</p>
+        </div>
     </div>
-
 </section>
-
 {% endblock %}
 {% set show_footer = False %}
-
-

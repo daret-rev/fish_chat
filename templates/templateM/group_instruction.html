@@ -1,31 +1,458 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Управление группами
-{% endblock %}
+{% block title %}Управление группами{% endblock %}
 
 {% block content %}
+<section class="hero-section">
     <div class="container">
-        <h1>Управление группами</h1>
 
-        <section>
-            <h2>Группа - совокупность пользователей, которые вместе участвуют в тестировании</h2>
-        </section>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Управление группами</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Объединение пользователей для совместного участия в тестировании
+            </p>
+        </div>
 
-        <section>
-            <section>
-                <h1>"Создание"</h1>
-                <p>Выберете пользователей, которых хотите объединить в группу</p>
-            </section>
+        <!-- Основная информация -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #28a745;
+            text-align: center;
+        ">
+            <div style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+                padding: 15px 30px;
+                background-color: rgba(40, 167, 69, 0.1);
+                border-radius: 50px;
+            ">
+                <div style="
+                    background-color: #28a745;
+                    color: white;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.5rem;
+                    margin-right: 15px;
+                ">
+                    👥
+                </div>
+                <h2 style="margin: 0; color: #2c3e50; font-size: 1.5rem;">
+                    Группа - совокупность пользователей, которые вместе участвуют в тестировании
+                </h2>
+            </div>
 
-            <section>
-                <h1>"Редактирование"</h1>
-                <p>Удалите пользователей из группы или добавьте новых</p>
-            </section>
-        </section>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-top: 30px;
+            ">
+                <!-- Карточка преимуществ -->
+                <div style="
+                    background-color: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: left;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #17a2b8;
+                            color: white;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.2rem;
+                        ">
+                            📊
+                        </div>
+                        <h3 style="margin: 0; color: #495057; font-size: 1.2rem;">Статистика</h3>
+                    </div>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                        Анализ результатов тестирования по группам для сравнения успеваемости
+                    </p>
+                </div>
 
+                <!-- Карточка управления -->
+                <div style="
+                    background-color: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: left;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #6f42c1;
+                            color: white;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.2rem;
+                        ">
+                            🎯
+                        </div>
+                        <h3 style="margin: 0; color: #495057; font-size: 1.2rem;">Назначение</h3>
+                    </div>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                        Группировка пользователей для назначения конкретных тестирований и уроков
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Две колонки инструкций -->
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        ">
+            <!-- Создание -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-top: 4px solid #007bff;
+                position: relative;
+                overflow: hidden;
+            ">
+                <!-- Декоративный элемент -->
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 100px;
+                    height: 100px;
+                    background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,123,255,0) 70%);
+                    border-radius: 0 12px 0 100px;
+                "></div>
+
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid #e9ecef;
+                ">
+                    <div style="
+                        background-color: #007bff;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-right: 15px;
+                    ">
+                        🆕
+                    </div>
+                    <div>
+                        <h2 style="margin: 0 0 5px 0; color: #2c3e50;">Создание группы</h2>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                            Создайте новую группу пользователей
+                        </p>
+                    </div>
+                </div>
+
+                <div style="padding: 25px; background-color: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #007bff;
+                            color: white;
+                            min-width: 35px;
+                            height: 35px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-weight: bold;
+                            font-size: 1.1rem;
+                        ">
+                            1
+                        </div>
+                        <div>
+                            <h3 style="margin: 0 0 10px 0; color: #495057; font-size: 1.1rem;">
+                                Придумайте название группы
+                            </h3>
+                            <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                                Уникальное название для идентификации группы
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start;">
+                        <div style="
+                            background-color: #007bff;
+                            color: white;
+                            min-width: 35px;
+                            height: 35px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-weight: bold;
+                            font-size: 1.1rem;
+                        ">
+                            2
+                        </div>
+                        <div>
+                            <h3 style="margin: 0 0 10px 0; color: #495057; font-size: 1.1rem;">
+                                Выберите пользователей
+                            </h3>
+                            <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                                Отметьте пользователей, которых хотите объединить в группу
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="
+                    background-color: #e7f1ff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    border-left: 4px solid #007bff;
+                ">
+                    <p style="margin: 0; color: #0056b3; font-weight: 500;">
+                        💡 <strong>Совет:</strong> Создавайте группы по тематике, классам или уровню подготовки
+                    </p>
+                </div>
+            </div>
+
+            <!-- Редактирование -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-top: 4px solid #fd7e14;
+                position: relative;
+                overflow: hidden;
+            ">
+                <!-- Декоративный элемент -->
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 100px;
+                    height: 100px;
+                    background: linear-gradient(135deg, rgba(253,126,20,0.1) 0%, rgba(253,126,20,0) 70%);
+                    border-radius: 0 12px 0 100px;
+                "></div>
+
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid #e9ecef;
+                ">
+                    <div style="
+                        background-color: #fd7e14;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-right: 15px;
+                    ">
+                        ✏️
+                    </div>
+                    <div>
+                        <h2 style="margin: 0 0 5px 0; color: #2c3e50;">Редактирование групп</h2>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                            Управление составом существующих групп
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <p style="color: #495057; margin-bottom: 20px; font-size: 1.1rem; font-weight: 500;">
+                        Вы можете:
+                    </p>
+
+                    <div style="
+                        display: flex;
+                        align-items: flex-start;
+                        margin-bottom: 20px;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';"
+                       onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none';">
+                        <div style="
+                            background-color: #fd7e14;
+                            color: white;
+                            min-width: 35px;
+                            height: 35px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.2rem;
+                        ">
+                            👁️
+                        </div>
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; color: #495057; font-size: 1.1rem;">
+                                Просмотреть состав групп
+                            </h3>
+                            <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                                Посмотреть список всех групп и их участников
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="
+                        display: flex;
+                        align-items: flex-start;
+                        margin-bottom: 20px;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';"
+                       onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none';">
+                        <div style="
+                            background-color: #fd7e14;
+                            color: white;
+                            min-width: 35px;
+                            height: 35px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.2rem;
+                        ">
+                            ➕
+                        </div>
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; color: #495057; font-size: 1.1rem;">
+                                Добавить пользователей
+                            </h3>
+                            <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                                Включить новых участников в существующую группу
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="
+                        display: flex;
+                        align-items: flex-start;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';"
+                       onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none';">
+                        <div style="
+                            background-color: #fd7e14;
+                            color: white;
+                            min-width: 35px;
+                            height: 35px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.2rem;
+                        ">
+                            ❌
+                        </div>
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; color: #495057; font-size: 1.1rem;">
+                                Удалить пользователей
+                            </h3>
+                            <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                                Исключить участников из группы или удалить группу полностью
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div style="
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        ">
+            <a href="{{ url_for('group_create') }}" style="text-decoration: none;">
+                <button class="primary-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    min-width: 200px;
+                ">
+                    <span style="font-size: 1.2rem;">➕</span>
+                    Создать группу
+                </button>
+            </a>
+
+            <a href="{{ url_for('group_list') }}" style="text-decoration: none;">
+                <button class="primary-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    min-width: 200px;
+                    background-color: #28a745;
+                    border-color: #28a745;
+                ">
+                    <span style="font-size: 1.2rem;">👥</span>
+                    Список групп
+                </button>
+            </a>
+
+            <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                <button class="secondary-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    min-width: 200px;
+                ">
+                    <span style="font-size: 1.2rem;">←</span>
+                    Назад к управлению
+                </button>
+            </a>
+        </div>
     </div>
-<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
-
+</section>
 {% endblock %}
 {% set show_footer = False %}

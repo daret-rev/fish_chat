@@ -1,96 +1,256 @@
 {% extends 'base.html' %}
 
-{% block title %}Панель управления{% endblock %}
+{% block title %}Управление тестированиями{% endblock %}
 
 {% block content %}
 <section class="hero-section">
-
     <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('dashboard') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Главная панель
+                </button>
+            </a>
+        </div>
 
-        <div class="hero-content">
-            <h1 class="hero-title">Управление тестированиями</h1>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Управление тестированиями</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Создание, редактирование и управление тестированиями, группами и уроками
+            </p>
+        </div>
 
-            <table border="1" cellpadding="10" id="messagesTable" style="width: 100%; border-collapse: collapse; text-align: center;">
-                <tr>
-                    <th style="padding: 15px; background-color: #f8f9fa;">Тестирования</th>
-                    <th style="padding: 15px; background-color: #f8f9fa;">Группы</th>
-                    <th style="padding: 15px; background-color: #f8f9fa;">Уроки</th>
-                </tr>
-                <tr class="msg_row">
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('testing_create') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Создание тестирования
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('group_create')}}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Создать группу
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('lesson_create')}}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Создать урок
-                            </button>
-                        </a>
-                    </td>
-                </tr>
-                <tr class="msg_row">
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('testing_list') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Редактировать тестирования
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('group_list') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Редактировать группы
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('lesson_list') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Редактировать уроки
-                            </button>
-                        </a>
-                    </td>
-                </tr>
-                <tr class="msg_row">
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('testing_management_instruction') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Инструкция
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('group_instruction') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Инструкция
-                            </button>
-                        </a>
-                    </td>
-                    <td style="padding: 20px; vertical-align: middle;">
-                        <a href="{{ url_for('lesson_instruction') }}" style="text-decoration: none; display: block;">
-                            <button class="primary-button" style="width: 80%; margin: 0 auto; display: block;">
-                                Инструкция
-                            </button>
-                        </a>
-                    </td>
-                </tr>
-            </table>
+        <!-- Карточки управления -->
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        ">
+            <!-- Тестирования -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border: 1px solid #e9ecef;
+            ">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 2px solid #007bff;
+                ">
+                    <div style="
+                        background-color: #007bff;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-right: 15px;
+                    ">
+                        📝
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Тестирования</h3>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="{{ url_for('testing_create') }}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Создание тестирования
+                            <span style="font-size: 1.2rem;">➕</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('testing_list') }}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Редактировать тестирования
+                            <span style="font-size: 1.2rem;">✏️</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('testing_management_instruction') }}" style="text-decoration: none;">
+                        <button class="secondary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Инструкция
+                            <span style="font-size: 1.2rem;">📖</span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Группы -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border: 1px solid #e9ecef;
+            ">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 2px solid #28a745;
+                ">
+                    <div style="
+                        background-color: #28a745;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-right: 15px;
+                    ">
+                        👥
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Группы</h3>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="{{ url_for('group_create')}}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Создать группу
+                            <span style="font-size: 1.2rem;">➕</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('group_list') }}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Редактировать группы
+                            <span style="font-size: 1.2rem;">✏️</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('group_instruction') }}" style="text-decoration: none;">
+                        <button class="secondary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Инструкция
+                            <span style="font-size: 1.2rem;">📖</span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Уроки -->
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border: 1px solid #e9ecef;
+            ">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 2px solid #6f42c1;
+                ">
+                    <div style="
+                        background-color: #6f42c1;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-right: 15px;
+                    ">
+                        📚
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Уроки</h3>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="{{ url_for('lesson_create')}}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Создать урок
+                            <span style="font-size: 1.2rem;">➕</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('lesson_list') }}" style="text-decoration: none;">
+                        <button class="primary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Редактировать уроки
+                            <span style="font-size: 1.2rem;">✏️</span>
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('lesson_instruction') }}" style="text-decoration: none;">
+                        <button class="secondary-button" style="width: 100%; padding: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                            Инструкция
+                            <span style="font-size: 1.2rem;">📖</span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Быстрые ссылки внизу -->
+        <div style="
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        ">
+            <p style="color: #6c757d; margin-bottom: 20px;">Быстрый доступ:</p>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <a href="{{ url_for('result_list') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #6f42c1;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">
+                        📊 Результаты тестирований
+                    </button>
+                </a>
+                <a href="{{ url_for('DB_management') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #17a2b8;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">
+                        🗃️ Банк заданий
+                    </button>
+                </a>
+                <a href="{{ url_for('dashboard_instruction') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #6c757d;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">
+                        ℹ️ Общая инструкция
+                    </button>
+                </a>
+            </div>
         </div>
     </div>
-
 </section>
-<footer><a href="{{ url_for('dashboard') }}"><button type="button">Главная панель</button></a></footer>
 {% endblock %}
 
 {% set show_footer = False %}

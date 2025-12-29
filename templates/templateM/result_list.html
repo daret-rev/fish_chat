@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
-{% block title %}Список тестирований{% endblock %}
+{% block title %}Результаты тестирований{% endblock %}
 
 {% block content %}
 <section class="hero-section">
     <div class="container">
         <!-- Кнопка назад -->
         <div style="margin-bottom: 30px;">
-            <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+            <a href="{{ url_for('dashboard') }}" style="text-decoration: none;">
                 <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
-                    ← Управление тестированиями
+                    ← Главная панель
                 </button>
             </a>
         </div>
 
         <!-- Заголовок -->
         <div style="text-align: center; margin-bottom: 40px;">
-            <h1 class="hero-title" style="margin-bottom: 15px;">Список всех тестирований</h1>
+            <h1 class="hero-title" style="margin-bottom: 15px;">Результаты тестирований</h1>
             <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
-                Просмотр, редактирование и управление всеми тестированиями в системе
+                Просмотр статистики и результатов всех проведенных тестирований
             </p>
         </div>
 
@@ -28,7 +28,7 @@
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-left: 4px solid #28a745;
+            border-left: 4px solid #6f42c1;
         ">
             <!-- Статистика -->
             <div style="
@@ -43,47 +43,26 @@
                     <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Статистика тестирований</h3>
                     <div style="display: flex; gap: 25px; color: #6c757d; font-size: 0.95rem;">
                         <div>
-                            <span style="color: #28a745; font-weight: 600;">●</span>
+                            <span style="color: #6f42c1; font-weight: 600;">●</span>
                             Всего тестирований: {{ testings|length }}
                         </div>
                         <div>
-                            <span style="color: #007bff; font-weight: 600;">●</span>
+                            <span style="color: #28a745; font-weight: 600;">●</span>
                             Активных: {{ testings|selectattr('status')|list|length }}
                         </div>
                         <div>
-                            <span style="color: #6f42c1; font-weight: 600;">●</span>
+                            <span style="color: #fd7e14; font-weight: 600;">●</span>
                             В архиве: {{ testings|rejectattr('status')|list|length }}
-                        </div>
-                        <div>
-                            <span style="color: #17a2b8; font-weight: 600;">●</span>
-                            Среднее групп на тестирование: {{ ((testings|map(attribute='group_id')|map('from_json' if testings.0.group_id is string else 'length')|sum / testings|length) if testings|length > 0 else 0)|round|int }}
                         </div>
                     </div>
                 </div>
-                <a href="{{ url_for('testing_create') }}" style="text-decoration: none;">
-                    <button style="
-                        padding: 10px 25px;
-                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 600;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                    ">
-                        <span style="font-size: 1.2rem;">➕</span>
-                        Создать тестирование
-                    </button>
-                </a>
             </div>
 
             <!-- Фильтры поиска -->
             <div>
                 <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.3rem;">🔍</span>
-                    Поиск и фильтрация
+                    Фильтрация тестирований
                 </h4>
                 <div style="
                     display: grid;
@@ -93,7 +72,7 @@
                 ">
                     <div>
                         <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
-                            По ID теста:
+                            По ID:
                         </label>
                         <input
                             type="text"
@@ -120,7 +99,7 @@
                         <input
                             type="text"
                             id="searchName"
-                            placeholder="Название тестирования..."
+                            placeholder="Название теста..."
                             style="
                                 width: 100%;
                                 padding: 10px 15px;
@@ -210,29 +189,33 @@
             </div>
         </div>
 
-        <!-- Таблица тестирований -->
+        <!-- Таблица результатов -->
         <div style="
             background: white;
             border-radius: 12px;
+            padding: 30px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box; <!-- ДОБАВЬ -->
+            overflow: hidden;
         ">
             <div style="overflow-x: auto;">
                 <table style="
                     width: 100%;
                     border-collapse: collapse;
-                    table-layout: fixed; /* ← Фиксируем ширину столбцов */
+                    min-width: 1000px;
                 ">
                     <thead>
-                        <tr style="...">
-                            <th style="width: 6%; padding: 15px; ...">ID</th>
-                            <th style="width: 20%; padding: 15px; ...">Название тестирования</th>
-                            <th style="width: 20%; padding: 15px; ...">Урок</th>
-                            <th style="width: 15%; padding: 15px; ...">Статус</th>
-                            <th style="width: 8%; padding: 15px; ...">Кол-во групп</th>
-                            <th style="width: 20%; padding: 15px; ...">Действия</th>
+                        <tr style="
+                            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                            color: white;
+                        ">
+                            <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0;">ID</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Название тестирования</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Урок</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Статус</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Участники</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Выполнили</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Процент</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0;">Действие</th>
                         </tr>
                     </thead>
                     <tbody id="testingTableBody">
@@ -252,46 +235,33 @@
                                     {{ t.name }}
                                 </div>
                                 <div style="font-size: 0.85rem; color: #6c757d;">
-                                    ID: {{ t.id }}
+                                    ID урока: {{ t.lesson_id }}
                                 </div>
                             </td>
                             <td style="padding: 15px; vertical-align: top;">
                                 {% set lesson = lessons_dict.get(t.lesson_id) %}
                                 {% if lesson %}
-                                    <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">
-                                        {{ lesson.name }}
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #6c757d;">
-                                        ID: {{ lesson.id }} • {{ lesson.questions|length }} заданий
-                                    </div>
+                                    <div style="color: #495057; font-weight: 500;">{{ lesson.name }}</div>
                                 {% else %}
-                                    <div style="color: #dc3545; font-weight: 600;">
-                                        <span style="font-size: 1rem;">⚠️</span> Урок удален
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #6c757d;">
-                                        ID: {{ t.lesson_id }}
-                                    </div>
+                                    <div style="color: #6c757d; font-style: italic;">Урок не найден</div>
+                                    <div style="font-size: 0.85rem; color: #999;">ID: {{ t.lesson_id }}</div>
                                 {% endif %}
                             </td>
                             <td style="padding: 15px; vertical-align: top;">
-                                {% if t.status %}
+                                {% if t.status == True %}
                                     <span style="
                                         display: inline-flex;
                                         align-items: center;
                                         padding: 6px 12px;
                                         border-radius: 20px;
                                         font-weight: 600;
-                                        font-size: 0.85rem;
+                                        font-size: 0.9rem;
                                         background-color: #d4edda;
                                         color: #155724;
                                         gap: 6px;
                                     ">
-                                        <span style="font-size: 0.9rem;">✅</span>
-                                        Активно
+                                        <span style="font-size: 1rem;">⚡</span> Активно
                                     </span>
-                                    <div style="margin-top: 5px; font-size: 0.8rem; color: #28a745;">
-                                        Доступно для прохождения
-                                    </div>
                                 {% else %}
                                     <span style="
                                         display: inline-flex;
@@ -299,131 +269,122 @@
                                         padding: 6px 12px;
                                         border-radius: 20px;
                                         font-weight: 600;
-                                        font-size: 0.85rem;
-                                        background-color: #f8d7da;
-                                        color: #721c24;
+                                        font-size: 0.9rem;
+                                        background-color: #fff3cd;
+                                        color: #856404;
                                         gap: 6px;
                                     ">
-                                        <span style="font-size: 0.9rem;">📁</span>
-                                        Архив
+                                        <span style="font-size: 1rem;">📁</span> Архив
                                     </span>
-                                    <div style="margin-top: 5px; font-size: 0.8rem; color: #dc3545;">
-                                        Недоступно для прохождения
-                                    </div>
                                 {% endif %}
                             </td>
-                            <td style="padding: 15px; vertical-align: top;">
-                                {% if t.group_id %}
-                                    {% set groups_count = t.group_id|from_json|length if t.group_id is string else t.group_id|length %}
-                                    <div style="
-                                        display: inline-flex;
-                                        align-items: center;
-                                        padding: 8px 15px;
-                                        border-radius: 20px;
-                                        font-weight: 600;
-                                        font-size: 1.1rem;
-                                        background-color: {% if groups_count >= 5 %}#d4edda{% elif groups_count >= 2 %}#fff3cd{% else %}#f8d7da{% endif %};
-                                        color: {% if groups_count >= 5 %}#155724{% elif groups_count >= 2 %}#856404{% else %}#721c24{% endif %};
-                                        gap: 8px;
-                                    ">
-                                        <span style="font-size: 1rem;">👥</span>
-                                        {{ groups_count }}
-                                    </div>
-                                    <div style="margin-top: 8px; font-size: 0.85rem; color: #6c757d;">
-                                        {% if groups_count == 0 %}
-                                            <span style="color: #dc3545;">Нет групп</span>
-                                        {% elif groups_count == 1 %}
-                                            1 группа
-                                        {% elif groups_count < 5 %}
-                                            {{ groups_count }} группы
-                                        {% else %}
-                                            {{ groups_count }} групп
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <div style="color: #dc3545;">
-                                        <span style="font-size: 1rem;">⚠️</span> Нет групп
-                                    </div>
-                                {% endif %}
-                            </td>
-                            <td style="padding: 15px; vertical-align: top;">
-                                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0;">
-                                    <a
-                                        href="{{ url_for('testing_edit', testing_id=t.id) }}"
-                                        style="
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            gap: 8px;
-                                            padding: 10px 15px;
-                                            background-color: #007bff;
-                                            color: white;
-                                            border: none;
-                                            border-radius: 6px;
-                                            text-decoration: none;
-                                            font-weight: 600;
-                                            font-size: 0.9rem;
-                                            transition: all 0.3s ease;
-                                            text-align: center;
-                                        "
-                                        onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-2px)';"
-                                        onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)';"
-                                    >
-                                        <span style="font-size: 1rem;">✏️</span>
-                                        Редактировать
-                                    </a>
-
-                                    <form
-                                        action="{{ url_for('testing_delete', testing_id=t.id) }}"
-                                        method="post"
-                                        style="margin: 0;"
-                                        onsubmit="return confirmDelete('{{ t.name }}', {{ 'true' if t.status else 'false' }});"
-                                    >
-                                        <button
-                                            type="submit"
-                                            style="
-                                                width: 100%;
-                                                display: flex;
-                                                align-items: center;
-                                                justify-content: center;
-                                                gap: 8px;
-                                                padding: 10px 15px;
-                                                background-color: #dc3545;
-                                                color: white;
-                                                border: none;
-                                                border-radius: 6px;
-                                                font-weight: 600;
-                                                font-size: 0.9rem;
-                                                cursor: pointer;
-                                                transition: all 0.3s ease;
-                                            "
-                                            onmouseover="this.style.backgroundColor='#c82333'; this.style.transform='translateY(-2px)';"
-                                            onmouseout="this.style.backgroundColor='#dc3545'; this.style.transform='translateY(0)';"
-                                        >
-                                            <span style="font-size: 1rem;">🗑️</span>
-                                            Удалить
-                                        </button>
-                                    </form>
+                            <td style="padding: 15px; vertical-align: top; text-align: center;">
+                                <div style="font-weight: 600; color: #495057; font-size: 1.1rem;">
+                                    {{ t.total_users }}
                                 </div>
+                                <div style="font-size: 0.85rem; color: #6c757d;">
+                                    всего
+                                </div>
+                            </td>
+                            <td style="padding: 15px; vertical-align: top; text-align: center;">
+                                <div style="font-weight: 600; color: #28a745; font-size: 1.1rem;">
+                                    {{ t.completed_count }}
+                                </div>
+                                <div style="font-size: 0.85rem; color: #6c757d;">
+                                    прошли
+                                </div>
+                            </td>
+                            <td style="padding: 15px; vertical-align: top;">
+                                {% if t.total_users > 0 %}
+                                    {% set percent = (t.completed_count / t.total_users * 100)|round(1) %}
+                                    <div style="margin-bottom: 8px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                            <span style="font-weight: 600; color: #495057; font-size: 1.1rem;">
+                                                {{ percent }}%
+                                            </span>
+                                            <span style="font-size: 0.85rem; color: #6c757d;">
+                                                {{ t.completed_count }}/{{ t.total_users }}
+                                            </span>
+                                        </div>
+                                        <div style="
+                                            width: 100%;
+                                            height: 8px;
+                                            background-color: #e9ecef;
+                                            border-radius: 4px;
+                                            overflow: hidden;
+                                        ">
+                                            <div style="
+                                                width: {{ percent }}%;
+                                                height: 100%;
+                                                background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+                                                border-radius: 4px;
+                                                transition: width 0.3s ease;
+                                            "></div>
+                                        </div>
+                                    </div>
+                                    {% if percent >= 80 %}
+                                        <div style="font-size: 0.8rem; color: #28a745; font-weight: 500;">
+                                            <span style="font-size: 0.9rem;">✅</span> Высокая активность
+                                        </div>
+                                    {% elif percent >= 50 %}
+                                        <div style="font-size: 0.8rem; color: #ffc107; font-weight: 500;">
+                                            <span style="font-size: 0.9rem;">📊</span> Средняя активность
+                                        </div>
+                                    {% else %}
+                                        <div style="font-size: 0.8rem; color: #dc3545; font-weight: 500;">
+                                            <span style="font-size: 0.9rem;">⚠️</span> Низкая активность
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div style="color: #6c757d; font-style: italic; text-align: center;">
+                                        Нет участников
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 15px; vertical-align: top;">
+                                <a
+                                    href="{{ url_for('results_detailed', testing_id=t.id) }}"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        gap: 8px;
+                                        padding: 10px 15px;
+                                        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                                        color: white;
+                                        border: none;
+                                        border-radius: 8px;
+                                        text-decoration: none;
+                                        font-weight: 600;
+                                        font-size: 0.9rem;
+                                        transition: all 0.3s ease;
+                                        text-align: center;
+                                    "
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(111,66,193,0.3)';"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                                >
+                                    <span style="font-size: 1rem;">📊</span>
+                                    Детальная статистика
+                                </a>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" style="padding: 40px; text-align: center; color: #6c757d;">
-                                <div style="font-size: 3rem; margin-bottom: 20px;">📋</div>
+                            <td colspan="8" style="padding: 40px; text-align: center; color: #6c757d;">
+                                <div style="font-size: 3rem; margin-bottom: 20px;">📭</div>
                                 <h3 style="margin-bottom: 10px; color: #495057;">Нет тестирований</h3>
-                                <p style="margin-bottom: 20px;">В системе пока не создано ни одного тестирования</p>
-                                <a href="{{ url_for('testing_create') }}" style="text-decoration: none;">
+                                <p style="margin-bottom: 20px;">Пока не создано ни одного тестирования</p>
+                                <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
                                     <button style="
                                         padding: 10px 25px;
-                                        background-color: #28a745;
+                                        background-color: #007bff;
                                         color: white;
                                         border: none;
                                         border-radius: 6px;
                                         cursor: pointer;
                                         font-weight: 600;
                                     ">
-                                        ➕ Создать первое тестирование
+                                        🎯 Перейти к созданию тестирований
                                     </button>
                                 </a>
                             </td>
@@ -459,14 +420,12 @@
                     💡
                 </div>
                 <div>
-                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Управление тестированиями:</h3>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Анализ результатов:</h3>
                     <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
-                        <li><strong>Активные</strong> тестирования доступны пользователям для прохождения</li>
-                        <li><strong>Архивные</strong> тестирования скрыты от пользователей, но сохраняют все данные</li>
-                        <li>Используйте фильтры для быстрого поиска нужных тестирований</li>
-                        <li>Редактируйте тестирования для изменения параметров или состава групп</li>
-                        <li>Удаляйте только ненужные тестирования - это действие необратимо</li>
-                        <li>Цвет индикатора количества групп показывает охват тестирования</li>
+                        <li>Используйте фильтры для поиска конкретных тестирований</li>
+                        <li>Процент выполнения показывает активность участников</li>
+                        <li>Детальная статистика содержит графики и таблицы по участникам и группам</li>
+                        <li>Активные тестирования помечены зеленым, архивные — желтым</li>
                     </ul>
                 </div>
             </div>
@@ -481,26 +440,29 @@
         const searchLesson = document.getElementById('searchLesson').value.toLowerCase();
         const searchStatus = document.getElementById('searchStatus').value.toLowerCase();
 
-        const rows = document.querySelectorAll('table tr.testing_row');
+        const rows = document.querySelectorAll('table tbody tr.testing_row');
 
         rows.forEach(row => {
             const cells = row.getElementsByTagName('td');
-            if (cells.length >= 6) {
+            if (cells.length >= 8) {
                 const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
                 const name = cells[1].textContent.toLowerCase();
                 const lesson = cells[2].textContent.toLowerCase();
-                const statusElement = cells[3].querySelector('span');
-                const status = statusElement ? statusElement.textContent.toLowerCase().trim() : '';
+                const statusSpan = cells[3].querySelector('span');
+                let statusValue = '';
+
+                if (statusSpan) {
+                    const statusText = statusSpan.textContent.toLowerCase().trim();
+                    if (statusText.includes('активно')) statusValue = 'active';
+                    else if (statusText.includes('архив')) statusValue = 'archived';
+                }
 
                 let show = true;
 
                 if (searchID && !id.includes(searchID)) show = false;
                 if (searchName && !name.includes(searchName)) show = false;
                 if (searchLesson && !lesson.includes(searchLesson)) show = false;
-                if (searchStatus) {
-                    if (searchStatus === 'active' && !status.includes('активно')) show = false;
-                    if (searchStatus === 'archived' && !status.includes('архив')) show = false;
-                }
+                if (searchStatus && statusValue !== searchStatus) show = false;
 
                 row.style.display = show ? '' : 'none';
                 row.style.opacity = show ? '1' : '0.5';
@@ -521,22 +483,9 @@
         });
     }
 
-    function confirmDelete(testingName, isActive) {
-        let message = `Вы уверены, что хотите удалить тестирование "${testingName}"?`;
-
-        if (isActive === 'true') {
-            message += '\n\nВнимание: тестирование активно. Удаление сделает его недоступным для пользователей.';
-        }
-
-        message += '\n\nЭто действие нельзя отменить.';
-
-        return confirm(message);
-    }
-
-    // Автоматический поиск при вводе
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInputs = ['searchID', 'searchName', 'searchLesson', 'searchStatus'];
-        searchInputs.forEach(id => {
+        const inputs = ['searchID', 'searchName', 'searchLesson', 'searchStatus'];
+        inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', searchTable);

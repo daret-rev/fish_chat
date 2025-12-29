@@ -2,54 +2,641 @@
 {% block title %}Тренировка – Шаг {{ step + 1 }}{% endblock %}
 
 {% block content %}
-<h2>Шаг {{ step + 1 }} из {{ total }}</h2>
+<style>
+    :root {
+        --primary-color: #6f42c1;
+        --primary-light: #8a63d2;
+        --primary-dark: #5a32a3;
+        --secondary-color: #20c997;
+        --accent-color: #ff6b6b;
+        --warning-color: #ffc107;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+    }
 
-<div class="chat-box">
-  <div class="message"><strong>Сообщение:</strong> {{ message.text }}</div>
+    .training-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        min-height: 100vh;
+    }
+
+    .progress-container {
+        margin-bottom: 40px;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .progress-title {
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .progress-numbers {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .progress-bar {
+        height: 10px;
+        background: var(--light-bg);
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+
+    .xp-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        border: 2px solid #e9ecef;
+    }
+
+    .xp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .xp-label {
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .xp-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .xp-change {
+        font-size: 1rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        margin-left: 10px;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    .xp-positive {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .xp-negative {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .message-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 35px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        border-left: 6px solid var(--primary-color);
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .message-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 1.5rem;
+    }
+
+    .message-title {
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .message-content {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        background: var(--light-bg);
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .answer-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+    }
+
+    .answer-title {
+        font-size: 1.6rem;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .answer-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .answer-buttons {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .answer-button {
+        padding: 25px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .answer-yes {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: var(--white);
+    }
+
+    .answer-yes:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+    }
+
+    .answer-no {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: var(--white);
+    }
+
+    .answer-no:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+    }
+
+    .finish-button {
+        width: 100%;
+        padding: 20px;
+        background: var(--light-bg);
+        color: var(--text-secondary);
+        border: 2px solid var(--text-secondary);
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .finish-button:hover {
+        background: var(--text-secondary);
+        color: var(--white);
+        transform: translateY(-3px);
+    }
+
+    .result-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .result-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .result-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        animation: bounce 1s ease;
+    }
+
+    .result-correct .result-icon {
+        color: #28a745;
+    }
+
+    .result-incorrect .result-icon {
+        color: #dc3545;
+    }
+
+    .result-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .result-correct .result-title {
+        color: #155724;
+    }
+
+    .result-incorrect .result-title {
+        color: #721c24;
+    }
+
+    .user-answer {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .explanation-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 30px 0;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .explanation-title {
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .explanation-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+
+    .navigation-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 40px;
+    }
+
+    .nav-button {
+        padding: 18px 40px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .next-button {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        box-shadow: 0 6px 20px rgba(111, 66, 193, 0.3);
+    }
+
+    .next-button:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(111, 66, 193, 0.4);
+    }
+
+    .finish-nav-button {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: var(--white);
+    }
+
+    .finish-nav-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+    }
+
+    .completion-message {
+        text-align: center;
+        padding: 40px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: var(--border-radius);
+        margin-bottom: 30px;
+    }
+
+    .completion-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .completion-text {
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .final-xp {
+        font-size: 2rem;
+        color: var(--primary-color);
+        font-weight: 800;
+        margin: 20px 0;
+    }
+
+    /* Анимации */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+</style>
+
+<div class="training-container">
+    <!-- Прогресс -->
+    <div class="progress-container">
+        <div class="progress-header">
+            <div class="progress-title">
+                <span style="font-size: 1.3rem;">📊</span>
+                Прогресс тренировки
+            </div>
+            <div class="progress-numbers">
+                Шаг {{ step + 1 }} из {{ total }}
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ ((step + 1) / total * 100)|round }}%"></div>
+        </div>
+        <div style="text-align: right; font-size: 0.9rem; color: var(--text-secondary);">
+            {{ ((step + 1) / total * 100)|round }}% выполнено
+        </div>
+    </div>
+
+    <!-- Опыт -->
+    <div class="xp-container">
+        <div class="xp-header">
+            <div class="xp-label">
+                <span style="font-size: 1.3rem;">⭐</span>
+                Накопленный опыт
+            </div>
+            <div class="xp-value">
+                {{ experience }} XP
+                {% if exp_change %}
+                <span class="xp-change {{ 'xp-positive' if exp_change > 0 else 'xp-negative' }}">
+                    {% if exp_change > 0 %}+{% endif %}{{ exp_change }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div style="height: 8px; background: var(--light-bg); border-radius: 4px; overflow: hidden;">
+            {% set progress_percent = experience / 200 * 100 %}
+<div style="width: {% if progress_percent > 100 %}100{% else %}{{ progress_percent|round }}{% endif %}%; height: 100%; background: linear-gradient(90deg, #ffc107, #fd7e14); border-radius: 4px;"></div>
+        </div>
+        <div style="text-align: center; margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">
+            Следующий уровень: 200 XP
+        </div>
+    </div>
+
+    <!-- Сообщение -->
+    <div class="message-container">
+        <div class="message-header">
+            <div class="message-icon">💬</div>
+            <h3 class="message-title">Анализируемое сообщение</h3>
+        </div>
+        <div class="message-content">
+            {{ message.text }}
+        </div>
+    </div>
+
+    {% if state == 'question' %}
+    <!-- Состояние 1: Выбор ответа -->
+    <div class="answer-container">
+        <h2 class="answer-title">Как вы считаете, это сообщение является мошенническим?</h2>
+
+        <form method="post">
+            <div class="answer-buttons">
+                <button type="submit" name="answer" value="yes" class="answer-button answer-yes">
+                    <span style="font-size: 2rem;">❌</span>
+                    Да, это мошенники
+                </button>
+
+                <button type="submit" name="answer" value="no" class="answer-button answer-no">
+                    <span style="font-size: 2rem;">✅</span>
+                    Нет, это легитимно
+                </button>
+            </div>
+
+            <button type="submit" name="answer" value="finish" class="finish-button">
+                <span style="font-size: 1.3rem;">⏸️</span>
+                Завершить тренировку
+            </button>
+        </form>
+    </div>
+
+    {% else %}
+    <!-- Состояние 2: Показ результата -->
+    <div class="result-container {{ 'result-correct' if is_correct else 'result-incorrect' }}">
+        <div class="result-header">
+            <div class="result-icon">
+                {% if is_correct %}🎉{% else %}💡{% endif %}
+            </div>
+            <h2 class="result-title">
+                {% if is_correct %}Отлично!{% else %}Почти!{% endif %}
+            </h2>
+            <div class="user-answer">
+                Ваш ответ: <strong>{{ 'Да, это мошенники' if current_answer == 'yes' else 'Нет, это легитимно' }}</strong>
+            </div>
+        </div>
+
+        {% if explanation %}
+        <div class="explanation-box">
+            <h3 class="explanation-title">
+                <span style="font-size: 1.3rem;">🧠</span>
+                Объяснение
+            </h3>
+            <div class="explanation-text">
+                {{ explanation }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Навигация -->
+        <form method="post">
+            <div class="navigation-container">
+                {% if step < total - 1 %}
+                <button type="submit" name="action" value="next" class="nav-button next-button">
+                    Следующий вопрос
+                    <span style="font-size: 1.4rem;">→</span>
+                </button>
+                {% else %}
+                <div class="completion-message">
+                    <div class="completion-icon">🏆</div>
+                    <div class="completion-text">Поздравляем! Вы завершили тренировку!</div>
+                    <div class="final-xp">Итоговый опыт: {{ experience }} XP</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Вы успешно проанализировали все {{ total }} сообщений
+                    </p>
+                    <button type="submit" name="action" value="finish" class="nav-button finish-nav-button">
+                        <span style="font-size: 1.3rem;">🏠</span>
+                        Вернуться на главную
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    {% endif %}
 </div>
 
-<p><strong>Опыт:</strong> {{ experience }}
-  {% if exp_change %}
-    <span class="{{ 'exp-positive' if exp_change > 0 else 'exp-negative' }}">
-      {% if exp_change > 0 %}+{% endif %}{{ exp_change }}
-    </span>
-  {% endif %}
-</p>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация прогресс-бара
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            const targetWidth = progressFill.style.width;
+            progressFill.style.width = '0%';
 
-{% if state == 'question' %}
-  <!-- Состояние 1: Выбор ответа -->
-  <form method="post">
-    <p>Как вы считаете, это мошенники или нет?</p>
-    <button type="submit" name="answer" value="yes">Да</button>
-    <button type="submit" name="answer" value="no">Нет</button>
-    <button type="submit" name="answer" value="finish">Завершить тренировку</button>
-  </form>
-  
-{% else %}
-  <!-- Состояние 2: Показ результата и комментария -->
-  <div class="answer-result">
-    <p>Ваш ответ: <strong>{{ 'Да' if current_answer == 'yes' else 'Нет' }}</strong></p>
-    <p class="{{ 'correct' if is_correct else 'incorrect' }}">
-      {{ 'Правильно!' if is_correct else 'Неправильно!' }}
-    </p>
-    
-    {% if explanation %}
-      <div class="explanation-box">
-        <p><em>{{ explanation }}</em></p>
-      </div>
-    {% endif %}
-  </div>
-  
-  <!-- Форма для навигации -->
-  <form method="post">
-    {% if step < total - 1 %}
-      <button type="submit" name="action" value="next">Далее →</button>
-    {% else %}
-      <p>Это был последний вопрос!</p>
-      <button type="submit" name="action" value="finish">Завершить тренировку</button>
-    {% endif %}
-  </form>
-{% endif %}
+            setTimeout(() => {
+                progressFill.style.transition = 'width 1s ease';
+                progressFill.style.width = targetWidth;
+            }, 300);
+        }
+
+        // Анимация XP при изменении
+        const xpChange = document.querySelector('.xp-change');
+        if (xpChange) {
+            xpChange.style.transform = 'scale(0)';
+            setTimeout(() => {
+                xpChange.style.transition = 'transform 0.5s ease';
+                xpChange.style.transform = 'scale(1)';
+            }, 500);
+
+            // Пульсация при положительном изменении
+            if (xpChange.classList.contains('xp-positive')) {
+                xpChange.classList.add('pulse');
+            }
+        }
+
+        // Интерактивные эффекты для кнопок ответов
+        const answerButtons = document.querySelectorAll('.answer-button');
+        answerButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.05)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+
+            // Эффект нажатия
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(-2px) scale(0.98)';
+            });
+
+            button.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-8px) scale(1.05)';
+            });
+        });
+
+        // Подсветка сообщения
+        const messageContent = document.querySelector('.message-content');
+        if (messageContent) {
+            messageContent.style.opacity = '0';
+            setTimeout(() => {
+                messageContent.style.transition = 'opacity 1s ease';
+                messageContent.style.opacity = '1';
+            }, 500);
+        }
+
+        // Анимация результата
+        const resultContainer = document.querySelector('.result-container');
+        if (resultContainer) {
+            resultContainer.style.opacity = '0';
+            resultContainer.style.transform = 'translateY(50px)';
+
+            setTimeout(() => {
+                resultContainer.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                resultContainer.style.opacity = '1';
+                resultContainer.style.transform = 'translateY(0)';
+            }, 300);
+        }
+    });
+</script>
+
 {% endblock %}
-
 {% set show_footer = False %}

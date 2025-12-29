@@ -1,102 +1,465 @@
 {% extends 'base.html' %}
 {% block title %}Список сообщений{% endblock %}
+
 {% block content %}
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('DB_management') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Управление банком заданий
+                </button>
+            </a>
+        </div>
 
-<p><a href="{{ url_for('DB_management') }}" class="btn">← назад</a></p>
-<h2>Список всех сообщений</h2>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Список всех сообщений</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Просмотр и управление всеми вопросами в базе данных
+            </p>
+        </div>
 
-<!-- Фильтр поиска -->
-<div style="margin: 20px 0;">
-  <input type="text" id="searchText" placeholder="Поиск по тексту..."
-         style="padding: 8px; width: 300px;">
+        <!-- Панель управления -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #17a2b8;
+        ">
+            <!-- Статистика -->
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e9ecef;
+            ">
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Всего сообщений: {{ messages|length }}</h3>
+                    <div style="display: flex; gap: 20px; color: #6c757d; font-size: 0.95rem;">
+                        <div>
+                            <span style="color: #dc3545; font-weight: 600;">●</span>
+                            Фейк: {{ messages|selectattr('correct')|list|length }}
+                        </div>
+                        <div>
+                            <span style="color: #28a745; font-weight: 600;">●</span>
+                            Реальная: {{ messages|rejectattr('correct')|list|length }}
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('DB_msg_create') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 25px;
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <span style="font-size: 1.2rem;">➕</span>
+                        Добавить сообщение
+                    </button>
+                </a>
+            </div>
 
-  <input type="text" id="searchID" placeholder="Поиск по ID..."
-         style="padding: 8px; width: 100px; margin-left: 10px;">
+            <!-- Фильтры поиска -->
+            <div>
+                <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.3rem;">🔍</span>
+                    Поиск и фильтрация
+                </h4>
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 15px;
+                    margin-bottom: 20px;
+                ">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                            По тексту сообщения:
+                        </label>
+                        <input
+                            type="text"
+                            id="searchText"
+                            placeholder="Введите текст..."
+                            style="
+                                width: 100%;
+                                padding: 10px 15px;
+                                border: 1px solid #ced4da;
+                                border-radius: 8px;
+                                font-size: 0.95rem;
+                                transition: border-color 0.3s ease;
+                            "
+                            onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            onkeyup="searchTable()"
+                        >
+                    </div>
 
-  <select id="searchAnswer" style="padding: 8px; margin-left: 10px;">
-    <option value="">Все ответы</option>
-    <option value="Фейк">Фейк</option>
-    <option value="Реальная">Реальная</option>
-  </select>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                            По ID сообщения:
+                        </label>
+                        <input
+                            type="text"
+                            id="searchID"
+                            placeholder="Введите ID..."
+                            style="
+                                width: 100%;
+                                padding: 10px 15px;
+                                border: 1px solid #ced4da;
+                                border-radius: 8px;
+                                font-size: 0.95rem;
+                                transition: border-color 0.3s ease;
+                            "
+                            onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            onkeyup="searchTable()"
+                        >
+                    </div>
 
-  <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
-    Найти
-  </button>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9rem;">
+                            По типу ответа:
+                        </label>
+                        <select
+                            id="searchAnswer"
+                            style="
+                                width: 100%;
+                                padding: 10px 15px;
+                                border: 1px solid #ced4da;
+                                border-radius: 8px;
+                                font-size: 0.95rem;
+                                background-color: white;
+                                transition: border-color 0.3s ease;
+                            "
+                            onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                            onchange="searchTable()"
+                        >
+                            <option value="">Все типы</option>
+                            <option value="Фейк">Фейк</option>
+                            <option value="Реальная">Реальная</option>
+                        </select>
+                    </div>
+                </div>
 
-  <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
-    Сбросить
-  </button>
-</div>
+                <div style="display: flex; gap: 10px;">
+                    <button
+                        type="button"
+                        onclick="clearSearch()"
+                        style="
+                            padding: 10px 20px;
+                            background-color: #6c757d;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            transition: all 0.3s ease;
+                        "
+                        onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                    >
+                        <span style="font-size: 1.1rem;">🔄</span>
+                        Сбросить фильтры
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<table border="1" cellpadding="5" id="messagesTable">
-  <tr>
-    <th>ID</th><th>Текст</th><th>Правильный ответ</th><th>Действия</th>
-  </tr>
-  {% for m in messages %}
-  <tr class="msg_row">
-    <td>{{ m.id }}</td>
-    <td>
-      <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-        {{ m.text }}
-      </div>
-    </td>
-    <td>{% if m.correct %}Фейк{% else %}Реальная{% endif %}</td>
-    <td>
-      <!-- компактные кнопки в одном ряду -->
-      <div class="actions">
-          <a href="{{ url_for('DB_msg_edit', msg_id=m.id) }}"
-             class="btn btn-action">Редактировать</a>
+        <!-- Таблица сообщений -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        ">
+            <div style="overflow-x: auto;">
+                <table style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    min-width: 800px;
+                ">
+                    <thead>
+                        <tr style="
+                            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+                            color: white;
+                        ">
+                            <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0;">ID</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Текст сообщения</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">Тип</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0;">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messagesTableBody">
+                        {% for m in messages %}
+                        <tr style="
+                            border-bottom: 1px solid #e9ecef;
+                            transition: all 0.3s ease;
+                        "
+                        class="msg_row"
+                        onmouseover="this.style.backgroundColor='#f8f9fa';"
+                        onmouseout="this.style.backgroundColor='';">
+                            <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: top;">
+                                #{{ m.id }}
+                            </td>
+                            <td style="padding: 15px; vertical-align: top;">
+                                <div style="
+                                    max-height: 120px;
+                                    overflow-y: auto;
+                                    padding: 12px;
+                                    background-color: #f8f9fa;
+                                    border-radius: 6px;
+                                    border: 1px solid #e9ecef;
+                                    font-size: 0.95rem;
+                                    line-height: 1.5;
+                                    color: #495057;
+                                ">
+                                    {{ m.text }}
+                                </div>
+                                <div style="margin-top: 10px; display: flex; gap: 15px; font-size: 0.85rem; color: #6c757d;">
+                                    <div>
+                                        <strong>Правильный:</strong>
+                                        <span style="color: #28a745;">+{{ m.price_correct if m.price_correct is not none else 0 }}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Неправильный:</strong>
+                                        <span style="color: #dc3545;">{{ m.price_wrong if m.price_wrong is not none else 0 }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 15px; vertical-align: top;">
+                                <div style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    padding: 6px 12px;
+                                    border-radius: 20px;
+                                    font-weight: 600;
+                                    font-size: 0.9rem;
+                                    background-color: {% if m.correct %}#f8d7da{% else %}#d1ecf1{% endif %};
+                                    color: {% if m.correct %}#721c24{% else %}#0c5460{% endif %};
+                                ">
+                                    {% if m.correct %}
+                                    <span style="margin-right: 6px;">⚠️</span> Фейк
+                                    {% else %}
+                                    <span style="margin-right: 6px;">✅</span> Реальная
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="padding: 15px; vertical-align: top;">
+                                <div style="display: flex; flex-direction: column; gap: 10px; min-width: 200px;">
+                                    <a
+                                        href="{{ url_for('DB_msg_edit', msg_id=m.id) }}"
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            gap: 8px;
+                                            padding: 10px 15px;
+                                            background-color: #007bff;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 6px;
+                                            text-decoration: none;
+                                            font-weight: 600;
+                                            font-size: 0.9rem;
+                                            transition: all 0.3s ease;
+                                            text-align: center;
+                                        "
+                                        onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-2px)';"
+                                        onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)';"
+                                    >
+                                        <span style="font-size: 1rem;">✏️</span>
+                                        Редактировать
+                                    </a>
 
-          <span class="action-divider">/</span>
+                                    <form
+                                        action="{{ url_for('DB_msg_delete', msg_id=m.id) }}"
+                                        method="post"
+                                        style="margin: 0;"
+                                        onsubmit="return confirm('Вы уверены, что хотите удалить сообщение #{{ m.id }}? Это действие нельзя отменить.');"
+                                    >
+                                        <button
+                                            type="submit"
+                                            style="
+                                                width: 100%;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                gap: 8px;
+                                                padding: 10px 15px;
+                                                background-color: #dc3545;
+                                                color: white;
+                                                border: none;
+                                                border-radius: 6px;
+                                                font-weight: 600;
+                                                font-size: 0.9rem;
+                                                cursor: pointer;
+                                                transition: all 0.3s ease;
+                                            "
+                                            onmouseover="this.style.backgroundColor='#c82333'; this.style.transform='translateY(-2px)';"
+                                            onmouseout="this.style.backgroundColor='#dc3545'; this.style.transform='translateY(0)';"
+                                        >
+                                            <span style="font-size: 1rem;">🗑️</span>
+                                            Удалить
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="padding: 40px; text-align: center; color: #6c757d;">
+                                <div style="font-size: 3rem; margin-bottom: 20px;">📭</div>
+                                <h3 style="margin-bottom: 10px; color: #495057;">Нет сообщений</h3>
+                                <p style="margin-bottom: 20px;">В базе данных пока нет сообщений</p>
+                                <a href="{{ url_for('DB_msg_create') }}" style="text-decoration: none;">
+                                    <button style="
+                                        padding: 10px 25px;
+                                        background-color: #28a745;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                    ">
+                                        ➕ Создать первое сообщение
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-          <form action="{{ url_for('DB_msg_delete', msg_id=m.id) }}"
-                method="post" style="display:inline;">
-              <button type="submit"
-                      onclick="return confirm('Удалить?')"
-                      class="btn btn-action">Удалить</button>
-          </form>
-      </div>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+        <!-- Информационная панель -->
+        <div style="
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: center;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Управление сообщениями:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Используйте фильтры для быстрого поиска нужных сообщений</li>
+                        <li>Редактируйте сообщения для обновления их содержания или баллов</li>
+                        <li>Удаляйте только устаревшие или некорректные сообщения</li>
+                        <li>Все изменения сразу отразятся в будущих тестированиях</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <script>
     function searchTable() {
-      const searchText = document.getElementById('searchText').value.toLowerCase();
-      const searchID = document.getElementById('searchID').value.toLowerCase();
-      const searchAnswer = document.getElementById('searchAnswer').value;
+        const searchText = document.getElementById('searchText').value.toLowerCase();
+        const searchID = document.getElementById('searchID').value.toLowerCase();
+        const searchAnswer = document.getElementById('searchAnswer').value;
 
-      const rows = document.querySelectorAll('table tr.msg_row');
+        const rows = document.querySelectorAll('table tr.msg_row');
 
-      rows.forEach(row => {
-        const cells = row.getElementsByTagName('td');
-        if (cells.length >= 3) {
-          const id = cells[0].textContent.toLowerCase();
-          const text = cells[1].textContent.toLowerCase();
-          const answer = cells[2].textContent;
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 3) {
+                const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
+                const text = cells[1].textContent.toLowerCase();
+                const answerTypeElement = cells[2].querySelector('div');
+                const answer = answerTypeElement ? answerTypeElement.textContent.toLowerCase().trim() : '';
 
-          let show = true;
+                let show = true;
 
-          if (searchID && !id.includes(searchID)) show = false;
-          if (searchText && !text.includes(searchText)) show = false;
-          if (searchAnswer && answer !== searchAnswer) show = false;
+                // Поиск по ID
+                if (searchID && !id.includes(searchID)) show = false;
 
-          row.style.display = show ? '' : 'none';
+                // Поиск по тексту
+                if (searchText && !text.includes(searchText)) show = false;
+
+                // Поиск по типу ответа
+                if (searchAnswer) {
+                    if (searchAnswer === "Фейк") {
+                        if (!answer.includes("фейк")) show = false;
+                    } else if (searchAnswer === "Реальная") {
+                        if (!answer.includes("реальная")) show = false;
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+
+                // Добавляем визуальный эффект при скрытии/показе
+                if (!show) {
+                    row.style.opacity = '0.5';
+                } else {
+                    row.style.opacity = '1';
+                }
+            }
+        });
+
+        // Показываем сообщение, если ничего не найдено
+        const visibleRows = document.querySelectorAll('table tr.msg_row[style*="display: none"]');
+        if (visibleRows.length === rows.length && rows.length > 0) {
+            // Можно добавить сообщение "Ничего не найдено"
         }
-      });
     }
 
     function clearSearch() {
-      document.getElementById('searchText').value = '';
-      document.getElementById('searchID').value = '';
-      document.getElementById('searchAnswer').value = '';
+        document.getElementById('searchText').value = '';
+        document.getElementById('searchID').value = '';
+        document.getElementById('searchAnswer').value = '';
 
-      const rows = document.querySelectorAll('tr.msg_row, tr.msg-row');
-      rows.forEach(row => {
-        row.style.display = '';
-      });
+        const rows = document.querySelectorAll('tr.msg_row');
+        rows.forEach(row => {
+            row.style.display = '';
+            row.style.opacity = '1';
+        });
     }
+
+    // Автоматический поиск при вводе
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInputs = ['searchText', 'searchID', 'searchAnswer'];
+        searchInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', searchTable);
+                element.addEventListener('change', searchTable);
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% set show_footer = False %}

@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+
+{% block title %}Общая инструкция{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">📖 Общая инструкция</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Руководство по использованию системы тестирования
+            </p>
+        </div>
+
+        <!-- Основные модули -->
+        <div style="margin-bottom: 50px;">
+            <h2 style="color: #2c3e50; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #007bff;">
+                🏗️ Основные модули системы
+            </h2>
+            
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 25px;
+            ">
+                <!-- Банк заданий -->
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    border-top: 4px solid #17a2b8;
+                    transition: transform 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-5px)'" 
+                   onmouseout="this.style.transform='translateY(0)'">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <div style="
+                            background-color: #17a2b8;
+                            color: white;
+                            width: 45px;
+                            height: 45px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.3rem;
+                        ">
+                            🗃️
+                        </div>
+                        <h3 style="margin: 0; color: #2c3e50;">Банк заданий</h3>
+                    </div>
+                    <p style="color: #6c757d; margin-bottom: 15px; line-height: 1.5;">
+                        Хранилище всех вопросов тестов. Здесь вы создаёте, редактируете и удаляете вопросы.
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 0.95rem;">
+                        <li>Создание вопросов с ответами</li>
+                        <li>Настройка баллов за правильные/неправильные ответы</li>
+                        <li>Добавление комментариев к ответам</li>
+                    </ul>
+                </div>
+
+                <!-- Управление тестированиями -->
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    border-top: 4px solid #007bff;
+                    transition: transform 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-5px)'" 
+                   onmouseout="this.style.transform='translateY(0)'">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <div style="
+                            background-color: #007bff;
+                            color: white;
+                            width: 45px;
+                            height: 45px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.3rem;
+                        ">
+                            🎯
+                        </div>
+                        <h3 style="margin: 0; color: #2c3e50;">Управление тестированиями</h3>
+                    </div>
+                    <p style="color: #6c757d; margin-bottom: 15px; line-height: 1.5;">
+                        Создание и управление тестами, группами учащихся и уроками.
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 0.95rem;">
+                        <li>Создание тестирований</li>
+                        <li>Формирование групп учащихся</li>
+                        <li>Создание уроков с вопросами</li>
+                    </ul>
+                </div>
+
+                <!-- Результаты -->
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    border-top: 4px solid #6f42c1;
+                    transition: transform 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-5px)'" 
+                   onmouseout="this.style.transform='translateY(0)'">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <div style="
+                            background-color: #6f42c1;
+                            color: white;
+                            width: 45px;
+                            height: 45px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 15px;
+                            font-size: 1.3rem;
+                        ">
+                            📊
+                        </div>
+                        <h3 style="margin: 0; color: #2c3e50;">Результаты тестирований</h3>
+                    </div>
+                    <p style="color: #6c757d; margin-bottom: 15px; line-height: 1.5;">
+                        Анализ и статистика по пройденным тестированиям.
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 0.95rem;">
+                        <li>Просмотр результатов по группам</li>
+                        <li>Детальная статистика по участникам</li>
+                        <li>Графики распределения баллов</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Рабочий процесс -->
+        <div style="margin-bottom: 50px;">
+            <h2 style="color: #2c3e50; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #28a745;">
+                🔄 Рабочий процесс системы
+            </h2>
+            
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-left: 4px solid #28a745;
+            ">
+                <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                    <div style="
+                        background-color: #28a745;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 15px;
+                        font-size: 1.5rem;
+                    ">
+                        1️⃣
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Подготовка вопросов</h3>
+                </div>
+                <p style="color: #6c757d; line-height: 1.6; margin-bottom: 20px;">
+                    В разделе <strong>"Управление банком заданий"</strong> создайте вопросы для тестов.
+                    Для каждого вопроса укажите:
+                </p>
+                <ul style="margin: 0 0 25px 20px; padding-left: 0; color: #6c757d;">
+                    <li style="margin-bottom: 8px;">✅ Текст вопроса</li>
+                    <li style="margin-bottom: 8px;">✅ Правильный вариант ответа</li>
+                    <li style="margin-bottom: 8px;">✅ Баллы за правильный/неправильный ответ</li>
+                    <li>✅ Комментарии для обратной связи</li>
+                </ul>
+
+                <div style="display: flex; align-items: center; margin: 30px 0 25px 0;">
+                    <div style="
+                        background-color: #17a2b8;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 15px;
+                        font-size: 1.5rem;
+                    ">
+                        2️⃣
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Организация тестирования</h3>
+                </div>
+                <p style="color: #6c757d; line-height: 1.6; margin-bottom: 20px;">
+                    В разделе <strong>"Управление тестированиями"</strong>:
+                </p>
+                <ul style="margin: 0 0 25px 20px; padding-left: 0; color: #6c757d;">
+                    <li style="margin-bottom: 8px;">👥 <strong>Создайте группы</strong> учащихся</li>
+                    <li style="margin-bottom: 8px;">📚 <strong>Создайте урок</strong> с выбранными вопросами</li>
+                    <li>🧪 <strong>Создайте тестирование</strong> для конкретных групп</li>
+                </ul>
+
+                <div style="display: flex; align-items: center; margin: 30px 0 25px 0;">
+                    <div style="
+                        background-color: #6f42c1;
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 15px;
+                        font-size: 1.5rem;
+                    ">
+                        3️⃣
+                    </div>
+                    <h3 style="margin: 0; color: #2c3e50;">Анализ результатов</h3>
+                </div>
+                <p style="color: #6c757d; line-height: 1.6;">
+                    После прохождения тестирования учащимися перейдите в раздел
+                    <strong>"Результаты тестирований"</strong> для анализа:
+                </p>
+                <ul style="margin: 20px 0 0 20px; padding-left: 0; color: #6c757d;">
+                    <li style="margin-bottom: 8px;">📈 Статистика по группам и участникам</li>
+                    <li style="margin-bottom: 8px;">📊 Графики распределения баллов</li>
+                    <li>🔍 Детальные результаты каждого участника</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Полезные советы -->
+        <div style="margin-bottom: 50px;">
+            <h2 style="color: #2c3e50; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #fd7e14;">
+                💡 Полезные советы
+            </h2>
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            ">
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    border-left: 4px solid #fd7e14;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #fd7e14;
+                            color: white;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 12px;
+                            font-size: 1.2rem;
+                        ">
+                            🏷️
+                        </div>
+                        <h4 style="margin: 0; color: #495057;">Уникальные названия</h4>
+                    </div>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                        Используйте понятные и уникальные названия для уроков, тестов и групп для удобной навигации.
+                    </p>
+                </div>
+
+
+
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    border-left: 4px solid #28a745;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #28a745;
+                            color: white;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 12px;
+                            font-size: 1.2rem;
+                        ">
+                            👥
+                        </div>
+                        <h4 style="margin: 0; color: #495057;">Группировка учащихся</h4>
+                    </div>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                        Создавайте группы по классам, уровню подготовки или тематике для адресного тестирования.
+                    </p>
+                </div>
+
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    border-left: 4px solid #6f42c1;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="
+                            background-color: #6f42c1;
+                            color: white;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 12px;
+                            font-size: 1.2rem;
+                        ">
+                            📝
+                        </div>
+                        <h4 style="margin: 0; color: #495057;">Комментарии к ответам</h4>
+                    </div>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">
+                        Добавляйте полезные комментарии к неправильным ответам для обратной связи с учащимися.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Быстрые ссылки -->
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 4px solid #007bff;
+            text-align: center;
+        ">
+            <h3 style="color: #2c3e50; margin-bottom: 25px;">🚀 Быстрый старт</h3>
+
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                <a href="{{ url_for('DB_management') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #17a2b8;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🗃️ Начать с банка заданий
+                    </button>
+                </a>
+
+                <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🎯 Начать с тестирований
+                    </button>
+                </a>
+
+                <a href="{{ url_for('dashboard') }}" style="text-decoration: none;">
+                    <button style="
+                        padding: 10px 20px;
+                        background-color: #6c757d;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🏠 Вернуться на главную
+                    </button>
+                </a>
+            </div>
+
+            <p style="color: #6c757d; font-size: 0.95rem; margin: 0;">
+                💬 Для получения дополнительной помощи обращайтесь к раздельным инструкциям в каждом модуле.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% set show_footer = False %}

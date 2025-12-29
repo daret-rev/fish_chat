@@ -2,14 +2,548 @@
 {% block title %}Результаты тренировки{% endblock %}
 
 {% block content %}
-    <h1>Тренировка завершена!</h1>
+<style>
+    :root {
+        --primary-color: #6f42c1;
+        --primary-light: #8a63d2;
+        --primary-dark: #5a32a3;
+        --secondary-color: #20c997;
+        --accent-color: #ff6b6b;
+        --warning-color: #ffc107;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+    }
 
-    <p>Вы прошли {{ step }} сообщений.</p>
-        <p>Верных ответов: {{ correct_count }}</p>
+    .results-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        min-height: 100vh;
+        text-align: center;
+    }
 
-    <p>Ваш опыт: {{ experience|int }}</p>
-    <form action="{{ url_for('reset_experience') }}" method="get">
-        <button type="submit">Выйти из тренировки</button>
-    </form>
+    .completion-header {
+        margin-bottom: 50px;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    .completion-icon {
+        font-size: 6rem;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .completion-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 20px;
+        line-height: 1.2;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .completion-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 50px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 35px 25px;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        text-align: center;
+        animation: fadeInUp 0.6s ease;
+        animation-fill-mode: both;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.2s; }
+    .stat-card:nth-child(2) { animation-delay: 0.4s; }
+    .stat-card:nth-child(3) { animation-delay: 0.6s; }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .stat-value {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .stat-description {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 10px;
+        opacity: 0.8;
+    }
+
+    .xp-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 50px;
+        border: 2px solid var(--primary-color);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease 0.8s both;
+    }
+
+    .xp-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .xp-header {
+        margin-bottom: 30px;
+    }
+
+    .xp-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .xp-value {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--primary-color);
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .xp-bar {
+        height: 12px;
+        background: var(--light-bg);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 30px 0;
+    }
+
+    .xp-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffc107, #fd7e14);
+        border-radius: 6px;
+        transition: width 1.5s ease;
+    }
+
+    .xp-next-level {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-top: 15px;
+    }
+
+    .performance-box {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 50px;
+        box-shadow: var(--shadow);
+        animation: fadeInUp 0.8s ease 1s both;
+        border-left: 6px solid var(--secondary-color);
+    }
+
+    .performance-title {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .performance-message {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin-top: 50px;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease 1.2s both;
+    }
+
+    .action-button {
+        padding: 20px 45px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+    }
+
+    .restart-button {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        box-shadow: 0 6px 20px rgba(111, 66, 193, 0.3);
+    }
+
+    .restart-button:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(111, 66, 193, 0.4);
+    }
+
+    .home-button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 2px solid var(--text-secondary);
+    }
+
+    .home-button:hover {
+        background: var(--text-secondary);
+        color: var(--white);
+        transform: translateY(-5px);
+    }
+
+    .accuracy-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 15px;
+    }
+
+    .high-accuracy {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .medium-accuracy {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .low-accuracy {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .quote-box {
+        margin: 40px auto;
+        padding: 30px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 12px;
+        font-style: italic;
+        color: #1565c0;
+        font-size: 1.1rem;
+        max-width: 500px;
+        animation: fadeInUp 0.8s ease 0.4s both;
+    }
+
+    /* Анимации */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        33% { transform: translateY(-20px) rotate(5deg); }
+        66% { transform: translateY(-10px) rotate(-5deg); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes countUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .count-up {
+        animation: countUp 1s ease forwards;
+    }
+
+    @media (max-width: 768px) {
+        .results-container {
+            padding: 20px 15px;
+        }
+
+        .completion-title {
+            font-size: 2.2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .buttons-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-button {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+
+        .xp-value {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<div class="results-container">
+    <!-- Заголовок завершения -->
+    <div class="completion-header">
+        <div class="completion-icon">🏆</div>
+        <h1 class="completion-title">Тренировка завершена!</h1>
+        <p class="completion-subtitle">
+            Вы успешно проанализировали серию сообщений и улучшили свои навыки распознавания мошенничества
+        </p>
+    </div>
+
+    <!-- Статистика тренировки -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-icon">📊</span>
+            <div class="stat-value">{{ step }}</div>
+            <div class="stat-label">Всего сообщений</div>
+            <div class="stat-description">Проанализировано в этой сессии</div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">✅</span>
+            <div class="stat-value">{{ correct_count }}</div>
+            <div class="stat-label">Правильных ответов</div>
+            <div class="stat-description">
+                {% set accuracy = (correct_count / step * 100) if step > 0 else 0 %}
+                Точность: {{ accuracy|round(1) }}%
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">⚡</span>
+            <div class="stat-value">{{ (correct_count / step * 100)|round(1) if step > 0 else 0 }}%</div>
+            <div class="stat-label">Общая точность</div>
+            <div class="stat-description">
+                {% set accuracy_percent = (correct_count / step * 100) if step > 0 else 0 %}
+                {% if accuracy_percent >= 80 %}
+                    <span class="accuracy-badge high-accuracy">Отличный результат!</span>
+                {% elif accuracy_percent >= 60 %}
+                    <span class="accuracy-badge medium-accuracy">Хороший результат</span>
+                {% else %}
+                    <span class="accuracy-badge low-accuracy">Есть над чем поработать</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Мотивационная цитата -->
+    <div class="quote-box">
+        "Каждая тренировка делает вас на шаг ближе к цифровой безопасности.
+        Помните: бдительность — лучшая защита от мошенничества."
+    </div>
+
+    <!-- Опыт -->
+    <div class="xp-container">
+        <div class="xp-header">
+            <h2 class="xp-title">
+                <span style="font-size: 1.5rem;">⭐</span>
+                Накопленный опыт
+            </h2>
+        </div>
+        <div class="xp-value">{{ experience|int }} XP</div>
+
+        <div class="xp-bar">
+            {% set xp_percent = (experience / 200 * 100)|round %}
+            {% if xp_percent > 100 %}
+                {% set xp_percent = 100 %}
+            {% endif %}
+            <div class="xp-fill" style="width: {{ xp_percent }}%;"></div>
+        </div>
+
+        <div class="xp-next-level">
+            {% if experience >= 200 %}
+                <span style="color: #28a745; font-weight: 600;">🎉 Поздравляем! Вы достигли следующего уровня!</span>
+            {% else %}
+                До следующего уровня: {{ 200 - experience|int }} XP
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Анализ производительности -->
+    <div class="performance-box">
+        <h3 class="performance-title">
+            <span style="font-size: 1.5rem;">📈</span>
+            Анализ вашей производительности
+        </h3>
+        <p class="performance-message">
+            {% set accuracy = (correct_count / step * 100) if step > 0 else 0 %}
+            {% if accuracy >= 80 %}
+                Отличная работа! Вы демонстрируете высокий уровень понимания методов мошенничества.
+                Продолжайте тренироваться для поддержания навыков.
+            {% elif accuracy >= 60 %}
+                Хороший результат! Вы хорошо распознаёте большинство мошеннических схем.
+                Обратите внимание на сложные случаи для дальнейшего улучшения.
+            {% else %}
+                Есть возможности для роста! Рекомендуем изучить памятку и повторить тренировку,
+                чтобы лучше понимать признаки мошенничества.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="buttons-container">
+        <a href="{{ url_for('train', step=0) }}" class="action-button restart-button">
+            <span style="font-size: 1.4rem;">🔄</span>
+            Начать новую тренировку
+        </a>
+
+        <form action="{{ url_for('reset_experience') }}" method="get" style="display: inline;">
+            <button type="submit" class="action-button home-button">
+                <span style="font-size: 1.4rem;">🏠</span>
+                Вернуться на главную
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация чисел
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues.forEach(value => {
+            const originalText = value.textContent;
+            value.textContent = '0';
+            value.classList.add('count-up');
+
+            setTimeout(() => {
+                value.textContent = originalText;
+                value.style.animation = 'none';
+            }, 100);
+        });
+
+        // Анимация прогресс-бара XP
+        const xpFill = document.querySelector('.xp-fill');
+        if (xpFill) {
+            const targetWidth = xpFill.style.width;
+            xpFill.style.width = '0%';
+
+            setTimeout(() => {
+                xpFill.style.transition = 'width 1.5s ease';
+                xpFill.style.width = targetWidth;
+            }, 500);
+        }
+
+        // Анимация иконки
+        const completionIcon = document.querySelector('.completion-icon');
+        if (completionIcon) {
+            completionIcon.style.opacity = '0';
+            completionIcon.style.transform = 'scale(0) rotate(0deg)';
+
+            setTimeout(() => {
+                completionIcon.style.transition = 'opacity 1s ease, transform 1s ease';
+                completionIcon.style.opacity = '1';
+                completionIcon.style.transform = 'scale(1) rotate(360deg)';
+            }, 300);
+        }
+
+        // Плавное появление карточек
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300 + (index * 200));
+        });
+
+        // Эффект при наведении на кнопки
+        const actionButtons = document.querySelectorAll('.action-button');
+        actionButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+
 {% endblock %}
 {% set show_footer = False %}

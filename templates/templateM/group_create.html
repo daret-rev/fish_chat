@@ -1,157 +1,468 @@
 {% extends 'base.html' %}
 {% block title %}Создание группы{% endblock %}
+
 {% block content %}
-<p><a href="{{ url_for('testing_management') }}" class="btn">← назад</a></p>
-
-<h2>Создание группы</h2>
-
-<form id="usersForm" method="post">
-    <section>
-        <div style="margin: 20px 0;">
-          <input type="text" name="group_name" id="nemeGroup" placeholder="Название"
-                 style="padding: 8px; width: 300px;">
+<section class="hero-section">
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 30px;">
+            <a href="{{ url_for('testing_management') }}" style="text-decoration: none;">
+                <button class="btn-left" style="padding: 8px 20px; font-size: 14px;">
+                    ← Управление тестированиями
+                </button>
+            </a>
         </div>
-    </section>
 
-    <h3>Укажите участников группы</h3>
+        <!-- Заголовок -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 class="hero-title" style="margin-bottom: 15px;">Создание группы</h1>
+            <p style="color: #6c757d; font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+                Объединение пользователей для совместного участия в тестировании
+            </p>
+        </div>
 
-    <button type="button" onclick="prepareAndSubmit()">Создать</button>
-    <h3>Список всех пользователей</h3>
+        <!-- Основная форма -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        ">
+            <form id="usersForm" method="post">
+                <!-- Название группы -->
+                <div style="margin-bottom: 40px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2c3e50;">
+                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                            <div style="
+                                background-color: #007bff;
+                                color: white;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin-right: 10px;
+                                font-size: 1rem;
+                            ">
+                                1️⃣
+                            </div>
+                            Название группы:
+                        </div>
+                    </label>
+                    <input
+                        type="text"
+                        name="group_name"
+                        id="nemeGroup"
+                        placeholder="Введите уникальное название группы"
+                        style="
+                            width: 100%;
+                            max-width: 500px;
+                            padding: 12px 15px;
+                            border: 1px solid #ced4da;
+                            border-radius: 8px;
+                            font-size: 1rem;
+                            transition: border-color 0.3s ease;
+                        "
+                        onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                    >
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">
+                        Придумайте уникальное название для идентификации группы
+                    </small>
+                </div>
 
-    <!-- Фильтр поиска -->
-    <div style="margin: 20px 0;">
-      <input type="text" id="searchName" placeholder="Поиск по имени..."
-             style="padding: 8px; width: 300px;">
+                <!-- Заголовок выбора участников -->
+                <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #28a745;">
+                    <h3 style="color: #2c3e50; display: flex; align-items: center; gap: 10px; margin: 0;">
+                        <span style="font-size: 1.3rem;">👥</span>
+                        Выберите участников группы
+                    </h3>
+                    <p style="color: #6c757d; margin-top: 8px;">
+                        Отметьте пользователей, которых хотите включить в группу. Выбрано: <span id="selectedCount" style="font-weight: 600; color: #007bff;">0</span> пользователей
+                    </p>
+                </div>
 
-      <input type="text" id="searchID" placeholder="Поиск по ID..."
-             style="padding: 8px; width: 100px; margin-left: 10px;">
+                <!-- Фильтры поиска -->
+                <div style="
+                    background-color: #f8f9fa;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 25px;
+                ">
+                    <h4 style="margin: 0 0 15px 0; color: #495057; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">🔍</span>
+                        Поиск пользователей
+                    </h4>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <input
+                                type="text"
+                                id="searchName"
+                                placeholder="Поиск по имени пользователя..."
+                                style="
+                                    width: 100%;
+                                    padding: 10px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 0.95rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                onkeyup="searchTable()"
+                            >
+                        </div>
 
-      <button type="button" onclick="searchTable()" style="padding: 6px 16px; margin-left: 15px;">
-        Найти
-      </button>
+                        <div style="flex: 1; min-width: 200px;">
+                            <input
+                                type="text"
+                                id="searchID"
+                                placeholder="Поиск по ID пользователя..."
+                                style="
+                                    width: 100%;
+                                    padding: 10px 15px;
+                                    border: 1px solid #ced4da;
+                                    border-radius: 8px;
+                                    font-size: 0.95rem;
+                                    transition: border-color 0.3s ease;
+                                "
+                                onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 0 0.2rem rgba(0,123,255,.25)';"
+                                onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='none';"
+                                onkeyup="searchTable()"
+                            >
+                        </div>
 
-      <button type="button" onclick="clearSearch()" style="padding: 6px 16px; margin-left: 10px;">
-        Сбросить
-      </button>
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                type="button"
+                                onclick="clearSearch()"
+                                style="
+                                    padding: 10px 20px;
+                                    background-color: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    transition: all 0.3s ease;
+                                "
+                                onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-2px)';"
+                                onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)';"
+                            >
+                                <span style="font-size: 1.1rem;">🔄</span>
+                                Сбросить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Скрытое поле для выбранных ID -->
+                <input type="hidden" id="selectedIds" name="selected_ids" value="">
+
+                <!-- Таблица пользователей -->
+                <div style="
+                    background: white;
+                    border-radius: 10px;
+                    border: 1px solid #e9ecef;
+                    overflow: hidden;
+                    margin-bottom: 30px;
+                ">
+                    <div style="overflow-x: auto;">
+                        <table style="
+                            width: 100%;
+                            border-collapse: collapse;
+                            min-width: 600px;
+                        ">
+                            <thead>
+                                <tr style="
+                                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                                    color: white;
+                                ">
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 8px 0 0 0;">ID</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600;">Имя пользователя</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; border-radius: 0 8px 0 0; width: 120px;">Выбрать</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                {% for u in users %}
+                                <tr style="
+                                    border-bottom: 1px solid #e9ecef;
+                                    transition: all 0.3s ease;
+                                "
+                                class="usr_row"
+                                onmouseover="this.style.backgroundColor='#f8f9fa';"
+                                onmouseout="this.style.backgroundColor='';">
+                                    <td style="padding: 15px; font-weight: 600; color: #495057; vertical-align: middle;">
+                                        #{{ u.id }}
+                                    </td>
+                                    <td style="padding: 15px; vertical-align: middle;">
+                                        <div style="color: #2c3e50; font-weight: 500;">{{ u.username }}</div>
+                                    </td>
+                                    <td style="padding: 15px; vertical-align: middle; text-align: center;">
+                                        <label style="
+                                            display: inline-block;
+                                            cursor: pointer;
+                                            position: relative;
+                                        ">
+                                            <input
+                                                type="checkbox"
+                                                class="usr-checkbox"
+                                                value="{{ u.id }}"
+                                                style="
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    cursor: pointer;
+                                                "
+                                            >
+                                        </label>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" style="padding: 40px; text-align: center; color: #6c757d;">
+                                        <div style="font-size: 3rem; margin-bottom: 20px;">👤</div>
+                                        <h3 style="margin-bottom: 10px; color: #495057;">Нет пользователей</h3>
+                                        <p style="margin-bottom: 20px;">В системе пока нет зарегистрированных пользователей</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Кнопка создания -->
+                <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                    <button
+                        type="button"
+                        onclick="prepareAndSubmit()"
+                        style="
+                            padding: 14px 40px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(40,167,69,0.3)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                    >
+                        <span style="font-size: 1.2rem;">✅</span>
+                        Создать группу
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Информационная панель -->
+        <div style="
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #17a2b8;
+        ">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="
+                    background-color: #17a2b8;
+                    color: white;
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                    font-size: 1.3rem;
+                ">
+                    💡
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Советы по созданию группы:</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Используйте понятные названия групп (например, "10А класс", "Сотрудники отдела продаж")</li>
+                        <li>Объединяйте пользователей по классам, отделам или уровню подготовки</li>
+                        <li>Проверьте, что название группы уникально (не повторяет существующие)</li>
+                        <li>Выберите всех нужных участников перед созданием группы</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-
-  <input type="hidden" id="selectedIds" name="selected_ids" value="">
-
-    <table border="1" cellpadding="5" id="usersTable">
-      <tr>
-        <th>ID</th><th>Имя</th><th>Добавить</th>
-      </tr>
-      {% for u in users %}
-      <tr class="usr_row">
-        <td>{{ u.id }}</td>
-        <td>
-          <div style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-            {{ u.username }}
-          </div>
-        </td>
-
-        <td>
-          <div class="actions">
-              <input type="checkbox" class="usr-checkbox" value="{{ u.id }}">
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-</form>
-
-
+</section>
 
 <script>
     function searchTable() {
-      const searchName = document.getElementById('searchName').value.toLowerCase();
-      const searchID = document.getElementById('searchID').value.toLowerCase();
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        const searchID = document.getElementById('searchID').value.toLowerCase();
 
-      const rows = document.querySelectorAll('table tr.usr_row');
+        const rows = document.querySelectorAll('table tr.usr_row');
 
-      rows.forEach(row => {
-        const cells = row.getElementsByTagName('td');
-        if (cells.length >= 3) {
-          const id = cells[0].textContent.toLowerCase();
-          const name = cells[1].textContent.toLowerCase();
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 3) {
+                const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
+                const name = cells[1].textContent.toLowerCase();
 
-          let show = true;
+                let show = true;
 
-          if (searchID && !id.includes(searchID)) show = false;
-          if (searchName && !name.includes(searchName)) show = false;
-          row.style.display = show ? '' : 'none';
-        }
-      });
+                if (searchID && !id.includes(searchID)) show = false;
+                if (searchName && !name.includes(searchName)) show = false;
+                row.style.display = show ? '' : 'none';
+            }
+        });
     }
 
     function clearSearch() {
-      document.getElementById('searchName').value = '';
-      document.getElementById('searchID').value = '';
+        document.getElementById('searchName').value = '';
+        document.getElementById('searchID').value = '';
 
-      const rows = document.querySelectorAll('tr.usr_row, tr.usr-row');
-      rows.forEach(row => {
-        row.style.display = '';
-      });
+        const rows = document.querySelectorAll('tr.usr_row');
+        rows.forEach(row => {
+            row.style.display = '';
+        });
     }
 
     function updateSelectedIds() {
-      const checkboxes = document.querySelectorAll('.usr-checkbox:checked');
-      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-      document.getElementById('selectedIds').value = selectedIds.join(',');
-      return selectedIds;
-    }
+        const checkboxes = document.querySelectorAll('.usr-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+        document.getElementById('selectedIds').value = selectedIds.join(',');
 
-    function submitForm(action) {
-      const selectedIds = updateSelectedIds();
+        // Обновляем счетчик выбранных пользователей
+        const selectedCount = document.getElementById('selectedCount');
+        selectedCount.textContent = selectedIds.length;
+        selectedCount.style.color = selectedIds.length > 0 ? '#28a745' : '#007bff';
 
-      if (selectedIds.length === 0) {
-        alert('Выберите хотя бы одно сообщение');
-        return;
-      }
-
-      const form = document.getElementById('usersForm');
-      const actionInput = document.createElement('input');
-      actionInput.type = 'hidden';
-      actionInput.name = 'action';
-      actionInput.value = action;
-      form.appendChild(actionInput);
-
-      form.submit();
+        return selectedIds;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const checkboxes = document.querySelectorAll('.usr-checkbox');
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectedIds);
-      });
+        const checkboxes = document.querySelectorAll('.usr-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedIds);
+        });
+
+        // Инициализируем счетчик
+        updateSelectedIds();
     });
 
     function prepareAndSubmit() {
-      const groupName = document.querySelector('input[name="group_name"]').value;
+        const groupNameInput = document.querySelector('input[name="group_name"]');
+        const groupName = groupNameInput.value.trim();
 
-      if (!groupName.trim()) {
-        alert('Введите название группы');
-        return;
-      }
+        // Валидация названия группы
+        if (!groupName) {
+            showError('Введите название группы', groupNameInput);
+            return;
+        }
 
-      const inputValue = groupName.trim();
-      const group_names = {{ group_names|tojson|safe }};
+        const inputValue = groupName;
+        const group_names = {{ group_names|tojson|safe }};
 
+        // Проверка уникальности названия
+        if (group_names.includes(inputValue)) {
+            showError("Название должно быть уникальным", groupNameInput);
+            return;
+        }
 
-      if (group_names.includes(inputValue)) {
-        alert("Название должно быть уникальным");
-        return;
-      }
+        const selectedIds = updateSelectedIds();
 
-      const selectedIds = updateSelectedIds();
+        // Проверка выбора пользователей
+        if (selectedIds.length === 0) {
+            showError('Выберите хотя бы одного пользователя');
+            return;
+        }
 
-      if (selectedIds.length === 0) {
-        alert('Выберите хотя бы одного пользователя');
-        return;
-      }
-
-      document.getElementById('usersForm').submit();
+        // Если все проверки пройдены, отправляем форму
+        document.getElementById('usersForm').submit();
     }
+
+    function showError(message, element = null) {
+        // Убираем старые сообщения об ошибке
+        const existingAlert = document.querySelector('.alert-error');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Если указан элемент, подсвечиваем его
+        if (element) {
+            element.style.borderColor = '#dc3545';
+            element.style.boxShadow = '0 0 0 0.2rem rgba(220,53,69,.25)';
+
+            setTimeout(() => {
+                element.style.borderColor = '#ced4da';
+                element.style.boxShadow = 'none';
+            }, 3000);
+        }
+
+        // Создаем всплывающее уведомление
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert-error';
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.backgroundColor = '#dc3545';
+        alertDiv.style.color = 'white';
+        alertDiv.style.padding = '15px 20px';
+        alertDiv.style.borderRadius = '8px';
+        alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.style.display = 'flex';
+        alertDiv.style.alignItems = 'center';
+        alertDiv.style.gap = '10px';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.innerHTML = `
+            <span style="font-size: 1.2rem;">⚠️</span>
+            <div>
+                <strong>Ошибка!</strong><br>
+                <span style="font-size: 0.9rem;">${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: auto;
+                padding: 0;
+            ">×</button>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Автоматический поиск при вводе
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInputs = ['searchName', 'searchID'];
+        searchInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', searchTable);
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% set show_footer = False %}

@@ -3,78 +3,624 @@
 {% block title %}Главная – Фейк‑детектор{% endblock %}
 
 {% block content %}
-<section class="hero-section">
+<style>
+    /* Общие стили */
+    :root {
+        --primary-color: #6f42c1;
+        --primary-light: #8a63d2;
+        --primary-dark: #5a32a3;
+        --secondary-color: #20c997;
+        --accent-color: #ff6b6b;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+    }
 
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        padding: 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+        opacity: 0.1;
+        z-index: 0;
+    }
+
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, var(--secondary-color) 0%, transparent 70%);
+        opacity: 0.1;
+        z-index: 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Навигационная панель */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        margin-bottom: 60px;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 20px 30px;
+        box-shadow: var(--shadow);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: 600;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-nav {
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+    .btn-login {
+        background: transparent;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-login:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-logout {
+        background: transparent;
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .btn-logout:hover {
+        background: var(--accent-color);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    /* Основной контент */
+    .hero-content {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto 80px;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 30px;
+        line-height: 1.2;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-description {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        text-align: left;
+    }
+
+    .hero-description p {
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+
+    .feature-list li {
+        background: var(--light-bg);
+        padding: 25px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        transition: var(--transition);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .feature-list li:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        background: var(--white);
+    }
+
+    .feature-list li::before {
+        content: "✓";
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.3rem;
+        min-width: 25px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.6rem;
+        color: var(--text-secondary);
+        margin-bottom: 50px;
+        font-weight: 500;
+    }
+
+    /* Кнопки действий */
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-bottom: 80px;
+    }
+
+    .action-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--primary-color);
+    }
+
+    .action-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        color: var(--white);
+        font-size: 2rem;
+        box-shadow: 0 8px 20px rgba(111, 66, 193, 0.3);
+    }
+
+    .action-title {
+        font-size: 1.5rem;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .action-description {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .action-button {
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        width: 100%;
+    }
+
+    .btn-memo {
+        background: linear-gradient(135deg, #6f42c1, #5a32a3);
+        color: var(--white);
+    }
+
+    .btn-memo:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
+    }
+
+    .btn-train {
+        background: linear-gradient(135deg, #20c997, #17a2b8);
+        color: var(--white);
+    }
+
+    .btn-train:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(32, 201, 151, 0.4);
+    }
+
+    .btn-test {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        color: var(--white);
+    }
+
+    .btn-test:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    .btn-check {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: var(--white);
+    }
+
+    .btn-check:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+    }
+
+    /* Футер */
+    .main-footer {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        box-shadow: var(--shadow);
+        margin-top: 40px;
+    }
+
+    .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    .footer-brand {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .footer-copy {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .footer-nav {
+        display: flex;
+        gap: 30px;
+    }
+
+    .footer-nav a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        padding: 8px 0;
+        position: relative;
+    }
+
+    .footer-nav a:hover {
+        color: var(--primary-color);
+    }
+
+    .footer-nav a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: var(--transition);
+    }
+
+    .footer-nav a:hover::after {
+        width: 100%;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .top-nav {
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .user-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-list {
+            grid-template-columns: 1fr;
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .footer-inner {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .footer-nav {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hero-description {
+            padding: 30px 20px;
+        }
+    }
+
+    /* Анимации */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .floating {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+
+<section class="hero-section">
     <div class="container">
-        <div class="container-flex">
-          {% if not user %}
-          <a href="{{ url_for('login') }}">
-            <button class="btn-left">Вход</button>
-          </a>
-            <a href="{{ url_for('test') }}">
-            <!--<button class="btn-left">Test</button>-->
-          </a>
-          {% else %}
-            <a href="{{ url_for('logout') }}">
-                <button class="btn-left">Выход</button>
-            </a>
-            <p class="text-right">{{ user.username }}</p>
-          {% endif %}
-        </div>
-        <div class="hero-content">
-            <h1 class="hero-title">Добро пожаловать в Фейк‑детектор!</h1>
-            
-            <div class="hero-description">
-                <p>На нашем сайте вы можете:</p>
-                <ul class="feature-list">
-                    <li>Ознакомиться с памяткой по информационной грамотности</li>
-                    <li>Проверить свои навыки распознавания мошенничества</li>
-                    <li>Получить рекомендации по реагированию на сообщения</li>
-                </ul>
+        <!-- Навигационная панель -->
+        <div class="top-nav">
+            <div class="logo">
+                <h2 style="color: var(--primary-color); font-weight: 800; font-size: 1.8rem;">
+                    🛡️ Фейк‑детектор
+                </h2>
             </div>
-            
-            <p class="hero-subtitle">Узнайте, действительно ли это фейковая новость</p>
-            
-            <div class="button-container">
-                <a href="{{ url_for('memo') }}">
-                    <button class="secondary-button">Памятка</button>
-                </a>
-                <a href="{{ url_for('train_preview') }}">
-                    <button class="primary-button">Начать тренировку</button>
-                </a>
+
+            <div class="user-info">
                 {% if user %}
-                <a href="{{ url_for('test_room_preview')}}">
-                    <button class="primary-button">Начать тестирование</button>
+                <div class="user-avatar floating">
+                    {{ user.username[:1]|upper }}
+                </div>
+                <div>
+                    <div class="user-name">{{ user.username }}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">ID: {{ user.id }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="auth-buttons">
+                {% if not user %}
+                <a href="{{ url_for('login') }}" class="btn-nav btn-login">
+                    Вход в систему
+                </a>
+                {% else %}
+                <a href="{{ url_for('logout') }}" class="btn-nav btn-logout">
+                    Выход
                 </a>
                 {% endif %}
-                <!--<a href="{{ url_for('check_preview')}}">
-                    <button class="secondary-button">Проверить сообщение</button>
-                </a>-->
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Защитите себя<br>от цифровых угроз
+            </h1>
+
+            <div class="hero-description">
+                <p>На нашем платформе вы сможете:</p>
+                <ul class="feature-list">
+                    <li>Освоить основы информационной грамотности</li>
+                    <li>Отработать навыки распознавания мошенничества</li>
+                    <li>Научиться правильно реагировать на подозрительные сообщения</li>
+                    <li>Повысить свою цифровую безопасность</li>
+                </ul>
+            </div>
+
+            <p class="hero-subtitle">
+                Узнайте, как отличить правду от обмана в цифровом мире
+            </p>
+        </div>
+
+        <!-- Карточки действий -->
+        <div class="actions-grid">
+            <!-- Памятка -->
+            <div class="action-card">
+                <div class="action-icon">📚</div>
+                <h3 class="action-title">Обучающая памятка</h3>
+                <p class="action-description">
+                    Изучите основные принципы информационной безопасности,
+                    узнайте о современных видах мошенничества и методах защиты.
+                </p>
+                <a href="{{ url_for('memo') }}">
+                    <button class="action-button btn-memo">Изучить памятку</button>
+                </a>
+            </div>
+
+            <!-- Тренировка -->
+            <div class="action-card">
+                <div class="action-icon">🎯</div>
+                <h3 class="action-title">Тренировочный режим</h3>
+                <p class="action-description">
+                    Практикуйтесь в безопасной среде. Получайте обратную связь
+                    и улучшайте свои навыки распознавания фейков.
+                </p>
+                <a href="{{ url_for('train_preview') }}">
+                    <button class="action-button btn-train">Начать тренировку</button>
+                </a>
+            </div>
+
+            <!-- Тестирование -->
+            {% if user %}
+            <div class="action-card">
+                <div class="action-icon">📝</div>
+                <h3 class="action-title">Контрольное тестирование</h3>
+                <p class="action-description">
+                    Проверьте свои знания в условиях, приближенных к реальным.
+                    Получите оценку и рекомендации по улучшению навыков.
+                </p>
+                <a href="{{ url_for('test_room_preview') }}">
+                    <button class="action-button btn-test">Начать тестирование</button>
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Проверка сообщения -->
+            <!--
+            <div class="action-card">
+                <div class="action-icon">🔍</div>
+                <h3 class="action-title">Проверка сообщения</h3>
+                <p class="action-description">
+                    Загрузите подозрительное сообщение для анализа.
+                    Наша система поможет определить его достоверность.
+                </p>
+                <a href="{{ url_for('check_preview') }}">
+                    <button class="action-button btn-check">Проверить сообщение</button>
+                </a>
+            </div>
+            -->
+        </div>
+
+        <!-- Футер -->
+        <div class="main-footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <div class="footer-brand">Fish Chat Team</div>
+                    <div class="footer-copy">
+                        © 2025 Проект по повышению информационной грамотности.
+                        Все права защищены.
+                    </div>
+                </div>
+
+                <div class="footer-right">
+                    <nav class="footer-nav">
+                        <a href="https://github.com/a20atamcom-beep/fish_chat" target="_blank">
+                            О проекте на GitHub
+                        </a>
+                        <!--
+                        <a href="/contacts">Контакты команды</a>
+                        <a href="/privacy">Политика конфиденциальности</a>
+                        -->
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
-    <footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-left">
-      <div class="footer-brand">Fish Chat</div>
-      <div class="footer-copy">© 2025 Fish Chat Team. Все права защищены.</div>
-    </div>
-
-    <div class="footer-right">
-      <nav class="footer-nav">
-        <a href="https://github.com/a20atamcom-beep/fish_chat">О проекте</a>
-        <!--<a href="/contacts">Контакты</a>-->
-        <!--<a href="/privacy">Политика конфиденциальности</a>-->
-      </nav>
-      <!--<div class="footer-socials">-->
-        <!--<a href="https://instagram.com/fishchat" target="_blank" rel="noopener noreferrer">Instagram</a>-->
-        <!--<a href="https://t.me/fishchat" target="_blank" rel="noopener noreferrer">Telegram</a>-->
-        <!--<a href="https://youtube.com/fishchat" target="_blank" rel="noopener noreferrer">YouTube</a>-->
-      <!--</div>-->
-    </div>
-  </div>
-</footer>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация появления карточек
+        const cards = document.querySelectorAll('.action-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+
+        // Анимация элементов списка
+        const listItems = document.querySelectorAll('.feature-list li');
+        listItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+
+            setTimeout(() => {
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, index * 100);
+        });
+
+        // Интерактивные эффекты для кнопок
+        const buttons = document.querySelectorAll('.action-button');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    });
+</script>
 
 {% endblock %}
 {% set show_footer = False %}

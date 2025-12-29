@@ -1,0 +1,568 @@
+{% extends 'base.html' %}
+{% block title %}Результаты - {{ user.username }} | {{ test.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+    }
+
+    .back-btn:hover {
+        background: #e9ecef;
+        transform: translateX(-5px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .user-header {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-left: 4px solid #6f42c1;
+    }
+
+    .header-title {
+        margin: 0 0 25px 0;
+        color: #2c3e50;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        min-width: 80px;
+        justify-content: center;
+    }
+
+    .score-good {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .score-medium {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .score-poor {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .groups-container {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .groups-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #6f42c1;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        margin: 40px 0 20px 0;
+        color: #495057;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f1f3f5;
+    }
+
+    .questions-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 40px;
+    }
+
+    .questions-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .questions-count {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+
+    .wrong-count-badge {
+        background: #dc3545;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .question-card {
+        padding: 25px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .question-card:hover {
+        background-color: #f8f9fa;
+    }
+
+    .question-id {
+        background: #6f42c1;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .question-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #6f42c1;
+    }
+
+    .answer-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    @media (max-width: 768px) {
+        .answer-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .answer-card {
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+    }
+
+    .answer-card.correct {
+        border-color: #28a745;
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    }
+
+    .answer-card.incorrect {
+        border-color: #dc3545;
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    }
+
+    .answer-label {
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .answer-label.correct {
+        color: #155724;
+    }
+
+    .answer-label.incorrect {
+        color: #721c24;
+    }
+
+    .answer-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .comment-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #17a2b8;
+        margin-top: 20px;
+    }
+
+    .comment-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comment-text {
+        color: #6c757d;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .no-questions {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #28a745;
+        opacity: 0.7;
+    }
+
+    .divider {
+        height: 1px;
+        background: #e9ecef;
+        margin: 30px 0;
+    }
+
+    .user-info-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .user-id {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container">
+    <!-- Кнопка назад -->
+    <a href="{{ url_for('results_detailed', testing_id=test.id) }}" class="back-btn">
+        <span style="font-size: 1.2rem;">←</span>
+        Назад к статистике теста
+    </a>
+
+    <!-- Заголовок и основная информация -->
+    <div class="user-header">
+        <h1 class="header-title">
+            <span style="font-size: 1.5rem;">📊</span>
+            Результаты тестирования
+        </h1>
+
+        <div class="user-info-row">
+            <div class="user-avatar">
+                {{ user.username[:1]|upper }}
+            </div>
+            <div class="user-details">
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-id">ID: {{ user.id }}</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span style="font-size: 1.1rem;">🎯</span>
+                    Название теста
+                </div>
+                <div class="stat-value">{{ test.name }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span style="font-size: 1.1rem;">📚</span>
+                    ID урока
+                </div>
+                <div class="stat-value">#{{ test.lesson_id }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span style="font-size: 1.1rem;">⭐</span>
+                    Баллы
+                </div>
+                <div class="stat-value">
+                    <span class="score-badge score-{% if result.score >= 80 %}good{% elif result.score >= 60 %}medium{% else %}poor{% endif %}">
+                        {{ result.score }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span style="font-size: 1.1rem;">✅</span>
+                    Правильные ответы
+                </div>
+                <div class="stat-value">
+                    {{ correct_count }} из {{ total_count }}
+                    <div style="font-size: 0.9rem; color: #6c757d; margin-top: 5px;">
+                        {{ ((correct_count / total_count * 100) if total_count > 0 else 0)|round(1) }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Группы пользователя -->
+        {% if user_groups and user_groups|length > 0 %}
+        <div class="groups-container">
+            <div class="stat-label">
+                <span style="font-size: 1.1rem;">🏷️</span>
+                {% if user_groups|length == 1 %}
+                    Группа
+                {% else %}
+                    Группы ({{ user_groups|length }})
+                {% endif %}
+            </div>
+            <div>
+                {% for group in user_groups %}
+                <span class="groups-badge">
+                    <span style="font-size: 0.9rem;">🏷️</span>
+                    {{ group }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Раздел с неправильными ответами -->
+    <h3 class="section-title">
+        <span style="font-size: 1.3rem;">❌</span>
+        Неправильные ответы
+        {% if wrong_count > 0 %}
+        <span class="wrong-count-badge">{{ wrong_count }}</span>
+        {% endif %}
+    </h3>
+
+    {% if wrong_questions %}
+    <div class="questions-container">
+        <div class="questions-header">
+            <div>
+                <span style="font-weight: 600; color: #495057;">Вопросы с ошибками</span>
+                <div class="questions-count">Всего вопросов: {{ total_count }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.9rem; color: #6c757d;">Ошибок</div>
+                <div style="font-size: 1.2rem; font-weight: 700; color: #dc3545;">{{ wrong_count }}</div>
+            </div>
+        </div>
+
+        {% for question in wrong_questions %}
+        <div class="question-card">
+            <div class="question-id">Вопрос #{{ question.id }}</div>
+
+            <div class="question-text">
+                {{ question.text }}
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-card correct">
+                    <div class="answer-label correct">
+                        <span style="font-size: 1.1rem;">✅</span>
+                        Правильный ответ
+                    </div>
+                    <div class="answer-value">
+                        {% if question.correct %}
+                            <span style="color: #28a745;">Да (это мошенники)</span>
+                        {% else %}
+                            <span style="color: #28a745;">Нет (это не мошенники)</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="answer-card incorrect">
+                    <div class="answer-label incorrect">
+                        <span style="font-size: 1.1rem;">❌</span>
+                        Ответ участника
+                    </div>
+                    <div class="answer-value">
+                        {% if question.correct %}
+                            <span style="color: #dc3545;">Нет (это не мошенники)</span>
+                        {% else %}
+                            <span style="color: #dc3545;">Да (это мошенники)</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-section">
+                <div class="comment-title">
+                    <span style="font-size: 1.1rem;">💡</span>
+                    Объяснение ошибки
+                </div>
+                <div class="comment-text">
+                    {% if question.correct %}
+                        {{ question.comment_no or 'Нет комментария для этого ответа' }}
+                    {% else %}
+                        {{ question.comment_yes or 'Нет комментария для этого ответа' }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not loop.last %}
+            <div class="divider"></div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-questions">
+        <div class="success-icon">🎉</div>
+        <h3 style="margin-bottom: 10px; color: #495057;">Все ответы правильные!</h3>
+        <p style="margin-bottom: 20px; color: #6c757d; max-width: 500px; margin-left: auto; margin-right: auto;">
+            Участник {{ user.username }} правильно ответил на все вопросы в этом тестировании.
+        </p>
+        <div style="
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        ">
+            <span style="font-size: 1.3rem;">✅</span>
+            Идеальный результат
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Плавное появление карточек
+        const questionCards = document.querySelectorAll('.question-card');
+        questionCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Плавное появление статистических карточек
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, index * 150);
+        });
+    });
+</script>
+
+{% endblock %}
+{% set show_footer = False %}
