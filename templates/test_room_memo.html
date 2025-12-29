@@ -1,42 +1,680 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Памятка
-{% endblock %}
+{% block title %}Памятка перед тестированием{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Тестирование</h1>
+<style>
+    :root {
+        --primary-color: #6f42c1;
+        --primary-light: #8a63d2;
+        --primary-dark: #5a32a3;
+        --secondary-color: #20c997;
+        --accent-color: #ff6b6b;
+        --warning-color: #ffc107;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+    }
 
-        <section>
-            <h2>Что вас ждёт</h2>
-            <p>Вам будут представлены различные сообщения, которые могут прийти:</p>
-            <ul>
-                <li>По обычной почте</li>
-                <li>По электронной почте</li>
-                <li>В SMS-сообщениях</li>
-                <li>На веб-сайтах</li>
+    .test-memo-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        min-height: 100vh;
+    }
+
+    .memo-back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--light-bg);
+        color: var(--text-primary);
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        margin-bottom: 40px;
+    }
+
+    .memo-back-button:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        transform: translateX(-5px);
+        box-shadow: var(--shadow);
+    }
+
+    .memo-header {
+        text-align: center;
+        margin-bottom: 60px;
+        padding-bottom: 40px;
+        border-bottom: 3px solid var(--light-bg);
+    }
+
+    .memo-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 20px;
+        line-height: 1.2;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .memo-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    .memo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+
+    .memo-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 35px;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
+        height: 100%;
+    }
+
+    .memo-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .memo-card h2 {
+        font-size: 1.6rem;
+        color: var(--text-primary);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .channels-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .channel-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: var(--light-bg);
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+    .channel-item:hover {
+        background: var(--primary-light);
+        color: var(--white);
+        transform: translateX(10px);
+    }
+
+    .channel-icon {
+        font-size: 1.2rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    .channel-name {
+        font-weight: 500;
+        flex: 1;
+    }
+
+    .task-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        border-left: 6px solid var(--secondary-color);
+    }
+
+    .task-title {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .task-description {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+    }
+
+    .answer-examples {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+        .answer-examples {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .answer-example {
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .answer-legit {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+    }
+
+    .answer-fraud {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        border: 2px solid #dc3545;
+    }
+
+    .answer-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .answer-label {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .answer-legit .answer-label {
+        color: #155724;
+    }
+
+    .answer-fraud .answer-label {
+        color: #721c24;
+    }
+
+    .scoring-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        border: 2px solid var(--warning-color);
+    }
+
+    .scoring-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .scoring-title {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .scoring-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .score-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .score-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+    }
+
+    .score-card.positive {
+        border-top: 4px solid #28a745;
+    }
+
+    .score-card.negative {
+        border-top: 4px solid #dc3545;
+    }
+
+    .score-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .score-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .positive .score-value {
+        color: #28a745;
+    }
+
+    .negative .score-value {
+        color: #dc3545;
+    }
+
+    .score-description {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+
+    .warning-section {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 60px;
+        border-left: 6px solid var(--warning-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .warning-section::before {
+        content: '⚠️';
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        font-size: 8rem;
+        opacity: 0.1;
+        transform: rotate(15deg);
+    }
+
+    .warning-title {
+        font-size: 1.8rem;
+        color: #856404;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .warning-text {
+        color: #856404;
+        font-size: 1.2rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .warning-list {
+        list-style: none;
+        padding: 0;
+        margin: 25px 0 0 0;
+    }
+
+    .warning-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 8px;
+    }
+
+    .warning-icon {
+        font-size: 1.2rem;
+        color: #856404;
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
+
+    .action-container {
+        text-align: center;
+        padding: 40px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: var(--border-radius);
+        margin-bottom: 50px;
+    }
+
+    .action-title {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .start-button {
+        padding: 18px 45px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        box-shadow: 0 6px 20px rgba(111, 66, 193, 0.3);
+        text-decoration: none;
+    }
+
+    .start-button:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(111, 66, 193, 0.4);
+    }
+
+    .back-button {
+        padding: 16px 35px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: 2px solid var(--text-secondary);
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        background: transparent;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .back-button:hover {
+        background: var(--text-secondary);
+        color: var(--white);
+        transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+        .test-memo-container {
+            padding: 20px 15px;
+        }
+
+        .memo-title {
+            font-size: 2.2rem;
+        }
+
+        .memo-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .start-button {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+
+        .scoring-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Анимации */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-in {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+</style>
+
+<div class="test-memo-container">
+    <!-- Кнопка назад -->
+    <a href="{{ url_for('test_room_preview') }}" class="memo-back-button">
+        <span style="font-size: 1.2rem;">←</span>
+        Назад к списку тестов
+    </a>
+
+    <!-- Заголовок -->
+    <div class="memo-header">
+        <h1 class="memo-title">Памятка перед тестированием</h1>
+        <p class="memo-subtitle">
+            Ознакомьтесь с ключевыми моментами перед началом контрольного тестирования по распознаванию мошенничества
+        </p>
+    </div>
+
+    <!-- Карточки с информацией -->
+    <div class="memo-grid">
+        <!-- Каналы коммуникации -->
+        <div class="memo-card animate-in">
+            <h2>
+                <span style="font-size: 1.5rem;">📱</span>
+                Каналы коммуникации
+            </h2>
+            <p>В тесте вы столкнетесь с сообщениями из различных источников:</p>
+            <ul class="channels-list">
+                <li class="channel-item">
+                    <span class="channel-icon">📧</span>
+                    <span class="channel-name">Электронная почта</span>
+                </li>
+                <li class="channel-item">
+                    <span class="channel-icon">💬</span>
+                    <span class="channel-name">Мессенджеры</span>
+                </li>
+                <li class="channel-item">
+                    <span class="channel-icon">📱</span>
+                    <span class="channel-name">SMS-сообщения</span>
+                </li>
+                <li class="channel-item">
+                    <span class="channel-icon">🌐</span>
+                    <span class="channel-name">Веб-сайты</span>
+                </li>
+                <li class="channel-item">
+                    <span class="channel-icon">📨</span>
+                    <span class="channel-name">Обычная почта</span>
+                </li>
+                <li class="channel-item">
+                    <span class="channel-icon">📞</span>
+                    <span class="channel-name">Телефонные звонки</span>
+                </li>
             </ul>
-        </section>
+        </div>
 
-        <section>
-            <h2>Ваша задача</h2>
-            <p>Определить, являются ли представленные сообщения мошенническими или нет.</p>
-        </section>
-
-        <section>
-            <h2>Система оценки</h2>
-            <p>Ваш прогресс будет отражаться через показатель опыта:</p>
-            <ul>
-                <li><span class="highlight">Правильные ответы</span> — повышают уровень опыта</li>
-                <li><span class="highlight">Неверные ответы</span> — снижают уровень опыта</li>
-            </ul>
-        </section>
-        <div class="important">
-            <h3>Важно</h3>
-            <p>После последнего вопроса или при нажатии "Завершить тестирование" тестирование будет завершено и доступ к нему закроется</p>
+        <!-- Система оценки -->
+        <div class="memo-card animate-in">
+            <h2>
+                <span style="font-size: 1.5rem;">📊</span>
+                Система оценки
+            </h2>
+            <p>Ваш прогресс отслеживается через показатель опыта (XP):</p>
+            <div style="margin-top: 25px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <span style="color: #28a745; font-size: 1.5rem;">⬆</span>
+                    <div>
+                        <div style="font-weight: 700; color: #155724;">Правильный ответ</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">+ XP за каждый верный ответ</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="color: #dc3545; font-size: 1.5rem;">⬇</span>
+                    <div>
+                        <div style="font-weight: 700; color: #721c24;">Ошибка</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">- XP за каждый неверный ответ</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                <div style="font-weight: 700; color: var(--primary-color);">Целевой показатель</div>
+                <div style="font-size: 1.1rem; color: var(--text-secondary);">Стремитесь набрать максимальное количество XP</div>
+            </div>
         </div>
     </div>
-    <p><a href="{{ url_for('test_room_preview') }}" class="btn">← назад</a></p>
+
+    <!-- Основная задача -->
+    <div class="task-section animate-in">
+        <h2 class="task-title">
+            <span style="font-size: 2rem;">🎯</span>
+            Ваша задача
+        </h2>
+        <div class="task-description">
+            Внимательно изучайте каждое представленное сообщение и определяйте, является ли оно мошенническим или легитимным.
+            Принимайте взвешенные решения на основе анализа содержания, контекста и подозрительных признаков.
+        </div>
+
+        <div class="answer-examples">
+            <div class="answer-example answer-legit">
+                <span class="answer-icon">✅</span>
+                <div class="answer-label">Легитимное сообщение</div>
+                <div style="font-size: 0.9rem; color: #155724;">Настоящее, правдивое сообщение от надежного источника</div>
+            </div>
+            <div class="answer-example answer-fraud">
+                <span class="answer-icon">❌</span>
+                <div class="answer-label">Мошенничество</div>
+                <div style="font-size: 0.9rem; color: #721c24;">Обманное сообщение с целью введения в заблуждение</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Важное предупреждение -->
+    <div class="warning-section animate-in">
+        <h3 class="warning-title">
+            <span style="font-size: 1.8rem;">⚠️</span>
+            Критически важно
+        </h3>
+        <p class="warning-text">
+            <strong>Тестирование автоматически завершается и становится недоступным в следующих случаях:</strong>
+        </p>
+        <ul class="warning-list">
+            <li class="warning-item">
+                <span class="warning-icon">⏹️</span>
+                <span>После ответа на <strong>последний вопрос</strong> в тесте</span>
+            </li>
+            <li class="warning-item">
+                <span class="warning-icon">🚫</span>
+                <span>При нажатии кнопки <strong>"Завершить тестирование"</strong> в процессе теста</span>
+            </li>
+        </ul>
+        <p class="warning-text" style="margin-top: 25px;">
+            Убедитесь, что вы готовы завершить тестирование — после завершения доступ к нему будет закрыт.
+        </p>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="action-container">
+        <h3 class="action-title">Готовы начать тестирование?</h3>
+        <div class="action-buttons">
+            <a href="{{ url_for('test_room_preview') }}" class="start-button pulse">
+                <span style="font-size: 1.5rem;">🚀</span>
+                Начать тестирование
+            </a>
+        </div>
+        <div style="margin-top: 25px; color: var(--text-secondary); font-size: 0.9rem;">
+            Вы можете вернуться к списку тестов, если не готовы начать сейчас
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация появления элементов
+        const animateElements = document.querySelectorAll('.animate-in');
+
+        animateElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+
+        // Интерактивные эффекты для карточек каналов
+        const channelItems = document.querySelectorAll('.channel-item');
+        channelItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(15px)';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Эффект для кнопки старта
+        const startButton = document.querySelector('.start-button');
+        if (startButton) {
+            startButton.addEventListener('mouseenter', function() {
+                this.style.animation = 'pulse 0.5s ease';
+            });
+
+            startButton.addEventListener('mouseleave', function() {
+                this.style.animation = 'pulse 2s ease-in-out infinite';
+            });
+        }
+
+        // Подсветка примеров ответов
+        const answerExamples = document.querySelectorAll('.answer-example');
+        answerExamples.forEach(example => {
+            example.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+
+            example.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Прокрутка к началу при загрузке
+        window.scrollTo(0, 0);
+    });
+</script>
+
 {% endblock %}
 {% set show_footer = False %}
