@@ -28,3 +28,21 @@ cd fish_chat
 docker-compose up -d --build
 
 # Система будет доступна: http://ваш-сервер:5000
+```
+### Способ 2: Ручная установка
+```bash
+# 1. Установите Python 3.8 или новее
+# Скачать: https://www.python.org/downloads/
+
+# 2. Скачайте проект
+git clone <адрес-репозитория>
+cd fish_chat
+
+# 3. Установите зависимости
+pip install -r requirements.txt
+
+# 4. Запустите систему
+python app.py
+
+# Откройте в браузере: http://localhost:5000
+```
