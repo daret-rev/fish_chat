@@ -1482,6 +1482,114 @@ def results_detailed(testing_id):
                            chart_data=chart_data)
 
 
+@app.route('/dashboard/testing_management/group_results/<int:testing_id>/<int:group_id>')
+def group_results(testing_id, group_id):
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
+    test = Testing.query.get_or_404(testing_id)
+    group = Group.query.get_or_404(group_id)
+    lesson = Lesson.query.get_or_404(test.lesson_id)
+
+    # group.users уже список, используем как есть
+    group_user_ids = group.users or []
+
+    # Получаем результаты пользователей этой группы
+    results = Result.query.filter_by(testing_id=testing_id).all()
+
+    # Фильтруем результаты по пользователям группы
+    group_results = [r for r in results if r.user_id in group_user_ids]
+
+    # Собираем статистику пользователей
+    users_data = []
+    for result in group_results:
+        user = User.query.get(result.user_id)
+        if user:
+            correct = len(result.correct_answers_id)
+            wrong = len(result.wrong_answers_id)
+            total = correct + wrong
+
+            users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'total_questions': total,
+                'correct': correct,
+                'wrong': wrong,
+                'accuracy': round((correct / total * 100) if total > 0 else 0, 1),
+                'score': result.score
+            })
+
+    # Собираем все вопросы урока (messages)
+    all_questions = Message.query.filter(Message.id.in_(lesson.questions)).all() if lesson.questions else []
+    total_questions_count = len(all_questions)
+
+    # Анализируем ошибки
+    common_errors = []
+    individual_errors = []
+    all_errors_dict = {}
+
+    # Собираем все ошибки
+    for result in group_results:
+        for wrong_id in result.wrong_answers_id:
+            message = Message.query.get(wrong_id)
+            if message:
+                if wrong_id not in all_errors_dict:
+                    all_errors_dict[wrong_id] = {
+                        'count': 0,
+                        'users': [],
+                        'message': message
+                    }
+                all_errors_dict[wrong_id]['count'] += 1
+                all_errors_dict[wrong_id]['users'].append(
+                    User.query.get(result.user_id)
+                )
+
+    # Разделяем на общие и индивидуальные ошибки
+    for message_id, error_data in all_errors_dict.items():
+        message_data = {
+            'id': message_id,
+            'text': error_data['message'].text,
+            'correct': error_data['message'].correct,
+            'comment_yes': error_data['message'].comment_yes,
+            'comment_no': error_data['message'].comment_no,
+            'error_count': error_data['count'],
+            'users': error_data['users']
+        }
+
+        if error_data['count'] > 1:
+            common_errors.append(message_data)
+        else:
+            individual_errors.append({
+                'message': message_data,
+                'user': error_data['users'][0]
+            })
+
+    # Общая статистика группы
+    total_questions_all = sum([len(r.correct_answers_id) + len(r.wrong_answers_id) for r in group_results])
+    total_correct_all = sum([len(r.correct_answers_id) for r in group_results])
+
+    group_stats = {
+        'total_users': len(group_user_ids),
+        'completed_users': len(group_results),
+        'avg_score': round(sum([r.score for r in group_results]) / len(group_results), 1) if group_results else 0,
+        'total_score': sum([r.score for r in group_results]),
+        'total_correct': total_correct_all,
+        'total_wrong': sum([len(r.wrong_answers_id) for r in group_results]),
+        'total_questions': total_questions_all,
+        'accuracy': round((total_correct_all / total_questions_all * 100) if total_questions_all > 0 else 0, 1)
+    }
+
+    return render_template(mgn + 'group_results.html',
+                           test=test,
+                           group=group,
+                           users_data=users_data,
+                           group_stats=group_stats,
+                           common_errors=common_errors,
+                           individual_errors=individual_errors,
+                           common_errors_count=len(common_errors),
+                           individual_errors_count=len(individual_errors),
+                           total_questions_count=total_questions_count)
+
 @app.route('/dashboard/testing_management/user_results/<int:testing_id>/<int:user_id>')
 def user_results(testing_id, user_id):
     if not check_privileges():

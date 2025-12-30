@@ -745,7 +745,7 @@
                 </thead>
                 <tbody id="detailedGroupsBody">
                     {% for group in groups_data %}
-                    <tr>
+                    <tr class="clickable-row-group" data-group-id="{{ group.id }}" data-testing-id="{{ test.id }}">
                         <td>
                             <strong style="color: #2c3e50;">{{ group.name }}</strong>
                         </td>
@@ -832,6 +832,24 @@
                 // Переход на детальную страницу
                 setTimeout(() => {
                     window.location.href = `/dashboard/testing_management/user_results/${testingId}/${userId}`;
+                }, 200);
+            }
+
+            // Обработчик клика по строкам групп
+            const groupRow = e.target.closest('.clickable-row-group');
+            if (groupRow && !e.target.closest('.no-data')) {
+                const groupId = groupRow.getAttribute('data-group-id');
+                const testingId = groupRow.getAttribute('data-testing-id');
+
+                // Анимация нажатия
+                groupRow.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    groupRow.style.transform = '';
+                }, 150);
+
+                // Переход на страницу статистики группы
+                setTimeout(() => {
+                    window.location.href = `/dashboard/testing_management/group_results/${testingId}/${groupId}`;
                 }, 200);
             }
         });
