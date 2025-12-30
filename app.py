@@ -129,6 +129,16 @@ class Group(db.Model):
     def add_users(self, users: list):
         self.users = users
 
+    def add_user(self, user_id):
+        """Добавить пользователя в группу"""
+        if self.users is None:
+            self.users = ""
+
+        if self.users:
+            self.users += user_id
+            return True
+        return False
+
     def set_groupname(self, groupname):
         self.groupname = groupname
 
@@ -575,27 +585,39 @@ def register():
                 'success': False,
                 'message': 'Пользователь уже существует'
             })
-
         return render_template('register.html', error='Пользователь уже существует')
 
-    user = User.create_user(username, password)
+    # Создаем пользователя
+    user = User(username=username, privileges=0)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
 
-    if user:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'success': True,
-                'redirect': url_for('index')
-            })
+    user_id = user.id
+    print(f"Создан пользователь: {username}, ID: {user_id}")
 
-        return redirect(url_for('index'))
-    else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'success': False,
-                'message': 'Ошибка создания пользователя'
-            })
+    # УДАЛЯЕМ старую группу и создаем новую
+    Group.query.filter_by(groupname='new').delete()
 
-        return render_template('register.html', error='Ошибка создания пользователя')
+    # Получаем ВСЕХ пользователей для группы
+    all_user_ids = [u.id for u in User.query.filter(User.privileges == 0).all()]
+
+    # Создаем новую группу со всеми пользователями
+    group = Group('new')
+    group.users = all_user_ids  # Все обычные пользователи
+    db.session.add(group)
+    db.session.commit()
+
+    print(f"✅ Группа 'new' пересоздана с {len(all_user_ids)} пользователями")
+    print(f"Список: {all_user_ids}")
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'redirect': url_for('index')
+        })
+
+    return redirect(url_for('index'))
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
