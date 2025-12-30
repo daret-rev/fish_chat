@@ -4,6 +4,13 @@
 
 {% block content %}
 <section class="hero-section">
+    {% if user and user.role_name == 'admin' %}
+    <div style="margin-bottom: 30px;">
+        <a href="{{ url_for('cons') }}" style="text-decoration: none; color: #007bff; display: inline-block; margin-bottom: 20px;">
+            ← Назад в админ-консоль
+        </a>
+    </div>
+    {% endif %}
     <div class="container">
         <!-- Выход в правом верхнем углу -->
         <div style="text-align: right; margin-bottom: 40px;">

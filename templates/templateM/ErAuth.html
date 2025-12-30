@@ -1,10 +1,351 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h1>Error: отказ в доступе</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Ошибка доступа{% endblock %}
+
+{% block content %}
+<style>
+    .error-container {
+        max-width: 480px;
+        margin: 100px auto;
+        padding: 60px 40px;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        border-top: 6px solid #dc3545;
+        text-align: center;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .error-icon {
+        font-size: 5rem;
+        color: #dc3545;
+        margin-bottom: 30px;
+        animation: shake 1s ease-in-out infinite;
+    }
+
+    .error-title {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #dc3545;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
+    }
+
+    .error-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .error-details {
+        background: #fff5f5;
+        border: 2px dashed #f8d7da;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px 0;
+        text-align: left;
+    }
+
+    .error-details-title {
+        font-weight: 600;
+        color: #dc3545;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+
+    .error-details-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .error-details-item {
+        padding: 12px 0 12px 30px;
+        position: relative;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        border-bottom: 1px solid #ffeaea;
+    }
+
+    .error-details-item:last-child {
+        border-bottom: none;
+    }
+
+    .error-details-item::before {
+        content: "•";
+        color: #dc3545;
+        font-size: 1.5rem;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 40px;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 18px 30px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
+    }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 30px;
+        background: var(--white);
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #e1e5eb;
+        width: 100%;
+    }
+
+    .btn-secondary:hover {
+        background: #f8f9fa;
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0) rotate(0);
+        }
+        25% {
+            transform: translateX(-5px) rotate(-5deg);
+        }
+        75% {
+            transform: translateX(5px) rotate(5deg);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    .timer {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 20px;
+        font-weight: 500;
+        animation: pulse 2s infinite;
+    }
+
+    @media (max-width: 576px) {
+        .error-container {
+            margin: 60px 20px;
+            padding: 40px 25px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+        }
+
+        .error-title {
+            font-size: 1.9rem;
+        }
+
+        .error-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+        }
+    }
+
+    /* Дополнительные анимации */
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+
+    .rotate {
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="error-container">
+    <div class="error-icon floating">🚫</div>
+    
+    <h1 class="error-title">Доступ запрещен</h1>
+    
+    <p class="error-subtitle">
+        У вас недостаточно прав для доступа к этой странице.
+        <br>
+        Пожалуйста, войдите под учетной записью с соответствующими привилегиями.
+    </p>
+
+    <div class="error-details">
+        <div class="error-details-title">
+            <span style="font-size: 1.2rem;">ℹ️</span>
+            Возможные причины:
+        </div>
+        <ul class="error-details-list">
+            <li class="error-details-item">Вы не авторизованы в системе</li>
+            <li class="error-details-item">Ваша учетная запись не имеет прав администратора</li>
+            <li class="error-details-item">Сессия истекла — требуется повторный вход</li>
+            <li class="error-details-item">Попытка доступа к защищенному ресурсу</li>
+        </ul>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ url_for('login') }}" class="btn-primary">
+            <span style="font-size: 1.2rem;">🔐</span>
+            Перейти к авторизации
+        </a>
+        
+        <a href="{{ url_for('index') }}" class="btn-secondary">
+            <span style="font-size: 1.2rem;">🏠</span>
+            На главную страницу
+        </a>
+        
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" class="btn-secondary">
+            <span style="font-size: 1.2rem;">👋</span>
+            Выйти из системы
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="timer" id="timer">
+        Автоматический переход через <span id="countdown">10</span> секунд...
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Таймер обратного отсчета
+        let seconds = 10;
+        const countdownElement = document.getElementById('countdown');
+        const timerElement = document.getElementById('timer');
+        
+        const countdownInterval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                timerElement.innerHTML = '<span style="color: var(--primary-color); font-weight: 600;">⏳ Перенаправление...</span>';
+                setTimeout(() => {
+                    window.location.href = "{{ url_for('login') }}";
+                }, 500);
+            } else if (seconds <= 5) {
+                timerElement.style.color = '#dc3545';
+                timerElement.style.fontWeight = '600';
+            }
+        }, 1000);
+
+        // Анимация иконки
+        const errorIcon = document.querySelector('.error-icon');
+        setTimeout(() => {
+            errorIcon.style.transition = 'transform 1s ease';
+            errorIcon.classList.add('rotate');
+            
+            setTimeout(() => {
+                errorIcon.classList.remove('rotate');
+                errorIcon.style.transition = 'none';
+            }, 2000);
+        }, 1000);
+
+        // Плавное появление элементов
+        const elements = document.querySelectorAll('.error-title, .error-subtitle, .error-details, .action-buttons');
+        elements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, 300 + (index * 200));
+        });
+
+        // Клик по любому месту для быстрого перехода
+        document.addEventListener('click', function() {
+            clearInterval(countdownInterval);
+            window.location.href = "{{ url_for('login') }}";
+        });
+
+        // Клавиша Enter для перехода
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                clearInterval(countdownInterval);
+                window.location.href = "{{ url_for('login') }}";
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% set show_footer = False %}

@@ -15,3 +15,5 @@ templates/*.db.idea/
 .idea/*
 .idea/
 .idea/workspace.xml
+migrate.py
+app_backup_20251230_152252.db

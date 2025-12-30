@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование пользователя{% endblock %}
+
+{% block content %}
+<style>
+    .edit-form {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+    
+    .role-selector {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .role-option {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .role-option:hover {
+        border-color: #007bff;
+        background: #f8f9fa;
+    }
+    
+    .role-option.selected {
+        border-color: #007bff;
+        background: rgba(0,123,255,0.1);
+    }
+    
+    .role-option input {
+        display: none;
+    }
+    
+    .role-name {
+        font-weight: 600;
+        margin-top: 8px;
+    }
+    
+    .role-description {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="container">
+    <!-- Навигация -->
+    <div style="margin-bottom: 30px;">
+        <a href="{{ url_for('console_users') }}" style="text-decoration: none; color: #007bff; display: inline-block; margin-bottom: 20px;">
+            ← Назад к списку пользователей
+        </a>
+        <h1>✏️ Редактирование пользователя</h1>
+        <p style="color: #6c757d;">{{ user.username }}</p>
+    </div>
+    
+    <!-- Форма редактирования -->
+    <div class="edit-form">
+        <form method="POST">
+            <!-- Информация о пользователе -->
+            <div class="form-group">
+                <label class="form-label">Имя пользователя</label>
+                <input type="text" class="form-input" value="{{ user.username }}" disabled>
+                <small style="color: #6c757d; display: block; margin-top: 5px;">Имя пользователя нельзя изменить</small>
+            </div>
+            
+            <!-- Выбор роли -->
+            <div class="form-group">
+                <label class="form-label">Роль пользователя</label>
+                <div class="role-selector">
+                    <!-- Пользователь -->
+                    <label class="role-option {% if user.privileges == 0 %}selected{% endif %}">
+                        <input type="radio" name="privileges" value="0" {% if user.privileges == 0 %}checked{% endif %}>
+                        <div style="font-size: 2rem;">👤</div>
+                        <div class="role-name">Пользователь</div>
+                        <div class="role-description">Может проходить тесты и тренировки</div>
+                    </label>
+                    
+                    <!-- Учитель -->
+                    <label class="role-option {% if user.privileges == 1 %}selected{% endif %}">
+                        <input type="radio" name="privileges" value="1" {% if user.privileges == 1 %}checked{% endif %}>
+                        <div style="font-size: 2rem;">👨‍🏫</div>
+                        <div class="role-name">Учитель</div>
+                        <div class="role-description">Может создавать тесты и управлять группами</div>
+                    </label>
+                    
+                    <!-- Администратор -->
+                    <label class="role-option {% if user.privileges == 2 %}selected{% endif %}">
+                        <input type="radio" name="privileges" value="2" {% if user.privileges == 2 %}checked{% endif %}>
+                        <div style="font-size: 2rem;">👑</div>
+                        <div class="role-name">Администратор</div>
+                        <div class="role-description">Полный доступ ко всем функциям системы</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Сброс пароля -->
+            <div class="form-group">
+                <label class="form-label">Сброс пароля</label>
+                <input type="password" name="new_password" class="form-input" placeholder="Новый пароль (оставьте пустым, чтобы не менять)">
+                <small style="color: #6c757d; display: block; margin-top: 5px;">Если введете новый пароль, он будет изменен</small>
+            </div>
+            
+            <!-- Кнопки -->
+            <div style="display: flex; gap: 15px; margin-top: 40px;">
+                <button type="submit" style="
+                    flex: 1;
+                    padding: 15px;
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                ">
+                    💾 Сохранить изменения
+                </button>
+                
+                <a href="{{ url_for('console_users') }}" style="
+                    flex: 1;
+                    padding: 15px;
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    text-decoration: none;
+                    text-align: center;
+                ">
+                    ❌ Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Предупреждение -->
+    {% if user.username == session.get('curent_user') %}
+    <div style="
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+        color: #856404;
+    ">
+        ⚠️ <strong>Внимание:</strong> Вы редактируете свой собственный профиль. 
+        Изменение роли может повлиять на ваши права доступа.
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Выбор роли
+    document.querySelectorAll('.role-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.role-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            this.querySelector('input').checked = true;
+        });
+    });
+</script>
+{% endblock %}
+{% set show_footer = False %}

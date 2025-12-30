@@ -1,14 +1,15 @@
 from pathlib import Path
 from pyexpat.errors import messages
-
+from unittest import case
+from functools import wraps
 from flask import (
     Flask, render_template, request,
-    redirect, url_for, session, flash, jsonify
+    redirect, url_for, session, flash, jsonify,
+    Response
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, UserMixin, LoginManager
 from flask_sqlalchemy import SQLAlchemy
-import model
 import json
 import random
 import logging
@@ -57,7 +58,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(64), nullable=False)
 
-    privileges = db.Column(db.Boolean, default = False)
+    privileges = db.Column(db.Integer, default = 0)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -72,10 +73,19 @@ class User(db.Model, UserMixin):
     def is_admin(self):
         return self.privileges
 
+    @property
+    def role_name(self):
+        roles = {
+            0: 'user',
+            1: 'teacher',
+            2: 'admin'
+        }
+        return roles.get(self.privileges, 'unknown')
+
     @staticmethod
     def create_default_users():
         if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', privileges=True)
+            admin = User(username='admin', privileges=1)
             admin.set_password('admin_admin')
             db.session.add(admin)
 
@@ -84,7 +94,7 @@ class User(db.Model, UserMixin):
     @staticmethod
     def create_user(username, password):
 
-        user = User(username=username, privileges=False)
+        user = User(username=username, privileges=0)
         user.set_password(password)
 
         db.session.add(user)
@@ -95,8 +105,9 @@ class User(db.Model, UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-mgn = '/templateM/'
 
+mgn = '/templateM/'
+con = '/console_dir/'
 # ------------------------------------------------------------------
 # Группа/класс: пользователи + ID
 # ------------------------------------------------------------------
@@ -516,15 +527,26 @@ def login():
         session['curent_user'] = user.username
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            match user.role_name:
+                case 'admin':
+                    redirect_url = '/cons'
+                case 'teacher':
+                    redirect_url = '/dashboard'
+                case 'user':
+                    redirect_url = '/'
+
             return jsonify({
                 'success': True,
-                'redirect': url_for('dashboard') if user.is_admin else url_for('index')
+                'redirect': redirect_url
             })
 
-        if user.is_admin:
-            return redirect(url_for('dashboard'))
-        else:
-            return redirect(url_for('index'))
+        match user.role_name:
+            case 'admin':
+                return redirect(url_for('cons'))
+            case 'teacher':
+                return redirect(url_for('dashboard'))
+            case 'user':
+                return redirect(url_for('index'))
     else:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({
@@ -584,7 +606,13 @@ def logout():
 # ---------------------------------------------------------
 @app.route('/ErAuth', methods=['GET'])
 def ErAuth():
-    return render_template(mgn + 'ErAuth.html')
+    # Логика для разных типов ошибок на будущее
+    error_type = session.pop('error_type', 'access_denied')
+    error_message = session.pop('error_message', None)
+
+    return render_template(mgn + 'ErAuth.html',
+                           error_type=error_type,
+                           error_message=error_message)
 
 def check_privileges():
     curent_user = User.query.filter(
@@ -600,12 +628,33 @@ def check_privileges():
     else:
         return True
 
+
+def check_admin():
+    curent_user = User.query.filter(
+        User.username.ilike(
+            session.get('curent_user')
+        )
+    ).first()
+    print("DEBUD: curent user-admin is", curent_user)
+    print("DEBUG: curent user-admin privileges -", curent_user.is_admin)
+
+    if not curent_user or curent_user.role_name != 'admin':
+        return False
+    else:
+        return True
+
 @app.route('/dashboard')
 def dashboard():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
 
-    return render_template(mgn + 'dashboard.html')
+    curent_user = User.query.filter(
+        User.username.ilike(
+            session.get('curent_user')
+        )
+    ).first()
+
+    return render_template(mgn + 'dashboard.html', user=curent_user)
 
 @app.route('/dashboard/dashboard_instruction')
 def dashboard_instruction():
@@ -807,7 +856,7 @@ def group_create():
     if not check_privileges():
         return redirect(url_for('ErAuth'))
 
-    users = User.query.order_by(User.id).offset(1).all()
+    users = [u for u in User.query.order_by(User.id).all() if u.role_name == 'user']
     group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all()]
     if request.method == 'GET':
         return render_template(mgn + 'group_create.html', users=users, group_names=group_names)
@@ -838,7 +887,7 @@ def group_edit(group_id):
         return redirect(url_for('ErAuth'))
 
     group = Group.query.get_or_404(group_id)
-    users = User.query.order_by(User.id).offset(1).all()
+    users = [u for u in User.query.order_by(User.id).all() if u.role_name == 'user']
     group_names = [g.groupname for g in Group.query.order_by(Group.groupname).all() if g.id != group_id]
 
     if request.method == 'GET':
@@ -1308,9 +1357,9 @@ def result_list():
                            testings=testings,
                            lessons_dict=lessons_dict,
                            groups_dict=groups_dict)
-#
-#
-#
+# ---------------------------------------------------------
+# Результаты тестирований
+# ---------------------------------------------------------
 @app.route('/dashboard/result_testing')
 def result_testing():
     results_all = Result.query.get(Lesson.id).all()
@@ -1451,7 +1500,9 @@ def user_results(testing_id, user_id):
                            wrong_count=wrong_count,
                            total_count=total_count)
 
-
+# ---------------------------------------------------------
+# Тестирования пользователя: список и история
+# ---------------------------------------------------------
 @app.route('/test_room_preview/history_result')
 def history_result():
     curent_user = User.query.filter(
@@ -1526,6 +1577,214 @@ def user_result(testing_id, user_id):
                            correct_count=correct_count,
                            wrong_count=wrong_count,
                            total_count=total_count)
+
+
+# ---------------------------------------------------------
+# Консоль администратора
+# ---------------------------------------------------------
+@app.route('/cons')
+def cons():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    # Статистика
+    total_users = User.query.count()
+    total_teachers = User.query.filter_by(privileges=1).count()
+    total_admins = User.query.filter_by(privileges=2).count()
+    total_messages = Message.query.count()
+    total_groups = Group.query.count()
+    total_lessons = Lesson.query.count()
+    total_testings = Testing.query.count()
+    total_results = Result.query.count()
+
+    # Последние N пользователей
+    N = 5
+    recent_users = User.query.order_by(User.id.desc()).limit(N).all()
+
+    return render_template(con + 'cons.html',
+                           total_users=total_users,
+                           total_teachers=total_teachers,
+                           total_admins=total_admins,
+                           total_messages=total_messages,
+                           total_groups=total_groups,
+                           total_lessons=total_lessons,
+                           total_testings=total_testings,
+                           total_results=total_results,
+                           recent_users=recent_users)
+
+
+# ---------------------------------------------------------
+# Управление пользователями
+# ---------------------------------------------------------
+@app.route('/cons/users')
+def console_users():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    users = User.query.order_by(User.id).all()
+    return render_template(con + 'console_users.html', users=users)
+
+
+@app.route('/cons/users/edit/<int:user_id>', methods=['GET', 'POST'])
+def console_user_edit(user_id):
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    user = User.query.get_or_404(user_id)
+
+    if request.method == 'POST':
+        # Изменение ролей
+        new_role = request.form.get('privileges')
+        if new_role in ['0', '1', '2']:
+            user.privileges = int(new_role)
+
+        # Сброс пароля
+        new_password = request.form.get('new_password')
+        if new_password:
+            user.set_password(new_password)
+            flash('Пароль изменен', 'success')
+
+        db.session.commit()
+        flash('Пользователь обновлен', 'success')
+        return redirect(url_for('console_users'))
+
+    return render_template(con + 'console_user_edit.html', user=user)
+
+
+@app.route('/cons/users/delete/<int:user_id>', methods=['POST'])
+def console_user_delete(user_id):
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    user = User.query.get_or_404(user_id)
+
+    # Нельзя удалить себя
+    current_username = session.get('curent_user')
+    if user.username == current_username:
+        flash('Нельзя удалить свой собственный аккаунт!', 'danger')
+        return redirect(url_for('console_users'))
+
+    # Нельзя удалить последнего админа
+    if user.privileges == 2:
+        admin_count = User.query.filter_by(privileges=2).count()
+        if admin_count <= 1:
+            flash('Нельзя удалить последнего администратора!', 'danger')
+            return redirect(url_for('console_users'))
+
+    # Удаление результатов пользователя
+    Result.query.filter_by(user_id=user_id).delete()
+
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'Пользователь {user.username} удален', 'success')
+    return redirect(url_for('console_users'))
+
+
+# ---------------------------------------------------------
+# Очистка истории результатов
+# ---------------------------------------------------------
+@app.route('/cons/cleanup')
+def console_cleanup():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    total_results = Result.query.count()
+
+    # Фильтр по пользователям
+    results_by_user = {}
+    all_results = Result.query.all()
+
+    for result in all_results:
+        user_id = result.user_id
+        if user_id not in results_by_user:
+            results_by_user[user_id] = 0
+        results_by_user[user_id] += 1
+
+    # Фильтр по тестированиям
+    results_by_testing = {}
+    for result in all_results:
+        testing_id = result.testing_id
+        if testing_id not in results_by_testing:
+            results_by_testing[testing_id] = 0
+        results_by_testing[testing_id] += 1
+
+    return render_template(con + 'console_cleanup.html',
+                           total_results=total_results,
+                           results_by_user=results_by_user,
+                           results_by_testing=results_by_testing,
+                           total_users=len(results_by_user),
+                           total_testings=len(results_by_testing))
+
+
+@app.route('/cons/cleanup/execute', methods=['POST'])
+def console_cleanup_execute():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    action = request.form.get('action')
+
+    # Удаление всех результатов
+    if action == 'clear_all_results':
+        count = Result.query.count()
+        Result.query.delete()
+        db.session.commit()
+        flash(f'Удалено {count} результатов тестирований', 'success')
+
+    elif action == 'clear_user_results':
+        # Удаление результатов пользователя
+        user_id = request.form.get('user_id')
+        if user_id:
+            count = Result.query.filter_by(user_id=user_id).count()
+            Result.query.filter_by(user_id=user_id).delete()
+            db.session.commit()
+            flash(f'Удалено {count} результатов пользователя', 'success')
+
+    elif action == 'clear_testing_results':
+        # Удаление результатов тестирования
+        testing_id = request.form.get('testing_id')
+        if testing_id:
+            count = Result.query.filter_by(testing_id=testing_id).count()
+            Result.query.filter_by(testing_id=testing_id).delete()
+            db.session.commit()
+            flash(f'Удалено {count} результатов тестирования', 'success')
+
+    return redirect(url_for('console_cleanup'))
+
+
+# ---------------------------------------------------------
+# Экспорт данных
+# ---------------------------------------------------------
+@app.route('/cons/export')
+def console_export():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    return render_template(con + 'console_export.html')
+
+
+@app.route('/cons/export/users_csv')
+def export_users_csv():
+    if not check_admin():
+        return redirect(url_for('ErAuth'))
+
+    users = User.query.all()
+
+    # Создаем CSV вручную
+    csv_data = "ID,Username,Role,Registration\n"
+    for user in users:
+        role = "Пользователь"
+        if user.privileges == 1:
+            role = "Учитель"
+        elif user.privileges == 2:
+            role = "Администратор"
+
+        csv_data += f"{user.id},{user.username},{role}\n"
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=users_export.csv"}
+    )
 # ---------------------------------------------------------
 # Запуск дебагера
 # ---------------------------------------------------------

@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %}Админ-консоль{% endblock %}
+
+{% block content %}
+<style>
+    .admin-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-left: 5px solid #007bff;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.users { border-left-color: #28a745; }
+    .stat-card.teachers { border-left-color: #17a2b8; }
+    .stat-card.admins { border-left-color: #dc3545; }
+    .stat-card.data { border-left-color: #6f42c1; }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-top: 5px;
+    }
+    
+    .admin-menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 40px 0;
+    }
+    
+    .admin-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 8px 20px rgba(0,123,255,0.15);
+    }
+    
+    .admin-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .admin-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 15px;
+    }
+    
+    .admin-card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .admin-card-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .admin-card-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .admin-btn {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-btn:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+    }
+    
+    .admin-btn.danger {
+        background: #dc3545;
+    }
+    
+    .admin-btn.danger:hover {
+        background: #c82333;
+    }
+    
+    .admin-btn.success {
+        background: #28a745;
+    }
+    
+    .admin-btn.success:hover {
+        background: #218838;
+    }
+    
+    .recent-users {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .user-list {
+        margin-top: 20px;
+    }
+    
+    .user-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .user-item:last-child {
+        border-bottom: none;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: 700;
+        color: #007bff;
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .user-role {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 3px;
+    }
+</style>
+
+<div class="container">
+    <!-- Заголовок -->
+    <div style="margin-bottom: 40px;">
+        <h1 style="margin-bottom: 10px;">👑 Админ-консоль</h1>
+        <p style="color: #6c757d;">Управление системой тестирования</p>
+    </div>
+    
+    <!-- Статистика -->
+    <div class="admin-stats-grid">
+        <div class="stat-card users">
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Всего пользователей</div>
+        </div>
+        
+        <div class="stat-card teachers">
+            <div class="stat-value">{{ total_teachers }}</div>
+            <div class="stat-label">Учителей</div>
+        </div>
+        
+        <div class="stat-card admins">
+            <div class="stat-value">{{ total_admins }}</div>
+            <div class="stat-label">Администраторов</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value">{{ total_testings }}</div>
+            <div class="stat-label">Тестирований</div>
+        </div>
+        
+        <div class="stat-card data">
+            <div class="stat-value">{{ total_results }}</div>
+            <div class="stat-label">Результатов тестов</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value">{{ total_messages }}</div>
+            <div class="stat-label">Заданий в базе</div>
+        </div>
+    </div>
+    
+    <!-- Меню администратора -->
+    <div class="admin-menu">
+        <!-- Управление пользователями -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">👥</div>
+                <h3 class="admin-card-title">Управление пользователями</h3>
+            </div>
+            <p class="admin-card-description">
+                Просмотр, редактирование и удаление пользователей. Изменение ролей и сброс паролей.
+            </p>
+            <div class="admin-card-actions">
+                <a href="{{ url_for('console_users') }}" class="admin-btn">Список пользователей</a>
+                <a href="{{ url_for('export_users_csv') }}" class="admin-btn success">Экспорт CSV</a>
+            </div>
+        </div>
+        
+        <!-- Очистка данных -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-icon" style="background: linear-gradient(135deg, #dc3545, #c82333);">🧹</div>
+                <h3 class="admin-card-title">Очистка данных</h3>
+            </div>
+            <p class="admin-card-description">
+                Удаление старых результатов тестирований. Осторожно: удаленные данные нельзя восстановить.
+            </p>
+            <div class="admin-card-actions">
+                <a href="{{ url_for('console_cleanup') }}" class="admin-btn danger">Очистить историю</a>
+            </div>
+        </div>
+        
+        <!-- Назад в панель управления -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-icon" style="background: linear-gradient(135deg, #6c757d, #545b62);">🏠</div>
+                <h3 class="admin-card-title">Панель управления</h3>
+            </div>
+            <p class="admin-card-description">
+                Вернуться к стандартной панели управления для учителей и администраторов.
+            </p>
+            <div class="admin-card-actions">
+                <a href="{{ url_for('dashboard') }}" class="admin-btn">Перейти к управлению</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Последние пользователи -->
+    <div class="recent-users">
+        <h3>Последние зарегистрированные пользователи</h3>
+        <div class="user-list">
+            {% for user in recent_users %}
+            <div class="user-item">
+                <div class="user-avatar">
+                    {{ user.username[:1].upper() }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ user.username }}</div>
+                    <div class="user-role">{{ user.role_name|title }}</div>
+                </div>
+                <a href="{{ url_for('console_user_edit', user_id=user.id) }}" class="admin-btn" style="padding: 8px 15px; font-size: 0.85rem;">
+                    Редактировать
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Быстрые ссылки -->
+    <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e9ecef; text-align: center;">
+        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <!--<a href="{{ url_for('index') }}" style="text-decoration: none;">
+                <button style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    🏠 На главную
+                </button>
+            </a>-->
+            <a href="{{ url_for('logout') }}" style="text-decoration: none;">
+                <button style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    👋 Выйти
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% set show_footer = False %}
