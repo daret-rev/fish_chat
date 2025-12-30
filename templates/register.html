@@ -1,105 +1,414 @@
 {% extends 'base.html' %}
-{% block header %}
-{% block title %}{% endblock %}
-<!--===============================================================================================-->
-	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="static/util.css">
-	<link rel="stylesheet" type="text/css" href="static/main.css">
-<!--===============================================================================================-->
-{% endblock %}
+{% block title %}Регистрация{% endblock %}
+
 {% block content %}
-    <div class="container">
-        <div class="limiter">
-		<div class="container-login100" style="background-image: url('image/bg-01.jpg');">
-			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
-				<form class="login100-form validate-form" method="POST" action="{{ url_for('register') }}">
-					<span class="login100-form-title p-b-49">
-						Регистрация
-					</span>
+<style>
+    .auth-container {
+        max-width: 480px;
+        margin: 80px auto;
+        padding: 50px 40px;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        border-top: 6px solid var(--secondary-color);
+        text-align: center;
+    }
 
-					<div class="wrap-input100 validate-input m-b-23" data-validate = "Username is reauired">
-						<span class="label-input100">Логин</span>
-						<input class="input100" type="text" name="username" placeholder="Введите ваш логин">
-						<span class="focus-input100" data-symbol="&#xf206;"></span>
-					</div>
+    .auth-header {
+        margin-bottom: 40px;
+    }
 
-					<div class="wrap-input100 validate-input" data-validate="Password is required">
-						<span class="label-input100">Пароль</span>
-						<input class="input100" type="text" name="password" placeholder="Введите ваш пароль">
-						<span class="focus-input100" data-symbol="&#xf190;"></span>
-					</div>
+    .auth-icon {
+        font-size: 4rem;
+        color: var(--secondary-color);
+        margin-bottom: 20px;
+        animation: float 3s ease-in-out infinite;
+    }
 
-					<div class="text-center p-t-8 p-b-31">
-						<a href="{{ url_for('login') }}" class="txt2">
-							Вход
-						</a>
-					</div>
+    .auth-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-					<div class="container-login100-form-btn">
-						<div class="wrap-login100-form-btn">
-							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn">
-								Регистрация
-							</button>
-						</div>
-					</div>
+    .auth-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
 
-                    <div class="text-left p-t-8 p-b-31">
-						<a href="{{ url_for('index') }}" class="txt2">
-							Главная
-						</a>
-					</div>
+    .auth-form {
+        text-align: left;
+    }
 
-				</form>
-			</div>
-		</div>
-        
-	</div>
+    .form-group {
+        margin-bottom: 25px;
+    }
 
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-	<div id="dropDownSelect1"></div>
+    .form-input {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e1e5eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        background: var(--white);
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
 
-<!--===============================================================================================-->
-	<script src="etc/vendor/jquery/jquery-3.2.1.min.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/vendor/animsition/js/animsition.min.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/vendor/bootstrap/js/popper.js"></script>
-	<script src="etc/vendor/bootstrap/js/bootstrap.min.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/vendor/select2/select2.min.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/vendor/daterangepicker/moment.min.js"></script>
-	<script src="etc/vendor/daterangepicker/daterangepicker.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/vendor/countdowntime/countdowntime.js"></script>
-<!--===============================================================================================-->
-	<script src="etc/js/main.js"></script>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
+    .form-input:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 4px rgba(32, 201, 151, 0.1);
+    }
 
-	  gtag('config', 'UA-23581568-13');
-	</script>
+    .form-input::placeholder {
+        color: #adb5bd;
+    }
+
+    .form-input.has-error {
+        border-color: #dc3545;
+        background: #fff5f5;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .success-message {
+        color: #28a745;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .auth-button {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
+        color: var(--white);
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+    }
+
+    .auth-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(32, 201, 151, 0.4);
+    }
+
+    .auth-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .auth-button:active {
+        transform: translateY(-1px);
+    }
+
+    .auth-links {
+        margin-top: 30px;
+        text-align: center;
+        padding-top: 25px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .auth-link {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .auth-link:hover {
+        background: rgba(32, 201, 151, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .home-link {
+        margin-top: 20px;
+        display: inline-block;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .home-link:hover {
+        color: var(--secondary-color);
+        background: rgba(32, 201, 151, 0.05);
+    }
+
+    .password-hint {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 3px solid var(--secondary-color);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 576px) {
+        .auth-container {
+            margin: 40px 20px;
+            padding: 40px 25px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+        }
+
+        .auth-icon {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <div class="auth-icon">📝</div>
+        <h1 class="auth-title">Регистрация</h1>
+        <p class="auth-subtitle">
+            Создайте аккаунт для доступа к системе тестирования
+        </p>
     </div>
+
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}" id="registerForm">
+        <div class="form-group">
+            <label class="form-label">
+                <span style="font-size: 1.1rem;">👤</span>
+                Логин
+            </label>
+            <input type="text"
+                   name="username"
+                   class="form-input"
+                   placeholder="Придумайте логин"
+                   required
+                   minlength="3"
+                   maxlength="30">
+            <div class="password-hint">
+                От 3 до 30 символов. Можно использовать буквы, цифры и подчеркивание.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <span style="font-size: 1.1rem;">🔒</span>
+                Пароль
+            </label>
+            <input type="password"
+                   name="password"
+                   class="form-input"
+                   placeholder="Придумайте пароль"
+                   required
+                   minlength="4">
+            <div class="password-hint">
+                Минимум 4 символа. Рекомендуем использовать сложный пароль.
+            </div>
+        </div>
+
+        <div id="errorContainer" class="error-message" style="display: none;"></div>
+        <div id="successContainer" class="success-message" style="display: none;"></div>
+
+        <button type="submit" class="auth-button" id="submitBtn">
+            <span style="font-size: 1.2rem;">🚀</span>
+            Создать аккаунт
+        </button>
+    </form>
+
+    <div class="auth-links">
+        <a href="{{ url_for('login') }}" class="auth-link">
+            <span style="font-size: 1.1rem;">🔐</span>
+            Уже есть аккаунт? Войти
+        </a>
+        <br>
+        <a href="{{ url_for('index') }}" class="home-link">
+            <span style="font-size: 1.1rem;">🏠</span>
+            Вернуться на главную
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorContainer = document.getElementById('errorContainer');
+        const successContainer = document.getElementById('successContainer');
+        const inputs = form.querySelectorAll('.form-input');
+
+        // Фокус на первом поле
+        inputs[0]?.focus();
+
+        // Валидация при вводе
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('has-error');
+                errorContainer.style.display = 'none';
+                errorContainer.textContent = '';
+            });
+        });
+
+        // Отправка формы
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Базовая валидация
+            let isValid = true;
+            const username = inputs[0].value.trim();
+            const password = inputs[1].value.trim();
+
+            if (username.length < 3 || username.length > 30) {
+                inputs[0].classList.add('has-error');
+                showError('Логин должен быть от 3 до 30 символов');
+                isValid = false;
+            }
+
+            if (password.length < 4) {
+                inputs[1].classList.add('has-error');
+                showError('Пароль должен быть не менее 4 символов');
+                isValid = false;
+            }
+
+            if (!username || !password) {
+                showError('Заполните все поля');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Блокируем кнопку
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span style="font-size: 1.2rem;">⏳</span> Регистрация...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                // Пытаемся получить JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Успешная регистрация - редирект
+                        window.location.href = data.redirect || '{{ url_for("index") }}';
+                    } else {
+                        // Ошибка регистрации
+                        showError(data.message || 'Ошибка регистрации');
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    // Если ответ не JSON, вероятно это редирект
+                    window.location.href = '{{ url_for("index") }}';
+                }
+            } catch (error) {
+                // Ошибка сети
+                showError('Ошибка соединения с сервером');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorContainer.innerHTML = `
+                <span style="font-size: 1.1rem;">⚠️</span>
+                ${message}
+            `;
+            errorContainer.style.display = 'flex';
+            successContainer.style.display = 'none';
+
+            // Автоскрытие через 5 секунд
+            setTimeout(() => {
+                errorContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            successContainer.innerHTML = `
+                <span style="font-size: 1.1rem;">✅</span>
+                ${message}
+            `;
+            successContainer.style.display = 'flex';
+            errorContainer.style.display = 'none';
+        }
+
+        // Анимация иконки
+        const authIcon = document.querySelector('.auth-icon');
+        authIcon.style.opacity = '0';
+        authIcon.style.transform = 'scale(0) rotate(0deg)';
+
+        setTimeout(() => {
+            authIcon.style.transition = 'opacity 1s ease, transform 1s ease';
+            authIcon.style.opacity = '1';
+            authIcon.style.transform = 'scale(1) rotate(360deg)';
+        }, 300);
+    });
+</script>
+
 {% endblock %}
+
+{% set show_footer = False %}

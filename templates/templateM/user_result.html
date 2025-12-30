@@ -1,0 +1,655 @@
+{% extends 'base.html' %}
+{% block title %}Результат теста - {{ test.name }}{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-color: #6f42c1;
+        --primary-light: #8a63d2;
+        --primary-dark: #5a32a3;
+        --secondary-color: #20c997;
+        --accent-color: #ff6b6b;
+        --warning-color: #ffc107;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+    }
+
+    .result-details-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        min-height: 100vh;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background: var(--light-bg);
+        color: var(--text-primary);
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        margin-bottom: 30px;
+    }
+
+    .back-btn:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        transform: translateX(-8px);
+        box-shadow: var(--shadow);
+    }
+
+    .result-header {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        border-left: 6px solid var(--primary-color);
+        text-align: center;
+    }
+
+    .result-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    .test-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        display: inline-block;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 30px 25px;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        text-align: center;
+        border-top: 4px solid var(--secondary-color);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        display: block;
+        color: var(--secondary-color);
+    }
+
+    .stat-value {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .stat-description {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 10px;
+        opacity: 0.8;
+    }
+
+    .score-display {
+        margin: 30px 0;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: var(--border-radius);
+        border: 3px solid var(--primary-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .score-display::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+    }
+
+    .score-value {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: var(--primary-color);
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .score-label {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin: 50px 0 25px 0;
+        color: var(--text-primary);
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--light-bg);
+    }
+
+    .wrong-questions-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 50px;
+    }
+
+    .questions-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .questions-count {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .wrong-count-badge {
+        background: var(--accent-color);
+        color: var(--white);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        min-width: 100px;
+        text-align: center;
+    }
+
+    .question-card {
+        padding: 35px 30px;
+        border-bottom: 1px solid #e9ecef;
+        transition: var(--transition);
+    }
+
+    .question-card:hover {
+        background-color: #f8f9fa;
+    }
+
+    .question-id {
+        background: var(--primary-color);
+        color: var(--white);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-block;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 10px rgba(111, 66, 193, 0.2);
+    }
+
+    .question-text {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: var(--text-primary);
+        margin-bottom: 30px;
+        padding: 25px;
+        background: var(--light-bg);
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .answer-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .answer-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .answer-card {
+        padding: 25px;
+        border-radius: 12px;
+        border: 3px solid transparent;
+        transition: var(--transition);
+    }
+
+    .answer-card.correct {
+        border-color: #28a745;
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    }
+
+    .answer-card.correct:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+    }
+
+    .answer-card.incorrect {
+        border-color: #dc3545;
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    }
+
+    .answer-card.incorrect:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.2);
+    }
+
+    .answer-label {
+        font-weight: 800;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.1rem;
+    }
+
+    .answer-label.correct {
+        color: #155724;
+    }
+
+    .answer-label.incorrect {
+        color: #721c24;
+    }
+
+    .answer-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .comment-section {
+        background: #e7f5ff;
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid #17a2b8;
+        margin-top: 25px;
+    }
+
+    .comment-title {
+        font-weight: 700;
+        color: #0c5460;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.2rem;
+    }
+
+    .comment-text {
+        color: #0c5460;
+        line-height: 1.7;
+        font-size: 1.05rem;
+        background: var(--white);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .no-errors {
+        text-align: center;
+        padding: 80px 30px;
+        color: var(--text-secondary);
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        margin-bottom: 25px;
+        color: #28a745;
+        opacity: 0.8;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .no-errors-title {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+        font-weight: 800;
+    }
+
+    .no-errors-text {
+        max-width: 500px;
+        margin: 0 auto 30px;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .perfect-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 40px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: var(--white);
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1.3rem;
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+        margin: 40px 0;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        33% { transform: translateY(-15px) rotate(5deg); }
+        66% { transform: translateY(-8px) rotate(-5deg); }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    @media (max-width: 768px) {
+        .result-details-container {
+            padding: 20px 15px;
+        }
+
+        .result-header {
+            padding: 25px 20px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+        }
+
+        .test-name {
+            font-size: 1.4rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .score-value {
+            font-size: 3.5rem;
+        }
+
+        .question-card {
+            padding: 25px 20px;
+        }
+
+        .question-text {
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="result-details-container">
+    <!-- Кнопка возврата -->
+    <a href="{{ url_for('history_result') }}" class="back-btn">
+        <span style="font-size: 1.2rem;">←</span>
+        Назад к истории результатов
+    </a>
+
+    <!-- Заголовок -->
+    <div class="result-header fade-in-up">
+        <h1 class="result-title">Детализация результата</h1>
+        <div class="test-name">{{ test.name }}</div>
+
+        <!-- Основная статистика -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">📊</span>
+                <div class="stat-value">{{ total_count }}</div>
+                <div class="stat-label">Всего вопросов</div>
+                <div class="stat-description">в тестировании</div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <div class="stat-value">{{ correct_count }}</div>
+                <div class="stat-label">Правильных ответов</div>
+                <div class="stat-description">
+                    {{ ((correct_count / total_count * 100) if total_count > 0 else 0)|round(1) }}% точности
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">❌</span>
+                <div class="stat-value">{{ wrong_count }}</div>
+                <div class="stat-label">Ошибок</div>
+                <div class="stat-description">
+                    {{ ((wrong_count / total_count * 100) if total_count > 0 else 0)|round(1) }}% ошибок
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">⚡</span>
+                <div class="stat-value">{{ result.score }}</div>
+                <div class="stat-label">Получено опыта</div>
+                <div class="stat-description">XP за тестирование</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Раздел с ошибками -->
+    <h2 class="section-title">
+        <span style="font-size: 1.5rem;">🔍</span>
+        Детализация ответов
+        {% if wrong_count > 0 %}
+        <span class="wrong-count-badge">{{ wrong_count }} ошибок</span>
+        {% endif %}
+    </h2>
+
+    {% if wrong_questions %}
+    <div class="wrong-questions-container fade-in-up">
+        <div class="questions-header">
+            <div class="questions-count">
+                <span style="font-size: 1.3rem;">📝</span>
+                Вопросы с ошибками
+            </div>
+            <div>
+                <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 5px;">Всего ошибок</div>
+                <div class="wrong-count-badge">{{ wrong_count }} / {{ total_count }}</div>
+            </div>
+        </div>
+
+        {% for question in wrong_questions %}
+        <div class="question-card">
+            <div class="question-id">Вопрос #{{ loop.index }}</div>
+
+            <div class="question-text">
+                {{ question.text }}
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-card correct">
+                    <div class="answer-label correct">
+                        <span style="font-size: 1.3rem;">✅</span>
+                        Правильный ответ
+                    </div>
+                    <div class="answer-value">
+                        {% if question.correct %}
+                            <span style="color: #28a745; font-weight: 800;">Да, это мошенники</span>
+                        {% else %}
+                            <span style="color: #28a745; font-weight: 800;">Нет, это не мошенники</span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.95rem; color: #155724; margin-top: 10px;">
+                        Этот ответ был бы засчитан как правильный
+                    </div>
+                </div>
+
+                <div class="answer-card incorrect">
+                    <div class="answer-label incorrect">
+                        <span style="font-size: 1.3rem;">❌</span>
+                        Ваш ответ
+                    </div>
+                    <div class="answer-value">
+                        {% if question.correct %}
+                            <span style="color: #dc3545; font-weight: 800;">Нет, это не мошенники</span>
+                        {% else %}
+                            <span style="color: #dc3545; font-weight: 800;">Да, это мошенники</span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.95rem; color: #721c24; margin-top: 10px;">
+                        Вы выбрали этот вариант
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-section">
+                <div class="comment-title">
+                    <span style="font-size: 1.3rem;">💡</span>
+                    Почему это важно?
+                </div>
+                <div class="comment-text">
+                    {% if question.correct %}
+                        {{ question.comment_no or 'Это сообщение содержит признаки мошенничества. Обратите внимание на стиль письма, просьбы перейти по ссылке или предоставить личные данные.' }}
+                    {% else %}
+                        {{ question.comment_yes or 'Это безопасное сообщение. Оно не содержит угроз или попыток получить ваши данные.' }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not loop.last %}
+            <div class="divider"></div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Нет ошибок - идеальный результат -->
+    <div class="no-errors fade-in-up">
+        <div class="success-icon">🎯</div>
+        <h2 class="no-errors-title">Идеальный результат!</h2>
+        <p class="no-errors-text">
+            Вы правильно ответили на все {{ total_count }} вопросов в тестировании "{{ test.name }}".
+            Отличная работа!
+        </p>
+        <div class="perfect-badge">
+            <span style="font-size: 1.5rem;">🏆</span>
+            100% точности
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация появления элементов
+        const animatedElements = document.querySelectorAll('.fade-in-up');
+        animatedElements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+
+        // Анимация карточек статистики
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8) translateY(50px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1) translateY(0)';
+            }, 400 + (index * 150));
+        });
+
+        // Эффект при наведении на кнопку
+        const backBtn = document.querySelector('.back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(-12px)';
+            });
+
+            backBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        }
+
+        // Подсветка правильных/неправильных ответов
+        const answerCards = document.querySelectorAll('.answer-card');
+        answerCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (this.classList.contains('correct')) {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                } else if (this.classList.contains('incorrect')) {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                }
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% set show_footer = False %}

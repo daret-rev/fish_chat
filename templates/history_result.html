@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Тестирования{% endblock %}
+{% block title %}История результатов тестирования{% endblock %}
 
 {% block content %}
 <style>
@@ -21,7 +21,7 @@
         --transition: all 0.3s ease;
     }
 
-    .testing-container {
+    .history-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 40px 20px;
@@ -37,7 +37,7 @@
         background: var(--white);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
-        border-left: 4px solid var(--primary-color);
+        border-left: 4px solid var(--secondary-color);
     }
 
     .user-info {
@@ -49,7 +49,7 @@
     .user-avatar {
         width: 50px;
         height: 50px;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -57,7 +57,7 @@
         color: var(--white);
         font-weight: 600;
         font-size: 1.2rem;
-        box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
     }
 
     .user-name {
@@ -87,7 +87,7 @@
     }
 
     .back-button:hover {
-        background: var(--primary-color);
+        background: var(--secondary-color);
         color: var(--white);
         transform: translateX(-5px);
         box-shadow: var(--shadow);
@@ -99,7 +99,7 @@
         padding: 40px;
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: var(--border-radius);
-        border: 2px solid var(--primary-color);
+        border: 2px solid var(--secondary-color);
     }
 
     .header-title {
@@ -108,7 +108,7 @@
         color: var(--text-primary);
         margin-bottom: 20px;
         line-height: 1.2;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -129,7 +129,7 @@
         flex-wrap: wrap;
     }
 
-    .memo-button {
+    .testing-button {
         display: inline-flex;
         align-items: center;
         gap: 10px;
@@ -146,12 +146,12 @@
         box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
     }
 
-    .memo-button:hover {
+    .testing-button:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
     }
 
-    .history-button {
+    .memo-button {
         display: inline-flex;
         align-items: center;
         gap: 10px;
@@ -167,11 +167,46 @@
         text-decoration: none;
     }
 
-    .history-button:hover {
+    .memo-button:hover {
         background: var(--primary-color);
         color: var(--white);
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3);
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        border-top: 4px solid var(--secondary-color);
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
     }
 
     .filters-container {
@@ -209,8 +244,8 @@
     }
 
     .filter-input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
         outline: none;
     }
 
@@ -233,13 +268,13 @@
     }
 
     .search-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
         color: var(--white);
     }
 
     .search-btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(111, 66, 193, 0.3);
+        box-shadow: 0 6px 20px rgba(32, 201, 151, 0.3);
     }
 
     .reset-btn {
@@ -252,7 +287,7 @@
         transform: translateY(-3px);
     }
 
-    .testing-table-container {
+    .results-table-container {
         background: var(--white);
         border-radius: var(--border-radius);
         overflow: hidden;
@@ -265,14 +300,14 @@
         overflow-y: auto;
     }
 
-    .testing-table {
+    .results-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
     }
 
-    .testing-table th {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    .results-table th {
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
         color: var(--white);
         font-weight: 600;
         padding: 20px;
@@ -282,37 +317,37 @@
         z-index: 10;
     }
 
-    .testing-table th:first-child {
+    .results-table th:first-child {
         border-radius: var(--border-radius) 0 0 0;
     }
 
-    .testing-table th:last-child {
+    .results-table th:last-child {
         border-radius: 0 var(--border-radius) 0 0;
     }
 
-    .testing-table td {
+    .results-table td {
         padding: 20px;
         border-bottom: 1px solid #e9ecef;
         vertical-align: middle;
         word-break: break-word;
     }
 
-    .testing-table tbody tr {
+    .results-table tbody tr {
         transition: var(--transition);
     }
 
-    .testing-table tbody tr:hover {
+    .results-table tbody tr:hover {
         background-color: #f8f9fa;
         transform: translateY(-2px);
     }
 
-    .testing-id {
+    .result-id {
         font-weight: 700;
-        color: var(--primary-color);
+        color: var(--secondary-color);
         font-size: 1.1rem;
     }
 
-    .testing-name {
+    .testing-info {
         font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 5px;
@@ -323,27 +358,44 @@
         color: var(--text-secondary);
     }
 
-    .status-badge {
+    .score-badge {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 16px;
+        padding: 10px 18px;
         border-radius: 20px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 1rem;
+        min-width: 100px;
+        justify-content: center;
     }
 
-    .status-active {
+    .score-positive {
         background: #d4edda;
         color: #155724;
     }
 
-    .start-button {
+    .score-negative {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .score-neutral {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .date-info {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .details-button {
         display: inline-flex;
         align-items: center;
         gap: 10px;
         padding: 10px 20px;
-        background: linear-gradient(135deg, #28a745, #20c997);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         color: var(--white);
         border: none;
         border-radius: 8px;
@@ -356,40 +408,40 @@
         justify-content: center;
     }
 
-    .start-button:hover {
+    .details-button:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 6px 20px rgba(111, 66, 193, 0.3);
     }
 
-    .no-testings {
+    .no-results {
         text-align: center;
         padding: 60px 20px;
         color: var(--text-secondary);
     }
 
-    .no-testings-icon {
+    .no-results-icon {
         font-size: 4rem;
         margin-bottom: 20px;
         color: #dee2e6;
     }
 
-    .no-testings-title {
+    .no-results-title {
         font-size: 1.5rem;
         color: var(--text-primary);
         margin-bottom: 10px;
     }
 
-    .no-testings-text {
+    .no-results-text {
         max-width: 400px;
         margin: 0 auto 25px;
     }
 
-    .create-testing-btn {
+    .take-test-btn {
         display: inline-flex;
         align-items: center;
         gap: 10px;
         padding: 14px 30px;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, var(--secondary-color), #1aa179);
         color: var(--white);
         border: none;
         border-radius: 50px;
@@ -398,44 +450,21 @@
         cursor: pointer;
         transition: var(--transition);
         text-decoration: none;
-        box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+        box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
     }
 
-    .create-testing-btn:hover {
+    .take-test-btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
+        box-shadow: 0 8px 25px rgba(32, 201, 151, 0.4);
     }
 
-    .stats-container {
-        display: flex;
-        justify-content: space-between;
-        background: var(--white);
-        border-radius: var(--border-radius);
-        padding: 25px 30px;
-        margin-bottom: 30px;
-        box-shadow: var(--shadow);
-        border: 1px solid #e9ecef;
-    }
-
-    .stat-item {
-        text-align: center;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--primary-color);
-        margin-bottom: 5px;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        font-weight: 500;
+    .accuracy-cell {
+        font-weight: 600;
+        font-size: 1.1rem;
     }
 
     @media (max-width: 768px) {
-        .testing-container {
+        .history-container {
             padding: 20px 15px;
         }
 
@@ -463,16 +492,15 @@
         }
 
         .stats-container {
-            flex-direction: column;
-            gap: 20px;
+            grid-template-columns: 1fr;
         }
 
-        .testing-table {
+        .results-table {
             font-size: 0.9rem;
         }
 
-        .testing-table th,
-        .testing-table td {
+        .results-table th,
+        .results-table td {
             padding: 15px 10px;
         }
 
@@ -482,7 +510,7 @@
     }
 </style>
 
-<div class="testing-container">
+<div class="history-container">
     <!-- Верхняя панель -->
     <div class="top-bar">
         <div class="user-info">
@@ -501,127 +529,193 @@
         </a>
     </div>
 
-    <!-- Заголовок и статистика -->
+    <!-- Заголовок -->
     <div class="header-section">
-        <h1 class="header-title">Доступные тестирования</h1>
+        <h1 class="header-title">История результатов</h1>
         <p class="header-subtitle">
-            Проверьте свои знания в условиях, приближенных к реальным.
-            Каждый тест помогает улучшить навыки распознавания мошенничества.
+            Здесь вы можете просмотреть все пройденные тестирования, 
+            ваш опыт и детализацию ответов для каждого теста.
         </p>
 
         <div class="action-buttons">
+            <a href="{{ url_for('test_room_preview') }}" class="testing-button">
+                <span style="font-size: 1.2rem;">📋</span>
+                К списку тестирований
+            </a>
             <a href="{{ url_for('test_room_memo') }}" class="memo-button">
                 <span style="font-size: 1.2rem;">📚</span>
-                Ознакомиться с памяткой
-            </a>
-            <a href="{{ url_for('results_history') if 'results_history' in url_map|map(attribute='endpoint') else url_for('history_result') }}"
-               class="history-button">
-                <span style="font-size: 1.2rem;">📊</span>
-                История результатов
+                Памятка по мошенничеству
             </a>
         </div>
     </div>
 
     <!-- Статистика -->
     <div class="stats-container">
-        <div class="stat-item">
-            <div class="stat-value">{{ testings|length }}</div>
-            <div class="stat-label">Доступных тестов</div>
+        <div class="stat-card">
+            <div class="stat-value">{{ results|length }}</div>
+            <div class="stat-label">Всего пройдено тестов</div>
         </div>
-        <div class="stat-item">
-            <div class="stat-value">{{ lessons_dict|length }}</div>
-            <div class="stat-label">Уроков в системе</div>
+        <div class="stat-card">
+            <div class="stat-value">
+                {% if results|length > 0 %}
+                    {{ (results|map(attribute='score')|sum / results|length)|round(1) }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+            <div class="stat-label">Средний опыт (XP)</div>
         </div>
-        <div class="stat-item">
-            <div class="stat-value">{{ testings|selectattr('status')|list|length }}</div>
-            <div class="stat-label">Активных тестов</div>
+        <div class="stat-card">
+            <div class="stat-value">
+                {% if results|length > 0 %}
+                    {% set total_correct = results|map(attribute='correct_answers_id')|map('length')|sum %}
+                    {% set total_questions = results|map(attribute='correct_answers_id')|map('length')|sum +
+                                            results|map(attribute='wrong_answers_id')|map('length')|sum %}
+                    {{ ((total_correct / total_questions * 100) if total_questions > 0 else 0)|round(1) }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </div>
+            <div class="stat-label">Общая точность</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">
+                {% if results|length > 0 %}
+                    {{ results|map(attribute='score')|sum }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+            <div class="stat-label">Всего XP</div>
         </div>
     </div>
 
-    {% if testings|length > 0 %}
+    {% if results|length > 0 %}
     <!-- Фильтры -->
     <div class="filters-container">
         <h3 class="filters-title">
             <span style="font-size: 1.3rem;">🔍</span>
-            Поиск тестирований
+            Поиск по истории
         </h3>
         <div class="filters-grid">
             <div>
-                <input type="text" id="scrollSearchID" class="filter-input"
-                       placeholder="ID тестирования...">
+                <input type="text" id="searchResultID" class="filter-input"
+                       placeholder="ID результата...">
             </div>
             <div>
-                <input type="text" id="scrollSearchName" class="filter-input"
+                <input type="text" id="searchTestingName" class="filter-input"
                        placeholder="Название тестирования...">
             </div>
             <div>
-                <input type="text" id="scrollSearchLesson" class="filter-input"
+                <input type="text" id="searchLessonName" class="filter-input"
                        placeholder="Название урока...">
             </div>
         </div>
         <div class="filter-actions">
-            <button type="button" class="filter-btn search-btn" onclick="searchScrollTable()">
+            <button type="button" class="filter-btn search-btn" onclick="searchResultsTable()">
                 <span style="font-size: 1rem;">🔍</span>
                 Найти
             </button>
-            <button type="button" class="filter-btn reset-btn" onclick="clearScrollSearch()">
+            <button type="button" class="filter-btn reset-btn" onclick="clearResultsSearch()">
                 <span style="font-size: 1rem;">🔄</span>
                 Сбросить
             </button>
         </div>
     </div>
 
-    <!-- Таблица тестирований -->
-    <div class="testing-table-container">
+    <!-- Таблица результатов -->
+    <div class="results-table-container">
         <div class="table-scroll">
-            <table class="testing-table">
+            <table class="results-table">
                 <thead>
                     <tr>
                         <th style="width: 10%">ID</th>
-                        <th style="width: 25%">Название тестирования</th>
-                        <th style="width: 25%">Урок</th>
-                        <th style="width: 15%">Статус</th>
-                        <th style="width: 25%">Действие</th>
+                        <th style="width: 25%">Тестирование</th>
+                        <th style="width: 15%">Результат</th>
+                        <th style="width: 15%">Опыт (XP)</th>
+                        <th style="width: 15%">Точность</th>
+                        <th style="width: 20%">Действие</th>
                     </tr>
                 </thead>
-                <tbody id="scrollTableBody">
-                    {% for t in testings %}
-                    <tr class="scroll-testing-row">
+                <tbody id="resultsTableBody">
+                    {% for result in results %}
+                    {% set testing = testings_dict.get(result.testing_id) %}
+                    {% set lesson = lessons_dict.get(result.lesson_id) %}
+                    <tr class="result-row">
                         <td>
-                            <div class="testing-id">#{{ t.id }}</div>
+                            <div class="result-id">#{{ result.id }}</div>
+                            <div class="date-info">
+                                Н/Д
+                            </div>
                         </td>
                         <td>
-                            <div class="testing-name">{{ t.name }}</div>
-                        </td>
-                        <td>
-                            {% set lesson = lessons_dict.get(t.lesson_id) %}
-                            {% if lesson %}
-                                <div class="testing-name">{{ lesson.name }}</div>
-                                <div class="lesson-info">
-                                    ID: {{ lesson.id }} • {{ lesson.questions|length }} заданий
-                                </div>
+                            {% if testing %}
+                                <div class="testing-info">{{ testing.name }}</div>
                             {% else %}
                                 <div style="color: #dc3545; font-weight: 600;">
-                                    <span style="font-size: 0.9rem;">⚠️</span> Урок удален
+                                    <span style="font-size: 0.9rem;">⚠️</span> Тестирование удалено
                                 </div>
-                                <div class="lesson-info">ID: {{ t.lesson_id }}</div>
+                            {% endif %}
+                            {% if lesson %}
+                                <div class="lesson-info">{{ lesson.name }}</div>
+                            {% else %}
+                                <div class="lesson-info">Урок удален</div>
                             {% endif %}
                         </td>
                         <td>
-                            <span class="status-badge status-active">
-                                <span style="font-size: 0.9rem;">✅</span>
-                                Активно
-                            </span>
+                            {% set correct_count = result.correct_answers_id|length if result.correct_answers_id else 0 %}
+                            {% set wrong_count = result.wrong_answers_id|length if result.wrong_answers_id else 0 %}
+                            {% set total = correct_count + wrong_count %}
+                            <div class="testing-info">
+                                {{ correct_count }} / {{ total }}
+                            </div>
+                            <div class="lesson-info">
+                                правильных ответов
+                            </div>
                         </td>
                         <td>
-                            <form method="get" action="{{ url_for('test_room', test=t.id, step=0) }}"
-                                  style="margin: 0;">
-                                <input type="hidden" name="testing_id" value="{{ t.id }}">
-                                <button type="submit" class="start-button">
-                                    <span style="font-size: 1.1rem;">🚀</span>
-                                    Приступить к тесту
-                                </button>
-                            </form>
+                            {% if result.score > 0 %}
+                                <span class="score-badge score-positive">
+                                    <span style="font-size: 0.9rem;">⬆</span>
+                                    +{{ result.score }}
+                                </span>
+                            {% elif result.score < 0 %}
+                                <span class="score-badge score-negative">
+                                    <span style="font-size: 0.9rem;">⬇</span>
+                                    {{ result.score }}
+                                </span>
+                            {% else %}
+                                <span class="score-badge score-neutral">
+                                    <span style="font-size: 0.9rem;">↔</span>
+                                    {{ result.score }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set correct_count = result.correct_answers_id|length if result.correct_answers_id else 0 %}
+                            {% set wrong_count = result.wrong_answers_id|length if result.wrong_answers_id else 0 %}
+                            {% set total = correct_count + wrong_count %}
+                            {% set accuracy = (correct_count / total * 100) if total > 0 else 0 %}
+                            <div class="accuracy-cell">
+                                {{ accuracy|round(1) }}%
+                            </div>
+                            <div class="lesson-info">
+                                {% if accuracy >= 80 %}
+                                    Отлично
+                                {% elif accuracy >= 60 %}
+                                    Хорошо
+                                {% else %}
+                                    Низкая
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Заглушка для детализации результата -->
+                            <button class="details-button"
+                                    onclick="showResultDetails('{{ result.testing_id }}', '{{ result.user_id }}')">
+                                <span style="font-size: 1.1rem;">📊</span>
+                                Детализация
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -631,42 +725,42 @@
     </div>
 
     {% else %}
-    <!-- Сообщение об отсутствии тестирований -->
-    <div class="no-testings">
-        <div class="no-testings-icon">📭</div>
-        <h3 class="no-testings-title">Нет доступных тестирований</h3>
-        <p class="no-testings-text">
-            В настоящее время для вас нет активных тестирований.
-            Обратитесь к администратору или дождитесь назначения тестов.
+    <!-- Сообщение об отсутствии результатов -->
+    <div class="no-results">
+        <div class="no-results-icon">📭</div>
+        <h3 class="no-results-title">Нет истории результатов</h3>
+        <p class="no-results-text">
+            Вы еще не проходили тестирования. Пройдите первый тест,
+            чтобы отслеживать ваши результаты и прогресс.
         </p>
-        <a href="{{ url_for('index') }}" class="create-testing-btn">
-            <span style="font-size: 1.2rem;">🏠</span>
-            Вернуться на главную
+        <a href="{{ url_for('test_room_preview') }}" class="take-test-btn">
+            <span style="font-size: 1.2rem;">🚀</span>
+            Пройти тестирование
         </a>
     </div>
     {% endif %}
 </div>
 
 <script>
-    function searchScrollTable() {
-        const searchID = document.getElementById('scrollSearchID').value.toLowerCase();
-        const searchName = document.getElementById('scrollSearchName').value.toLowerCase();
-        const searchLesson = document.getElementById('scrollSearchLesson').value.toLowerCase();
+    function searchResultsTable() {
+        const searchResultID = document.getElementById('searchResultID').value.toLowerCase();
+        const searchTestingName = document.getElementById('searchTestingName').value.toLowerCase();
+        const searchLessonName = document.getElementById('searchLessonName').value.toLowerCase();
 
-        const rows = document.querySelectorAll('.scroll-testing-row');
+        const rows = document.querySelectorAll('.result-row');
         let visibleCount = 0;
 
         rows.forEach(row => {
             const cells = row.getElementsByTagName('td');
-            if (cells.length >= 5) {
+            if (cells.length >= 6) {
                 const id = cells[0].textContent.toLowerCase().replace('#', '').trim();
-                const name = cells[1].textContent.toLowerCase();
-                const lesson = cells[2].textContent.toLowerCase();
+                const testing = cells[1].textContent.toLowerCase();
+                const lesson = cells[1].textContent.toLowerCase(); // В той же ячейке
 
                 let show = true;
-                if (searchID && !id.includes(searchID)) show = false;
-                if (searchName && !name.includes(searchName)) show = false;
-                if (searchLesson && !lesson.includes(searchLesson)) show = false;
+                if (searchResultID && !id.includes(searchResultID)) show = false;
+                if (searchTestingName && !testing.includes(searchTestingName)) show = false;
+                if (searchLessonName && !lesson.includes(searchLessonName)) show = false;
 
                 if (show) {
                     row.style.display = '';
@@ -684,15 +778,15 @@
         });
 
         // Обновляем статистику
-        document.querySelector('.stat-value').textContent = visibleCount;
+        document.querySelectorAll('.stat-value')[0].textContent = visibleCount;
     }
 
-    function clearScrollSearch() {
-        document.getElementById('scrollSearchID').value = '';
-        document.getElementById('scrollSearchName').value = '';
-        document.getElementById('scrollSearchLesson').value = '';
+    function clearResultsSearch() {
+        document.getElementById('searchResultID').value = '';
+        document.getElementById('searchTestingName').value = '';
+        document.getElementById('searchLessonName').value = '';
 
-        const rows = document.querySelectorAll('.scroll-testing-row');
+        const rows = document.querySelectorAll('.result-row');
         rows.forEach(row => {
             row.style.display = '';
             row.style.opacity = '1';
@@ -700,12 +794,17 @@
         });
 
         // Восстанавливаем статистику
-        document.querySelector('.stat-value').textContent = {{ testings|length }};
+        document.querySelectorAll('.stat-value')[0].textContent = {{ results|length }};
     }
+
+    function showResultDetails(testingId, userId) {
+        window.location.href = `/test_room_preview/history_result/user_result/${testingId}/${userId}`;
+    }
+
 
     document.addEventListener('DOMContentLoaded', function() {
         // Анимация появления строк таблицы
-        const rows = document.querySelectorAll('.scroll-testing-row');
+        const rows = document.querySelectorAll('.result-row');
         rows.forEach((row, index) => {
             row.style.opacity = '0';
             row.style.transform = 'translateY(20px)';
@@ -718,7 +817,7 @@
         });
 
         // Интерактивные эффекты для кнопок
-        const buttons = document.querySelectorAll('.start-button, .memo-button, .history-button');
+        const buttons = document.querySelectorAll('.details-button, .testing-button, .memo-button');
         buttons.forEach(button => {
             button.addEventListener('mouseenter', function() {
                 this.style.transform = 'translateY(-5px)';
@@ -730,15 +829,28 @@
         });
 
         // Автоматический поиск при вводе
-        const searchInputs = ['scrollSearchID', 'scrollSearchName', 'scrollSearchLesson'];
+        const searchInputs = ['searchResultID', 'searchTestingName', 'searchLessonName'];
         searchInputs.forEach(id => {
             const input = document.getElementById(id);
             if (input) {
-                input.addEventListener('input', searchScrollTable);
+                input.addEventListener('input', searchResultsTable);
                 input.addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') searchScrollTable();
+                    if (e.key === 'Enter') searchResultsTable();
                 });
             }
+        });
+
+        // Анимация карточек статистики
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300 + (index * 200));
         });
     });
 </script>
