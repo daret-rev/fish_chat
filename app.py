@@ -642,8 +642,8 @@ def check_privileges():
             session.get('curent_user')
         )
     ).first()
-    print("DEBUD: curent user is",curent_user)
-    print("DEBUG: curent user privileges -",curent_user.is_admin)
+    print("DEBUD: curent user-teacher is",curent_user)
+    print("DEBUG: curent user-teacher privileges -",curent_user.is_admin)
 
     if not curent_user or not curent_user.is_admin:
         return False
@@ -661,6 +661,20 @@ def check_admin():
     print("DEBUG: curent user-admin privileges -", curent_user.is_admin)
 
     if not curent_user or curent_user.role_name != 'admin':
+        return False
+    else:
+        return True
+
+def check_user_id(usr_id: int):
+    curent_user = User.query.filter(
+        User.username.ilike(
+            session.get('curent_user')
+        )
+    ).first()
+    print("DEBUD: curent user-teacher is", curent_user)
+    print("DEBUG: curent user-teacher privileges -", curent_user.is_admin)
+
+    if not curent_user or curent_user.id != usr_id:
         return False
     else:
         return True
@@ -1384,9 +1398,12 @@ def result_list():
 # ---------------------------------------------------------
 @app.route('/dashboard/result_testing')
 def result_testing():
+    if not check_privileges():
+        return redirect(url_for('ErAuth'))
+
     results_all = Result.query.get(Lesson.id).all()
-    testings_all = list(set([r.testing_id for r in results_all]))
-    lessons_all = Lesson
+    #testings_all = list(set([r.testing_id for r in results_all]))
+    #lessons_all = Lesson
     testings = {}
     for r in results_all:
         if r.testing_id not in testings:
@@ -1491,10 +1508,9 @@ def group_results(testing_id, group_id):
     group = Group.query.get_or_404(group_id)
     lesson = Lesson.query.get_or_404(test.lesson_id)
 
-    # group.users уже список, используем как есть
     group_user_ids = group.users or []
 
-    # Получаем результаты пользователей этой группы
+    # Результаты пользователей группы
     results = Result.query.filter_by(testing_id=testing_id).all()
 
     # Фильтруем результаты по пользователям группы
@@ -1668,6 +1684,9 @@ def user_result(testing_id, user_id):
     curent_user = User.query.filter(
         User.username.ilike(session.get('curent_user'))
     ).first()
+
+    if not check_user_id(user_id):
+        return redirect(url_for('ErAuth'))
 
     if curent_user.id != user_id:
         return "Доступ запрещён", 403
@@ -1930,5 +1949,5 @@ if __name__ == '__main__':
     print("Регистрация маршрутов:")
     for rule in app.url_map.iter_rules():
         print(f"{rule.methods} {rule.rule}")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=80)
 
