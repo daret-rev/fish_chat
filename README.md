@@ -21,7 +21,7 @@
 
 ```bash
 # 1. Скачайте проект
-git clone <адрес-репозитория>
+git clone https://github.com/daret-rev/fish_chat.git
 cd fish_chat
 
 # 2. Запустите (нужен установленный Docker compose)
@@ -35,7 +35,7 @@ docker-compose up -d --build
 # Скачать: https://www.python.org/downloads/
 
 # 2. Скачайте проект
-git clone <адрес-репозитория>
+git clone https://github.com/daret-rev/fish_chat.git
 cd fish_chat
 
 # 3. Установите зависимости
