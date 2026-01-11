@@ -376,6 +376,18 @@
         font-size: 1.3rem;
         box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
     }
+    .lose-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 40px;
+        background: linear-gradient(135deg, #dc3545, #ff6b6b);
+        color: var(--white);
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1.3rem;
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
 
     .divider {
         height: 2px;
@@ -492,7 +504,7 @@
     <h2 class="section-title">
         <span style="font-size: 1.5rem;">🔍</span>
         Детализация ответов
-        {% if wrong_count > 0 %}
+        {% if correct_count < total_count %}
         <span class="wrong-count-badge">{{ wrong_count }} ошибок</span>
         {% endif %}
     </h2>
@@ -575,7 +587,7 @@
         {% endfor %}
     </div>
 
-    {% else %}
+    {% elif correct_count == total_count %}
     <!-- Нет ошибок - идеальный результат -->
     <div class="no-errors fade-in-up">
         <div class="success-icon">🎯</div>
@@ -587,6 +599,19 @@
         <div class="perfect-badge">
             <span style="font-size: 1.5rem;">🏆</span>
             100% точности
+        </div>
+    </div>
+    {% else %}
+    <!-- Нет ошибок - идеальный результат -->
+    <div class="no-errors fade-in-up">
+        <div class="success-icon">💥</div>
+        <h2 class="no-errors-title">Ошибка!</h2>
+        <p class="no-errors-text">
+            Вы не отвечали на вопросы
+        </p>
+        <div class="lose-badge">
+            <span style="font-size: 1.5rem;">📉</span>
+            0% результата
         </div>
     </div>
     {% endif %}
