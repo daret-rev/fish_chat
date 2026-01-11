@@ -1695,6 +1695,7 @@ def user_result(testing_id, user_id):
     test = Testing.query.get_or_404(testing_id)
     user = User.query.get_or_404(user_id)
     result = Result.query.filter_by(testing_id=testing_id, user_id=user_id).first_or_404()
+    lesson = Lesson.query.get_or_404(test.lesson_id)
 
     groups = Group.query.filter(Group.id.in_(test.group_id)).all() if test.group_id else []
     user_groups = []
@@ -1714,9 +1715,9 @@ def user_result(testing_id, user_id):
 
     correct_count = len(result.correct_answers_id)
     wrong_count = len(result.wrong_answers_id)
-    total_count = correct_count + wrong_count
+    total_count = len(lesson.questions)
 
-    return render_template(mgn + 'user_result.html',
+    return render_template('user_result.html',
                            test=test,
                            user=user,
                            result=result,
@@ -1949,5 +1950,5 @@ if __name__ == '__main__':
     print("Регистрация маршрутов:")
     for rule in app.url_map.iter_rules():
         print(f"{rule.methods} {rule.rule}")
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
