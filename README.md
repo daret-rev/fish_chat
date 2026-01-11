@@ -99,7 +99,7 @@ cp app.db app.db.backup_$(date +%Y%m%d)
 ```bash
 docker-compose down
 git pull origin main
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ### Мониторинг и экспорт данных
