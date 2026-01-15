@@ -138,12 +138,6 @@ fish_chat/
 ├── uv.lock # Lock-файл менеджера зависимостей uv
 └── README.md # Документация
 ```
-**Основные файлы:**
-- `app.py` - главный файл приложения Flask
-- `app.db` - база данных SQLite (создаётся автоматически при первом запуске)
-- `requirements.txt` - зависимости Python
-- `docker-compose.yml` - конфигурация для запуска через Docker Compose
-- `Dockerfile` - инструкции для сборки Docker образа
 
 ---
 
