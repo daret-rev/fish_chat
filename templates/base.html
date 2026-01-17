@@ -6,6 +6,7 @@
 {% block header %}
 <title>{% block title %}Фейк‑детектор{% endblock %}</title>
 
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 
@@ -20,7 +21,6 @@
   {% endwith %}
 
   {% block content %}{% endblock %}
-  {# Footer – видим только если явно не отключено #}
   {% if show_footer|default(true) %}
   <footer><a href="{{ url_for('index') }}"><button type="button">Главная</button></a></footer>
   {% endif %}
